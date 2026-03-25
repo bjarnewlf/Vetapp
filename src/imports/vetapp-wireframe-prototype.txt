@@ -1,0 +1,100 @@
+Create a mobile app wireframe prototype for an app called VetApp.
+
+VetApp is a mobile application where pet owners can manage the health and information of their pets. The app acts as a central place to store pet profiles, vaccinations, reminders, and veterinarian contacts.
+
+Target users:
+Pet owners with one or multiple pets (especially dogs and cats).
+
+Goal of the prototype:
+Create a simple clickable MVP prototype that demonstrates the core flow of the app.
+
+Use a clean modern mobile UI, minimalistic design, card-based layout, and clear buttons. The prototype should focus on usability and clarity rather than detailed styling.
+
+Main navigation:
+Bottom navigation bar with:
+
+Dashboard
+
+Pets
+
+Reminders
+
+Settings
+
+Create the following screens:
+
+Welcome / Onboarding Screen
+Short introduction to VetApp with a button "Get Started".
+
+Login / Sign Up Screen
+Simple authentication screen with email and password fields and a "Create Account" button.
+
+Dashboard Screen
+Overview of pets and upcoming reminders.
+Show pet cards with:
+
+Pet name
+
+Pet type
+
+Next vaccination date
+Include a button "Add Pet".
+
+Add Pet Screen
+Form to add a pet with:
+
+Pet name
+
+Animal type (dog, cat, etc.)
+
+Birth date
+
+Upload photo
+Button: "Save Pet".
+
+Pet Profile Screen
+Detailed page for a pet showing:
+
+Pet photo
+
+Name
+
+Species
+
+Age
+Sections:
+
+Vaccinations
+
+Health events
+
+Veterinarian contact
+Button: "Add Vaccination".
+
+Add Vaccination Screen
+Form to record a vaccination:
+
+Vaccination name
+
+Date
+
+Next due date
+Button: "Save".
+
+Reminders Screen
+List of upcoming vaccinations and health reminders.
+
+Settings Screen
+Basic account settings and a section for upgrading to Premium.
+
+Design requirements:
+
+Mobile layout (iPhone size)
+
+Simple cards and lists
+
+Clear CTA buttons
+
+Friendly but professional look
+
+Designed as a clickable prototype flow.
