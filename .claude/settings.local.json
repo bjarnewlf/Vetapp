@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-expo-app@latest . --template blank-typescript)",
+      "Bash(npx expo:*)",
+      "Bash(EXPO_NO_DOCTOR=1 npx expo start --web --no-dev)"
+    ]
+  }
+}

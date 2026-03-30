@@ -1,0 +1,398 @@
+import React, { useState } from 'react';
+import {
+  View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { colors, typography, spacing, borderRadius } from '../theme';
+import { InputField, Button, Card } from '../components';
+import { useData } from '../context/DataContext';
+import { useSubscription, FREE_LIMITS } from '../context/SubscriptionContext';
+import { RecurrenceType } from '../types';
+
+interface AddEventScreenProps {
+  navigation: any;
+  route: any;
+}
+
+type Step = 'select-pet' | 'select-type' | 'config';
+
+const eventTypes = [
+  { id: 'vaccination', label: 'Impfung', icon: 'bandage-outline' as const, free: true },
+  { id: 'deworming', label: 'Entwurmung', icon: 'medical-outline' as const, free: false },
+  { id: 'checkup', label: 'Vorsorge', icon: 'fitness-outline' as const, free: false },
+  { id: 'custom', label: 'Eigener Typ', icon: 'add-circle-outline' as const, free: false },
+];
+
+const recurrenceOptions: RecurrenceType[] = ['Once', 'Weekly', 'Monthly', 'Yearly', 'Custom'];
+
+export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
+  const { isPro } = useSubscription();
+  const { pets, addReminder } = useData();
+  const preselectedPetId = route.params?.petId;
+
+  const [step, setStep] = useState<Step>(preselectedPetId ? 'select-type' : 'select-pet');
+  const [selectedPetId, setSelectedPetId] = useState(preselectedPetId || '');
+  const [selectedType, setSelectedType] = useState('');
+  const [title, setTitle] = useState('');
+  const [date, setDate] = useState('');
+  const [notes, setNotes] = useState('');
+  const [recurrence, setRecurrence] = useState<RecurrenceType>('Once');
+  const [showRecurrencePicker, setShowRecurrencePicker] = useState(false);
+
+  const selectedPet = pets.find(p => p.id === selectedPetId);
+
+  const handleSelectPet = (petId: string) => {
+    setSelectedPetId(petId);
+    setStep('select-type');
+  };
+
+  const handleSelectType = (typeId: string) => {
+    const type = eventTypes.find(t => t.id === typeId);
+    if (type && !type.free && !isPro) {
+      navigation.navigate('Paywall', { feature: typeId });
+      return;
+    }
+    setSelectedType(typeId);
+    const typeLabel = type?.label || typeId;
+    setTitle(typeLabel);
+    setStep('config');
+  };
+
+  const handleSave = () => {
+    if (!title.trim() || !date.trim()) {
+      Alert.alert('Fehlende Angaben', 'Bitte fülle Titel und Datum aus.');
+      return;
+    }
+    if (recurrence !== 'Once' && !isPro) {
+      navigation.navigate('Paywall', { feature: 'recurrence' });
+      return;
+    }
+    // Parse date
+    let isoDate = date;
+    const parts = date.split('.');
+    if (parts.length === 3) {
+      isoDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+    }
+
+    addReminder({
+      petId: selectedPetId || undefined,
+      title: title.trim(),
+      date: isoDate,
+      description: notes.trim() || undefined,
+      recurrence,
+    });
+    navigation.goBack();
+  };
+
+  const getStepTitle = () => {
+    switch (step) {
+      case 'select-pet': return 'Tier wählen';
+      case 'select-type': return 'Eventtyp wählen';
+      case 'config': return 'Event konfigurieren';
+    }
+  };
+
+  const handleBack = () => {
+    if (step === 'config') setStep('select-type');
+    else if (step === 'select-type' && !preselectedPetId) setStep('select-pet');
+    else navigation.goBack();
+  };
+
+  return (
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{getStepTitle()}</Text>
+      </View>
+
+      {/* Progress indicator */}
+      <View style={styles.progress}>
+        {['select-pet', 'select-type', 'config'].map((s, i) => (
+          <View
+            key={s}
+            style={[
+              styles.progressDot,
+              (step === s || ['select-pet', 'select-type', 'config'].indexOf(step) > i)
+                && styles.progressDotActive,
+            ]}
+          />
+        ))}
+      </View>
+
+      {/* Step 1: Select Pet */}
+      {step === 'select-pet' && (
+        <View style={styles.content}>
+          {pets.map((pet: any) => (
+            <TouchableOpacity
+              key={pet.id}
+              style={styles.selectCard}
+              onPress={() => handleSelectPet(pet.id)}
+              activeOpacity={0.7}
+            >
+              <View style={styles.selectIcon}>
+                <Ionicons name="paw" size={24} color={colors.primary} />
+              </View>
+              <View style={styles.selectInfo}>
+                <Text style={styles.selectName}>{pet.name}</Text>
+                <Text style={styles.selectSub}>{pet.breed}</Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={colors.textLight} />
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+
+      {/* Step 2: Select Event Type */}
+      {step === 'select-type' && (
+        <View style={styles.content}>
+          {selectedPet && (
+            <Text style={styles.forPetLabel}>Für: {selectedPet.name}</Text>
+          )}
+          {eventTypes.map(type => (
+            <TouchableOpacity
+              key={type.id}
+              style={styles.selectCard}
+              onPress={() => handleSelectType(type.id)}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.selectIcon, !type.free && !isPro && styles.lockedIcon]}>
+                <Ionicons name={type.icon} size={24} color={!type.free && !isPro ? colors.textLight : colors.primary} />
+              </View>
+              <View style={styles.selectInfo}>
+                <Text style={styles.selectName}>{type.label}</Text>
+                {!type.free && !isPro && (
+                  <View style={styles.proTag}>
+                    <Ionicons name="lock-closed" size={10} color={colors.accent} />
+                    <Text style={styles.proTagText}>Pro</Text>
+                  </View>
+                )}
+              </View>
+              <Ionicons name="chevron-forward" size={20} color={colors.textLight} />
+            </TouchableOpacity>
+          ))}
+        </View>
+      )}
+
+      {/* Step 3: Configure Event */}
+      {step === 'config' && (
+        <View style={styles.content}>
+          {selectedPet && (
+            <Card style={styles.summaryCard}>
+              <Text style={styles.summaryLabel}>{selectedPet.name} · {eventTypes.find(t => t.id === selectedType)?.label}</Text>
+            </Card>
+          )}
+
+          <InputField
+            label="Titel"
+            placeholder="z.B. Tollwut-Impfung"
+            value={title}
+            onChangeText={setTitle}
+          />
+
+          <InputField
+            label="Datum"
+            placeholder="tt.mm.jjjj"
+            value={date}
+            onChangeText={setDate}
+          />
+
+          <InputField
+            label="Notizen"
+            placeholder="Optionale Details..."
+            value={notes}
+            onChangeText={setNotes}
+            multiline
+            numberOfLines={3}
+            style={{ height: 80, textAlignVertical: 'top' }}
+          />
+
+          {/* Recurrence */}
+          <Text style={styles.label}>Wiederholung</Text>
+          <TouchableOpacity
+            style={styles.picker}
+            onPress={() => setShowRecurrencePicker(!showRecurrencePicker)}
+          >
+            <Text style={styles.pickerText}>{recurrence}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              {recurrence !== 'Once' && !isPro && (
+                <View style={styles.proTag}>
+                  <Ionicons name="lock-closed" size={10} color={colors.accent} />
+                  <Text style={styles.proTagText}>Pro</Text>
+                </View>
+              )}
+              <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
+            </View>
+          </TouchableOpacity>
+          {showRecurrencePicker && (
+            <View style={styles.pickerOptions}>
+              {recurrenceOptions.map(opt => (
+                <TouchableOpacity
+                  key={opt}
+                  style={styles.pickerOption}
+                  onPress={() => { setRecurrence(opt); setShowRecurrencePicker(false); }}
+                >
+                  <Text style={[
+                    styles.pickerOptionText,
+                    recurrence === opt && styles.pickerOptionSelected,
+                  ]}>{opt}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+
+          <Button title="Event speichern" onPress={handleSave} style={styles.saveButton} />
+        </View>
+      )}
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: 60,
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.sm,
+  },
+  backButton: {
+    marginRight: spacing.md,
+  },
+  headerTitle: {
+    ...typography.h2,
+    color: colors.text,
+  },
+  progress: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: spacing.sm,
+    paddingVertical: spacing.md,
+  },
+  progressDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: colors.borderLight,
+  },
+  progressDotActive: {
+    backgroundColor: colors.primary,
+    width: 24,
+  },
+  content: {
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.xxl,
+    gap: spacing.md,
+  },
+  forPetLabel: {
+    ...typography.bodySmall,
+    color: colors.primary,
+    fontWeight: '600',
+  },
+  selectCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  selectIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.md,
+  },
+  lockedIcon: {
+    backgroundColor: colors.borderLight,
+  },
+  selectInfo: {
+    flex: 1,
+  },
+  selectName: {
+    ...typography.h3,
+    color: colors.text,
+  },
+  selectSub: {
+    ...typography.bodySmall,
+    color: colors.textSecondary,
+  },
+  proTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    backgroundColor: colors.accentLight,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: borderRadius.full,
+    alignSelf: 'flex-start',
+    marginTop: 2,
+  },
+  proTagText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: colors.accent,
+  },
+  summaryCard: {
+    backgroundColor: colors.primaryLight,
+  },
+  summaryLabel: {
+    ...typography.label,
+    color: colors.primary,
+    textAlign: 'center',
+  },
+  label: {
+    ...typography.label,
+    color: colors.text,
+    marginBottom: 6,
+  },
+  picker: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.sm,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+  },
+  pickerText: {
+    ...typography.body,
+    color: colors.text,
+  },
+  pickerOptions: {
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.sm,
+    borderWidth: 1,
+    borderColor: colors.border,
+    overflow: 'hidden',
+  },
+  pickerOption: {
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+  },
+  pickerOptionText: {
+    ...typography.body,
+    color: colors.text,
+  },
+  pickerOptionSelected: {
+    color: colors.primary,
+    fontWeight: '600',
+  },
+  saveButton: {
+    marginTop: spacing.md,
+  },
+});
