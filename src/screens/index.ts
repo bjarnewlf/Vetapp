@@ -1,4 +1,6 @@
 export { WelcomeScreen } from './WelcomeScreen';
+export { LoginScreen } from './LoginScreen';
+export { RegisterScreen } from './RegisterScreen';
 export { HomeScreen } from './HomeScreen';
 export { MyPetsScreen } from './MyPetsScreen';
 export { AddPetScreen } from './AddPetScreen';
@@ -11,3 +13,5 @@ export { PaywallScreen } from './PaywallScreen';
 export { AddEventScreen } from './AddEventScreen';
 export { EventDetailScreen } from './EventDetailScreen';
 export { ReminderSettingsScreen } from './ReminderSettingsScreen';
+export { OnboardingScreen } from './OnboardingScreen';
+export { AddVetContactScreen } from './AddVetContactScreen';

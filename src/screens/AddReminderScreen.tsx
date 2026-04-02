@@ -62,18 +62,18 @@ export function AddReminderScreen({ navigation }: AddReminderScreenProps) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Add Reminder</Text>
+        <Text style={styles.headerTitle}>Erinnerung hinzufügen</Text>
       </View>
 
       <View style={styles.form}>
         {/* Pet Picker */}
-        <Text style={styles.label}>Pet (Optional)</Text>
+        <Text style={styles.label}>Tier (Optional)</Text>
         <TouchableOpacity
           style={styles.picker}
           onPress={() => setShowPetPicker(!showPetPicker)}
         >
           <Text style={selectedPet ? styles.pickerText : styles.pickerPlaceholder}>
-            {selectedPet ? selectedPet.name : 'General reminder'}
+            {selectedPet ? selectedPet.name : 'Allgemeine Erinnerung'}
           </Text>
           <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
         </TouchableOpacity>
@@ -83,7 +83,7 @@ export function AddReminderScreen({ navigation }: AddReminderScreenProps) {
               style={styles.pickerOption}
               onPress={() => { setPetId(''); setShowPetPicker(false); }}
             >
-              <Text style={styles.pickerOptionText}>General reminder</Text>
+              <Text style={styles.pickerOptionText}>Allgemeine Erinnerung</Text>
             </TouchableOpacity>
             {pets.map(pet => (
               <TouchableOpacity
@@ -101,22 +101,22 @@ export function AddReminderScreen({ navigation }: AddReminderScreenProps) {
         )}
 
         <InputField
-          label="Reminder Title"
-          placeholder="e.g., Vet appointment, Buy food"
+          label="Titel"
+          placeholder="z.B. Tierarzttermin, Futter kaufen"
           value={title}
           onChangeText={setTitle}
         />
 
         <InputField
-          label="Date"
+          label="Datum"
           placeholder="tt.mm.jjjj"
           value={date}
           onChangeText={setDate}
         />
 
         <InputField
-          label="Description"
-          placeholder="Add any details..."
+          label="Beschreibung"
+          placeholder="Weitere Details..."
           value={description}
           onChangeText={setDescription}
           multiline
@@ -125,7 +125,7 @@ export function AddReminderScreen({ navigation }: AddReminderScreenProps) {
         />
 
         {/* Recurrence Picker */}
-        <Text style={styles.label}>Recurrence</Text>
+        <Text style={styles.label}>Wiederholung</Text>
         <TouchableOpacity
           style={styles.picker}
           onPress={() => setShowRecurrencePicker(!showRecurrencePicker)}
@@ -150,7 +150,7 @@ export function AddReminderScreen({ navigation }: AddReminderScreenProps) {
           </View>
         )}
 
-        <Button title="Save Reminder" onPress={handleSave} style={styles.saveButton} />
+        <Button title="Erinnerung speichern" onPress={handleSave} style={styles.saveButton} />
       </View>
     </ScrollView>
   );

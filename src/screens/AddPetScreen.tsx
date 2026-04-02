@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert,
+  View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert, Image,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { InputField, Button } from '../components';
 import { AnimalType } from '../types';
@@ -10,6 +11,11 @@ import { useData } from '../context/DataContext';
 import { useSubscription, FREE_LIMITS } from '../context/SubscriptionContext';
 
 const animalTypes: AnimalType[] = ['Dog', 'Cat', 'Bird', 'Rabbit', 'Fish', 'Reptile', 'Other'];
+
+const animalTypeLabels: Record<AnimalType, string> = {
+  Dog: 'Hund', Cat: 'Katze', Bird: 'Vogel', Rabbit: 'Kaninchen',
+  Fish: 'Fisch', Reptile: 'Reptil', Other: 'Andere',
+};
 
 interface AddPetScreenProps {
   navigation: any;
@@ -23,7 +29,20 @@ export function AddPetScreen({ navigation }: AddPetScreenProps) {
   const [breed, setBreed] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [microchip, setMicrochip] = useState('');
+  const [photoUri, setPhotoUri] = useState<string | null>(null);
   const [showTypePicker, setShowTypePicker] = useState(false);
+
+  const pickImage = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
+    });
+    if (!result.canceled && result.assets[0]) {
+      setPhotoUri(result.assets[0].uri);
+    }
+  };
 
   const handleSave = () => {
     if (!name.trim()) {
@@ -56,7 +75,7 @@ export function AddPetScreen({ navigation }: AddPetScreenProps) {
       breed: breed.trim(),
       birthDate: isoDate || new Date().toISOString().split('T')[0],
       microchipCode: microchip.trim() || undefined,
-      photo: undefined,
+      photo: photoUri || undefined,
     });
 
     navigation.goBack();
@@ -68,35 +87,38 @@ export function AddPetScreen({ navigation }: AddPetScreenProps) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.title}>Add Pet</Text>
+        <Text style={styles.title}>Tier hinzufügen</Text>
       </View>
 
       <View style={styles.form}>
         {/* Photo Upload */}
-        <Text style={styles.label}>Upload Pet Photo</Text>
-        <TouchableOpacity style={styles.photoUpload}>
-          <Ionicons name="cloud-upload-outline" size={32} color={colors.textLight} />
-          <Text style={styles.photoText}>Click or drag to upload</Text>
-          <View style={styles.urlInput}>
-            <Text style={styles.urlPlaceholder}>Or paste image URL</Text>
-          </View>
+        <Text style={styles.label}>Foto</Text>
+        <TouchableOpacity style={styles.photoUpload} onPress={pickImage}>
+          {photoUri ? (
+            <Image source={{ uri: photoUri }} style={styles.photoPreview} resizeMode="cover" />
+          ) : (
+            <>
+              <Ionicons name="camera-outline" size={32} color={colors.textLight} />
+              <Text style={styles.photoText}>Tippe um ein Foto auszuwählen</Text>
+            </>
+          )}
         </TouchableOpacity>
 
         <InputField
-          label="Pet Name"
-          placeholder="e.g., Max"
+          label="Name"
+          placeholder="z.B. Max, Luna, Bello..."
           value={name}
           onChangeText={setName}
         />
 
         {/* Animal Type Picker */}
-        <Text style={styles.label}>Animal Type</Text>
+        <Text style={styles.label}>Tierart</Text>
         <TouchableOpacity
           style={styles.picker}
           onPress={() => setShowTypePicker(!showTypePicker)}
         >
           <Text style={animalType ? styles.pickerText : styles.pickerPlaceholder}>
-            {animalType || 'Select type'}
+            {animalType ? animalTypeLabels[animalType] : 'Tierart wählen'}
           </Text>
           <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
         </TouchableOpacity>
@@ -111,35 +133,35 @@ export function AddPetScreen({ navigation }: AddPetScreenProps) {
                 <Text style={[
                   styles.pickerOptionText,
                   animalType === type && styles.pickerOptionSelected,
-                ]}>{type}</Text>
+                ]}>{animalTypeLabels[type]}</Text>
               </TouchableOpacity>
             ))}
           </View>
         )}
 
         <InputField
-          label="Breed"
-          placeholder="e.g., Golden Retriever"
+          label="Rasse"
+          placeholder="z.B. Golden Retriever"
           value={breed}
           onChangeText={setBreed}
         />
 
         <InputField
-          label="Birth Date"
+          label="Geburtsdatum"
           placeholder="tt.mm.jjjj"
           value={birthDate}
           onChangeText={setBirthDate}
         />
 
         <InputField
-          label="Microchip Code"
-          placeholder="e.g., 982000123456789"
+          label="Chip-Nummer"
+          placeholder="z.B. 982000123456789"
           value={microchip}
           onChangeText={setMicrochip}
           keyboardType="numeric"
         />
 
-        <Button title="Save Pet" onPress={handleSave} style={styles.saveButton} />
+        <Button title="Tier speichern" onPress={handleSave} style={styles.saveButton} />
       </View>
     </ScrollView>
   );
@@ -161,11 +183,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing.md, backgroundColor: colors.surface,
   },
   photoText: { ...typography.bodySmall, color: colors.textSecondary, marginTop: spacing.sm },
-  urlInput: {
-    backgroundColor: colors.background, borderRadius: borderRadius.sm,
-    paddingHorizontal: 12, paddingVertical: 8, marginTop: spacing.sm,
-  },
-  urlPlaceholder: { ...typography.caption, color: colors.textLight },
+  photoPreview: { width: 120, height: 120, borderRadius: borderRadius.md },
   picker: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
     backgroundColor: colors.surface, borderRadius: borderRadius.sm,

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Button } from '../components';
@@ -14,7 +14,7 @@ function getAge(birthDate: string): string {
   const birth = new Date(birthDate);
   const now = new Date();
   const years = now.getFullYear() - birth.getFullYear();
-  return `${years} years old`;
+  return `${years} Jahre`;
 }
 
 export function MyPetsScreen({ navigation }: MyPetsScreenProps) {
@@ -26,9 +26,13 @@ export function MyPetsScreen({ navigation }: MyPetsScreenProps) {
       onPress={() => navigation.navigate('PetDetail', { petId: item.id })}
       activeOpacity={0.7}
     >
-      <View style={styles.petAvatar}>
-        <Ionicons name="paw" size={28} color={colors.primary} />
-      </View>
+      {item.photo ? (
+        <Image source={{ uri: item.photo }} style={styles.petAvatar} />
+      ) : (
+        <View style={styles.petAvatarPlaceholder}>
+          <Ionicons name="paw" size={28} color={colors.primary} />
+        </View>
+      )}
       <View style={styles.petInfo}>
         <Text style={styles.petName}>{item.name}</Text>
         <Text style={styles.petBreed}>{item.breed || item.type}</Text>
@@ -40,10 +44,10 @@ export function MyPetsScreen({ navigation }: MyPetsScreenProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>My Pets</Text>
+      <Text style={styles.title}>Meine Tiere</Text>
       <View style={styles.content}>
         <Button
-          title="+ Add Pet"
+          title="+ Tier hinzufügen"
           onPress={() => navigation.navigate('AddPet')}
           style={styles.addButton}
         />
@@ -86,6 +90,9 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
   },
   petAvatar: {
+    width: 56, height: 56, borderRadius: 28, marginRight: spacing.md,
+  },
+  petAvatarPlaceholder: {
     width: 56, height: 56, borderRadius: 28, backgroundColor: colors.primaryLight,
     alignItems: 'center', justifyContent: 'center', marginRight: spacing.md,
   },

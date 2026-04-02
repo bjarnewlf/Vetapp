@@ -37,8 +37,8 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
           <View style={styles.dateRow}>
             <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
             <Text style={styles.reminderDate}>
-              {new Date(item.date).toLocaleDateString('en-US', {
-                month: 'short', day: 'numeric', year: 'numeric',
+              {new Date(item.date).toLocaleDateString('de-DE', {
+                day: 'numeric', month: 'short', year: 'numeric',
               })}
             </Text>
           </View>
@@ -59,10 +59,10 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Reminders</Text>
+      <Text style={styles.title}>Erinnerungen</Text>
       <View style={styles.content}>
         <Button
-          title="+ Add Reminder"
+          title="+ Erinnerung hinzufügen"
           onPress={() => navigation.navigate('AddReminder')}
           style={styles.addButton}
         />

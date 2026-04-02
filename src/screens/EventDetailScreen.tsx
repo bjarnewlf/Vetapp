@@ -40,7 +40,7 @@ export function EventDetailScreen({ navigation, route }: EventDetailScreenProps)
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Event Details</Text>
+        <Text style={styles.headerTitle}>Event-Details</Text>
       </View>
 
       <Card style={styles.card}>

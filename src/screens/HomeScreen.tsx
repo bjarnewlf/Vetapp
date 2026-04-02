@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card } from '../components';
@@ -17,8 +17,8 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <Text style={styles.greeting}>Hello! 👋</Text>
-        <Text style={styles.welcomeText}>Welcome back to VetApp</Text>
+        <Text style={styles.greeting}>Hallo! 👋</Text>
+        <Text style={styles.welcomeText}>Willkommen zurück bei VetApp</Text>
       </View>
 
       <View style={styles.body}>
@@ -29,13 +29,13 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
                 <Ionicons name="notifications-outline" size={22} color={colors.warning} />
               </View>
               <View style={styles.reminderContent}>
-                <Text style={styles.reminderLabel}>Next Reminder</Text>
+                <Text style={styles.reminderLabel}>Nächste Erinnerung</Text>
                 <Text style={styles.reminderTitle}>{nextReminder.title}</Text>
                 <View style={styles.dateRow}>
                   <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
                   <Text style={styles.reminderDate}>
-                    {new Date(nextReminder.date).toLocaleDateString('en-US', {
-                      month: 'short', day: 'numeric', year: 'numeric',
+                    {new Date(nextReminder.date).toLocaleDateString('de-DE', {
+                      day: 'numeric', month: 'short', year: 'numeric',
                     })}
                   </Text>
                 </View>
@@ -45,9 +45,9 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
         )}
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>My Pets</Text>
+          <Text style={styles.sectionTitle}>Meine Tiere</Text>
           <TouchableOpacity onPress={() => navigation.navigate('AddPet')}>
-            <Text style={styles.addLink}>+ Add Pet</Text>
+            <Text style={styles.addLink}>+ Tier hinzufügen</Text>
           </TouchableOpacity>
         </View>
 
@@ -67,13 +67,17 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
                 onPress={() => navigation.navigate('PetDetail', { petId: pet.id })}
                 activeOpacity={0.8}
               >
-                <View style={styles.petImagePlaceholder}>
-                  <Ionicons
-                    name={pet.type === 'Dog' ? 'paw' : 'paw-outline'}
-                    size={40}
-                    color={colors.primary}
-                  />
-                </View>
+                {pet.photo ? (
+                  <Image source={{ uri: pet.photo }} style={styles.petImage} />
+                ) : (
+                  <View style={styles.petImagePlaceholder}>
+                    <Ionicons
+                      name={pet.type === 'Dog' ? 'paw' : 'paw-outline'}
+                      size={40}
+                      color={colors.primary}
+                    />
+                  </View>
+                )}
                 <Text style={styles.petName}>{pet.name}</Text>
                 <Text style={styles.petType}>{pet.type}</Text>
               </TouchableOpacity>
@@ -82,21 +86,21 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
         )}
 
         <Card style={styles.statsCard}>
-          <Text style={styles.statsTitle}>Quick Stats</Text>
+          <Text style={styles.statsTitle}>Übersicht</Text>
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
               <Text style={[styles.statNumber, { color: colors.primary }]}>{pets.length}</Text>
-              <Text style={styles.statLabel}>Pets</Text>
+              <Text style={styles.statLabel}>Tiere</Text>
             </View>
             <View style={styles.statItem}>
               <Text style={[styles.statNumber, { color: colors.primary }]}>{vaccinations.length}</Text>
-              <Text style={styles.statLabel}>Vaccinations</Text>
+              <Text style={styles.statLabel}>Impfungen</Text>
             </View>
             <View style={styles.statItem}>
               <Text style={[styles.statNumber, { color: colors.primary }]}>
                 {reminders.filter(r => r.status !== 'completed').length}
               </Text>
-              <Text style={styles.statLabel}>Reminders</Text>
+              <Text style={styles.statLabel}>Erinnerungen</Text>
             </View>
           </View>
         </Card>
@@ -140,6 +144,9 @@ const styles = StyleSheet.create({
     flex: 1, minWidth: 140, backgroundColor: colors.surface, borderRadius: borderRadius.lg,
     padding: spacing.md, shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
+  },
+  petImage: {
+    width: '100%', aspectRatio: 1.3, borderRadius: borderRadius.md, marginBottom: spacing.sm,
   },
   petImagePlaceholder: {
     width: '100%', aspectRatio: 1.3, backgroundColor: colors.primaryLight,

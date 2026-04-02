@@ -53,6 +53,16 @@ export interface VetContact {
   address: string;
 }
 
+export interface Document {
+  id: string;
+  petId: string;
+  name: string;
+  fileUrl: string;
+  fileType?: string;
+  fileSize?: number;
+  createdAt: string;
+}
+
 export interface UserProfile {
   id: string;
   name: string;

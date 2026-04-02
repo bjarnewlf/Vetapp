@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as DocumentPicker from 'expo-document-picker';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card } from '../components';
 import { useData } from '../context/DataContext';
@@ -16,26 +17,51 @@ type DetailTab = 'vaccinations' | 'documents' | 'vet';
 function getAge(birthDate: string): string {
   const birth = new Date(birthDate);
   const now = new Date();
-  return `${now.getFullYear() - birth.getFullYear()} years`;
+  return `${now.getFullYear() - birth.getFullYear()} Jahre`;
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('en-US', {
-    month: 'short', day: 'numeric', year: 'numeric',
+  return new Date(dateStr).toLocaleDateString('de-DE', {
+    day: 'numeric', month: 'short', year: 'numeric',
   });
 }
 
 export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
   const { petId } = route.params;
   const { isPro } = useSubscription();
-  const { pets, vaccinations: allVaccinations, treatments: allTreatments, reminders: allReminders, vetContact } = useData();
+  const { pets, vaccinations: allVaccinations, treatments: allTreatments, reminders: allReminders, documents: allDocuments, vetContact, addDocument, deleteDocument } = useData();
   const [activeTab, setActiveTab] = useState<DetailTab>('vaccinations');
 
   const pet = pets.find(p => p.id === petId);
   const vaccinations = allVaccinations.filter(v => v.petId === petId);
   const treatments = allTreatments.filter(t => t.petId === petId);
   const reminders = allReminders.filter(r => r.petId === petId);
+  const petDocuments = allDocuments.filter(d => d.petId === petId);
   const vet = vetContact;
+
+  const handlePickDocument = async () => {
+    const result = await DocumentPicker.getDocumentAsync({
+      type: ['application/pdf', 'image/*'],
+      copyToCacheDirectory: true,
+    });
+    if (!result.canceled && result.assets[0]) {
+      const file = result.assets[0];
+      await addDocument({
+        petId,
+        name: file.name,
+        fileUrl: file.uri,
+        fileType: file.mimeType,
+        fileSize: file.size,
+      });
+    }
+  };
+
+  const handleDeleteDocument = (docId: string, docName: string) => {
+    Alert.alert('Dokument löschen', `"${docName}" wirklich löschen?`, [
+      { text: 'Abbrechen', style: 'cancel' },
+      { text: 'Löschen', style: 'destructive', onPress: () => deleteDocument(docId) },
+    ]);
+  };
 
   if (!pet) return null;
 
@@ -65,11 +91,15 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
 
       {/* Pet Information */}
       <Card style={styles.infoCard}>
-        <Text style={styles.sectionLabel}>PET INFORMATION</Text>
+        <Text style={styles.sectionLabel}>TIER-INFORMATIONEN</Text>
         <View style={styles.petHeader}>
-          <View style={styles.avatar}>
-            <Ionicons name="paw" size={32} color={colors.primary} />
-          </View>
+          {pet.photo ? (
+            <Image source={{ uri: pet.photo }} style={styles.avatarImage} />
+          ) : (
+            <View style={styles.avatar}>
+              <Ionicons name="paw" size={32} color={colors.primary} />
+            </View>
+          )}
           <View>
             <Text style={styles.petName}>{pet.name}</Text>
             <Text style={styles.petBreed}>{pet.breed}</Text>
@@ -77,20 +107,20 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
         </View>
         <View style={styles.infoRows}>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Type</Text>
+            <Text style={styles.infoLabel}>Tierart</Text>
             <Text style={styles.infoValue}>{pet.type}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Age</Text>
+            <Text style={styles.infoLabel}>Alter</Text>
             <Text style={styles.infoValue}>{getAge(pet.birthDate)}</Text>
           </View>
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Birth Date</Text>
+            <Text style={styles.infoLabel}>Geburtsdatum</Text>
             <Text style={styles.infoValue}>{formatDate(pet.birthDate)}</Text>
           </View>
           {pet.microchipCode && (
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Microchip</Text>
+              <Text style={styles.infoLabel}>Chip-Nr.</Text>
               <Text style={styles.infoValue}>{pet.microchipCode}</Text>
             </View>
           )}
@@ -127,30 +157,30 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
           <View style={styles.healthButtons}>
             <TouchableOpacity style={styles.healthButton}>
               <Ionicons name="medical-outline" size={24} color={colors.accent} />
-              <Text style={styles.healthButtonLabel}>Treatments</Text>
-              <Text style={styles.healthButtonCount}>{treatments.length} recorded</Text>
+              <Text style={styles.healthButtonLabel}>Behandlungen</Text>
+              <Text style={styles.healthButtonCount}>{treatments.length} erfasst</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.healthButton, styles.healthButtonActive]}
               onPress={() => navigation.navigate('AddEvent', { petId: pet.id })}
             >
               <Ionicons name="bandage-outline" size={24} color={colors.primary} />
-              <Text style={styles.healthButtonLabel}>Add Vaccination</Text>
+              <Text style={styles.healthButtonLabel}>Impfung hinzufügen</Text>
             </TouchableOpacity>
           </View>
 
           {/* Recent Treatments */}
           <View style={styles.subSectionHeader}>
-            <Text style={styles.subSectionTitle}>Recent Treatments</Text>
-            <TouchableOpacity><Text style={styles.viewAll}>View All</Text></TouchableOpacity>
+            <Text style={styles.subSectionTitle}>Letzte Behandlungen</Text>
+            <TouchableOpacity><Text style={styles.viewAll}>Alle anzeigen</Text></TouchableOpacity>
           </View>
           {treatments.length === 0 && (
-            <Text style={styles.emptyText}>No treatments recorded yet</Text>
+            <Text style={styles.emptyText}>Noch keine Behandlungen erfasst</Text>
           )}
 
           {/* Vaccinations */}
           <View style={styles.subSectionHeader}>
-            <Text style={styles.subSectionTitle}>Vaccinations</Text>
+            <Text style={styles.subSectionTitle}>Impfungen</Text>
             <TouchableOpacity onPress={() => navigation.navigate('AddEvent', { petId: pet.id })}>
               <Ionicons name="add" size={22} color={colors.text} />
             </TouchableOpacity>
@@ -160,13 +190,13 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
               <Text style={styles.vaccinationName}>{vax.name}</Text>
               <View style={styles.vaccinationRow}>
                 <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
-                <Text style={styles.vaccinationDate}>Given: {formatDate(vax.givenDate)}</Text>
+                <Text style={styles.vaccinationDate}>Verabreicht: {formatDate(vax.givenDate)}</Text>
               </View>
               {vax.nextDate && (
                 <View style={styles.vaccinationRow}>
                   <Ionicons name="calendar" size={14} color={colors.primary} />
                   <Text style={[styles.vaccinationDate, { color: colors.primary }]}>
-                    Next: {formatDate(vax.nextDate)}
+                    Nächste: {formatDate(vax.nextDate)}
                   </Text>
                 </View>
               )}
@@ -179,7 +209,7 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
             </View>
           ))}
           {vaccinations.length === 0 && (
-            <Text style={styles.emptyText}>No vaccinations recorded yet</Text>
+            <Text style={styles.emptyText}>Noch keine Impfungen erfasst</Text>
           )}
 
           {/* Reminders */}
@@ -192,9 +222,9 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
             </View>
             {reminders.length === 0 ? (
               <View style={styles.emptyReminders}>
-                <Text style={styles.emptyText}>No upcoming reminders</Text>
+                <Text style={styles.emptyText}>Keine anstehenden Erinnerungen</Text>
                 <TouchableOpacity onPress={() => navigation.navigate('AddReminder')}>
-                  <Text style={styles.addReminderLink}>Add a reminder</Text>
+                  <Text style={styles.addReminderLink}>Erinnerung hinzufügen</Text>
                 </TouchableOpacity>
               </View>
             ) : (
@@ -218,8 +248,32 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
         <View style={styles.tabContent}>
           <Card>
             <Text style={styles.sectionLabel}>DOKUMENTE</Text>
-            <Text style={styles.emptyText}>Noch keine Dokumente vorhanden.</Text>
-            <TouchableOpacity style={styles.uploadButton}>
+            {petDocuments.length === 0 ? (
+              <Text style={styles.emptyText}>Noch keine Dokumente vorhanden.</Text>
+            ) : (
+              <View style={styles.documentList}>
+                {petDocuments.map(doc => (
+                  <View key={doc.id} style={styles.documentRow}>
+                    <Ionicons
+                      name={doc.fileType?.includes('pdf') ? 'document-text-outline' : 'image-outline'}
+                      size={24}
+                      color={colors.primary}
+                    />
+                    <View style={styles.documentInfo}>
+                      <Text style={styles.documentName} numberOfLines={1}>{doc.name}</Text>
+                      <Text style={styles.documentMeta}>
+                        {doc.fileSize ? `${(doc.fileSize / 1024).toFixed(0)} KB` : ''}
+                        {doc.fileType ? ` · ${doc.fileType.split('/')[1]?.toUpperCase()}` : ''}
+                      </Text>
+                    </View>
+                    <TouchableOpacity onPress={() => handleDeleteDocument(doc.id, doc.name)}>
+                      <Ionicons name="trash-outline" size={20} color={colors.error} />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+              </View>
+            )}
+            <TouchableOpacity style={styles.uploadButton} onPress={handlePickDocument}>
               <Ionicons name="cloud-upload-outline" size={24} color={colors.primary} />
               <Text style={styles.uploadText}>Dokument hochladen</Text>
             </TouchableOpacity>
@@ -232,6 +286,10 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
         <View style={styles.tabContent}>
           <Card>
             <Text style={styles.sectionLabel}>ZUGEWIESENER TIERARZT</Text>
+            {!vet ? (
+              <Text style={styles.emptyText}>Noch kein Tierarzt gespeichert</Text>
+            ) : (
+              <>
             <Text style={styles.vetName}>{vet.name}</Text>
             <Text style={styles.vetClinic}>{vet.clinic}</Text>
             <View style={styles.vetInfoRow}>
@@ -246,6 +304,8 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
               <Ionicons name="location-outline" size={16} color={colors.primary} />
               <Text style={styles.vetInfoText}>{vet.address}</Text>
             </View>
+              </>
+            )}
           </Card>
         </View>
       )}
@@ -266,6 +326,9 @@ const styles = StyleSheet.create({
   infoCard: { marginHorizontal: spacing.md, marginBottom: spacing.md },
   sectionLabel: { ...typography.sectionHeader, color: colors.textSecondary, marginBottom: spacing.md },
   petHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.md },
+  avatarImage: {
+    width: 64, height: 64, borderRadius: 32, marginRight: spacing.md,
+  },
   avatar: {
     width: 64, height: 64, borderRadius: 32,
     backgroundColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center',
@@ -324,6 +387,15 @@ const styles = StyleSheet.create({
   reminderDate: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
 
   // Documents Tab
+  documentList: { gap: spacing.sm, marginBottom: spacing.sm },
+  documentRow: {
+    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
+    paddingVertical: spacing.sm,
+    borderBottomWidth: 1, borderBottomColor: colors.borderLight,
+  },
+  documentInfo: { flex: 1 },
+  documentName: { ...typography.body, color: colors.text },
+  documentMeta: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
   uploadButton: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: spacing.sm, marginTop: spacing.md, paddingVertical: spacing.md,

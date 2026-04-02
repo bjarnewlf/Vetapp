@@ -48,3 +48,6 @@ yarn-error.*
 
 # Claude backup
 docs/.claude-backup/
+
+# Credentials
+Login.txt

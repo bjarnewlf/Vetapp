@@ -3,27 +3,34 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card, Button } from '../components';
-import { mockUser } from '../data/mockData';
+import { useAuth } from '../context/AuthContext';
+import { useSubscription } from '../context/SubscriptionContext';
 
 export function ProfileScreen() {
-  const user = mockUser;
+  const { user: authUser, signOut } = useAuth();
+  const { isPro, togglePro } = useSubscription();
+  const user = {
+    name: authUser?.user_metadata?.name || 'User',
+    email: authUser?.email || '',
+    phone: '',
+  };
 
   const premiumFeatures = [
-    { icon: 'globe-outline' as const, label: 'AI Health Assistant' },
-    { icon: 'camera-outline' as const, label: 'Symptom Photo Analysis' },
-    { icon: 'trending-up-outline' as const, label: 'Health Trends & Reports' },
-    { icon: 'notifications-outline' as const, label: 'Smart Reminder System' },
+    { icon: 'globe-outline' as const, label: 'KI-Gesundheitsassistent' },
+    { icon: 'camera-outline' as const, label: 'Symptom-Fotoanalyse' },
+    { icon: 'trending-up-outline' as const, label: 'Gesundheitstrends & Berichte' },
+    { icon: 'notifications-outline' as const, label: 'Intelligente Erinnerungen' },
   ];
 
   const settingsItems = [
-    'Notifications',
-    'Privacy & Security',
-    'Help & Support',
+    'Benachrichtigungen',
+    'Datenschutz & Sicherheit',
+    'Hilfe & Support',
   ];
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text style={styles.title}>Profile & Settings</Text>
+      <Text style={styles.title}>Profil & Einstellungen</Text>
 
       {/* User Info */}
       <Card style={styles.userCard}>
@@ -42,14 +49,30 @@ export function ProfileScreen() {
         </View>
       </Card>
 
+      {/* Dev Mode: Premium Toggle */}
+      <Card style={styles.devCard}>
+        <View style={styles.devToggleRow}>
+          <View>
+            <Text style={styles.devLabel}>Dev: Premium-Modus</Text>
+            <Text style={styles.devStatus}>{isPro ? '✓ Aktiviert' : '○ Deaktiviert'}</Text>
+          </View>
+          <TouchableOpacity
+            style={[styles.devToggleButton, isPro && styles.devToggleButtonActive]}
+            onPress={togglePro}
+          >
+            <Text style={styles.devToggleText}>{isPro ? 'Aus' : 'An'}</Text>
+          </TouchableOpacity>
+        </View>
+      </Card>
+
       {/* Premium Features */}
       <View style={styles.premiumCard}>
         <View style={styles.premiumHeader}>
           <Ionicons name="sparkles" size={20} color={colors.textOnPrimary} />
-          <Text style={styles.premiumTitle}>Premium Features</Text>
+          <Text style={styles.premiumTitle}>Premium-Funktionen</Text>
         </View>
         <Text style={styles.premiumSubtitle}>
-          Unlock AI-powered insights and advanced features
+          KI-gestützte Einblicke und erweiterte Funktionen freischalten
         </Text>
         <View style={styles.premiumFeatures}>
           {premiumFeatures.map((feature, index) => (
@@ -60,7 +83,7 @@ export function ProfileScreen() {
           ))}
         </View>
         <Button
-          title="Upgrade to Premium →"
+          title="Auf Premium upgraden →"
           onPress={() => {}}
           style={styles.upgradeButton}
         />
@@ -73,14 +96,14 @@ export function ProfileScreen() {
             <Ionicons name="sparkles" size={22} color={colors.primary} />
           </View>
           <View style={styles.aiContent}>
-            <Text style={styles.aiTitle}>AI Pet Health Assistant →</Text>
+            <Text style={styles.aiTitle}>KI-Gesundheitsassistent →</Text>
           </View>
         </View>
         <Text style={styles.aiDescription}>
-          Coming soon: Get personalized health recommendations, early warning signs, and expert advice powered by AI.
+          Kommt bald: Personalisierte Gesundheitsempfehlungen, Frühwarnzeichen und Expertenrat — powered by KI.
         </Text>
         <TouchableOpacity>
-          <Text style={styles.previewLink}>✨ Preview Premium Features →</Text>
+          <Text style={styles.previewLink}>✨ Premium-Funktionen ansehen →</Text>
         </TouchableOpacity>
       </Card>
 
@@ -98,8 +121,8 @@ export function ProfileScreen() {
             <Ionicons name="chevron-forward" size={18} color={colors.textLight} />
           </TouchableOpacity>
         ))}
-        <TouchableOpacity style={styles.settingsItem}>
-          <Text style={styles.signOutText}>Sign Out</Text>
+        <TouchableOpacity style={styles.settingsItem} onPress={signOut}>
+          <Text style={styles.signOutText}>Abmelden</Text>
         </TouchableOpacity>
       </Card>
 
@@ -122,6 +145,41 @@ const styles = StyleSheet.create({
   },
   userCard: {
     marginBottom: spacing.md,
+  },
+  devCard: {
+    marginBottom: spacing.md,
+    backgroundColor: '#f5f0e8',
+    borderLeftWidth: 3,
+    borderLeftColor: colors.accent,
+  },
+  devToggleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  devLabel: {
+    ...typography.body,
+    color: colors.text,
+    fontWeight: '600',
+  },
+  devStatus: {
+    ...typography.bodySmall,
+    color: colors.textSecondary,
+    marginTop: 4,
+  },
+  devToggleButton: {
+    backgroundColor: colors.textLight,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  devToggleButtonActive: {
+    backgroundColor: colors.primary,
+  },
+  devToggleText: {
+    ...typography.bodySmall,
+    color: colors.surface,
+    fontWeight: '600',
   },
   userRow: {
     flexDirection: 'row',
