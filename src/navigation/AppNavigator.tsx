@@ -97,7 +97,7 @@ export function AppNavigator() {
     if (session && !dataLoading && !initialDataLoaded) {
       setInitialDataLoaded(true);
     }
-  }, [session, dataLoading, initialDataLoaded]);
+  }, [session, dataLoading]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading || (session && !initialDataLoaded)) {
     return (

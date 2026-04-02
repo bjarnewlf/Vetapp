@@ -15,12 +15,13 @@ interface AddVetContactScreenProps {
 export function AddVetContactScreen({ navigation, route }: AddVetContactScreenProps) {
   const { vetContact, saveVetContact } = useData();
   const isEditing = !!vetContact && !route?.params?.forceNew;
+  const existing = isEditing ? vetContact : null;
 
-  const [name, setName] = useState(isEditing ? vetContact.name : '');
-  const [clinic, setClinic] = useState(isEditing ? vetContact.clinic : '');
-  const [phone, setPhone] = useState(isEditing ? vetContact.phone : '');
-  const [email, setEmail] = useState(isEditing ? vetContact.email : '');
-  const [address, setAddress] = useState(isEditing ? vetContact.address : '');
+  const [name, setName] = useState(existing?.name || '');
+  const [clinic, setClinic] = useState(existing?.clinic || '');
+  const [phone, setPhone] = useState(existing?.phone || '');
+  const [email, setEmail] = useState(existing?.email || '');
+  const [address, setAddress] = useState(existing?.address || '');
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {

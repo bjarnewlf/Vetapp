@@ -13,7 +13,12 @@ interface MyPetsScreenProps {
 function getAge(birthDate: string): string {
   const birth = new Date(birthDate);
   const now = new Date();
-  const years = now.getFullYear() - birth.getFullYear();
+  let years = now.getFullYear() - birth.getFullYear();
+  const monthDiff = now.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) {
+    years--;
+  }
+  if (years < 1) return 'Unter 1 Jahr';
   return `${years} Jahre`;
 }
 

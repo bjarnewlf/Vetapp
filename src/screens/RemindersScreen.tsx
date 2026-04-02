@@ -66,7 +66,7 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
           onPress={() => navigation.navigate('AddReminder')}
           style={styles.addButton}
         />
-        {reminders.length === 0 ? (
+        {activeReminders.length === 0 ? (
           <View style={styles.empty}>
             <Ionicons name="notifications-outline" size={48} color={colors.textLight} />
             <Text style={styles.emptyText}>Keine Erinnerungen</Text>
@@ -74,7 +74,7 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
           </View>
         ) : (
           <FlatList
-            data={reminders}
+            data={activeReminders}
             renderItem={renderReminder}
             keyExtractor={item => item.id}
             contentContainerStyle={styles.list}

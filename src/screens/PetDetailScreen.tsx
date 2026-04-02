@@ -17,7 +17,13 @@ type DetailTab = 'vaccinations' | 'documents' | 'vet';
 function getAge(birthDate: string): string {
   const birth = new Date(birthDate);
   const now = new Date();
-  return `${now.getFullYear() - birth.getFullYear()} Jahre`;
+  let years = now.getFullYear() - birth.getFullYear();
+  const monthDiff = now.getMonth() - birth.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) {
+    years--;
+  }
+  if (years < 1) return 'Unter 1 Jahr';
+  return `${years} Jahre`;
 }
 
 function formatDate(dateStr: string): string {
@@ -216,14 +222,14 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
           <Card style={styles.remindersSection}>
             <View style={styles.subSectionHeader}>
               <Text style={styles.sectionLabel}>REMINDERS</Text>
-              <TouchableOpacity onPress={() => navigation.navigate('AddReminder')}>
+              <TouchableOpacity onPress={() => navigation.navigate('AddReminder', { petId })}>
                 <Ionicons name="add" size={22} color={colors.text} />
               </TouchableOpacity>
             </View>
             {reminders.length === 0 ? (
               <View style={styles.emptyReminders}>
                 <Text style={styles.emptyText}>Keine anstehenden Erinnerungen</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('AddReminder')}>
+                <TouchableOpacity onPress={() => navigation.navigate('AddReminder', { petId })}>
                   <Text style={styles.addReminderLink}>Erinnerung hinzufügen</Text>
                 </TouchableOpacity>
               </View>

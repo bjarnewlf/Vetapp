@@ -7,9 +7,9 @@ interface StatusBadgeProps {
 }
 
 const statusConfig = {
-  overdue: { bg: colors.errorLight, text: colors.error, label: 'Overdue' },
-  upcoming: { bg: colors.warningLight, text: colors.warning, label: 'Upcoming' },
-  completed: { bg: colors.successLight, text: colors.success, label: 'Completed' },
+  overdue: { bg: colors.errorLight, text: colors.error, label: 'Überfällig' },
+  upcoming: { bg: colors.warningLight, text: colors.warning, label: 'Anstehend' },
+  completed: { bg: colors.successLight, text: colors.success, label: 'Erledigt' },
 };
 
 export function StatusBadge({ status }: StatusBadgeProps) {
