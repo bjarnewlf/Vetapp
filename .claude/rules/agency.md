@@ -35,7 +35,7 @@ Wenn Brian einen Auftrag an einen Spezialisten delegiert, nutzt er dieses Format
 
 **Ziel:** Was soll am Ende erreicht sein?
 
-**Kontext:** Warum machen wir das? (Audit-Finding, Feature-Request, Bug-Report, etc.)
+**Kontext:** Warum machen wir das? Referenziere die Task-ID aus tasks.md falls vorhanden (z.B. "Audit-Finding K1", "Feature M3")
 
 **Betroffene Dateien:**
 - src/screens/XY.tsx
@@ -56,7 +56,7 @@ Wenn Brian einen Auftrag an einen Spezialisten delegiert, nutzt er dieses Format
 
 ## Rückmeldung
 
-Wenn ein Spezialist fertig ist, meldet er zurück:
+Wenn ein Spezialist fertig ist, meldet er **kompakt** zurück (max 200 Wörter):
 
 ```
 ## Ergebnis: [Kurzbeschreibung]
@@ -68,6 +68,8 @@ Wenn ein Spezialist fertig ist, meldet er zurück:
 
 **Offene Punkte:**
 - Falls etwas unklar war oder nicht umgesetzt werden konnte
+
+**Nächster Schritt:** [Ein Satz — was sollte als nächstes passieren?]
 ```
 
 ## Zusammenarbeit zwischen Spezialisten
