@@ -11,22 +11,35 @@ import { AnimalType, animalTypeDisplayLabels } from '../types';
 import { useData } from '../context/DataContext';
 import { useSubscription, FREE_LIMITS } from '../context/SubscriptionContext';
 import { parseGermanDate } from '../utils/petHelpers';
+import type { Pet } from '../types';
 
 const animalTypes: AnimalType[] = ['Dog', 'Cat', 'Bird', 'Rabbit', 'Fish', 'Reptile', 'Other'];
 
-interface AddPetScreenProps {
-  navigation: any;
+function toGermanDate(isoDate: string): string {
+  if (!isoDate) return '';
+  const [year, month, day] = isoDate.split('-');
+  if (!year || !month || !day) return '';
+  return `${day}.${month}.${year}`;
 }
 
-export function AddPetScreen({ navigation }: AddPetScreenProps) {
-  const { addPet, pets } = useData();
+interface AddPetScreenProps {
+  navigation: any;
+  route: any;
+}
+
+export function AddPetScreen({ navigation, route }: AddPetScreenProps) {
+  const editPet: Pet | undefined = route?.params?.pet;
+  const isEditMode = !!editPet;
+
+  const { addPet, updatePet, pets } = useData();
   const { isPro } = useSubscription();
-  const [name, setName] = useState('');
-  const [animalType, setAnimalType] = useState<AnimalType | ''>('');
-  const [breed, setBreed] = useState('');
-  const [birthDate, setBirthDate] = useState('');
-  const [microchip, setMicrochip] = useState('');
-  const [photoUri, setPhotoUri] = useState<string | null>(null);
+  const [name, setName] = useState(editPet?.name ?? '');
+  const [animalType, setAnimalType] = useState<AnimalType | ''>(editPet?.type ?? '');
+  const [breed, setBreed] = useState(editPet?.breed ?? '');
+  const [birthDate, setBirthDate] = useState(editPet ? toGermanDate(editPet.birthDate) : '');
+  const [microchip, setMicrochip] = useState(editPet?.microchipCode ?? '');
+  const [photoUri, setPhotoUri] = useState<string | null>(editPet?.photo ?? null);
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
@@ -49,8 +62,8 @@ export function AddPetScreen({ navigation }: AddPetScreenProps) {
       return;
     }
 
-    // Free tier: max 1 pet
-    if (!isPro && pets.length >= FREE_LIMITS.maxPets) {
+    // Free tier: max 1 pet — nur beim Hinzufügen prüfen
+    if (!isEditMode && !isPro && pets.length >= FREE_LIMITS.maxPets) {
       navigation.navigate('Paywall', { feature: 'pets' });
       return;
     }
@@ -65,14 +78,25 @@ export function AddPetScreen({ navigation }: AddPetScreenProps) {
       }
     }
 
-    addPet({
-      name: name.trim(),
-      type: animalType,
-      breed: breed.trim(),
-      birthDate: isoDate ?? new Date().toISOString().split('T')[0],
-      microchipCode: microchip.trim() || undefined,
-      photo: photoUri || undefined,
-    });
+    if (isEditMode && editPet) {
+      updatePet(editPet.id, {
+        name: name.trim(),
+        type: animalType,
+        breed: breed.trim(),
+        birthDate: isoDate ?? editPet.birthDate,
+        microchipCode: microchip.trim() || undefined,
+        photo: photoUri || undefined,
+      });
+    } else {
+      addPet({
+        name: name.trim(),
+        type: animalType,
+        breed: breed.trim(),
+        birthDate: isoDate ?? new Date().toISOString().split('T')[0],
+        microchipCode: microchip.trim() || undefined,
+        photo: photoUri || undefined,
+      });
+    }
 
     navigation.goBack();
   };
@@ -83,7 +107,7 @@ export function AddPetScreen({ navigation }: AddPetScreenProps) {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
-        <Text style={styles.title}>Tier hinzufügen</Text>
+        <Text style={styles.title}>{isEditMode ? 'Tier bearbeiten' : 'Tier hinzufügen'}</Text>
       </View>
 
       <View style={styles.form}>
@@ -138,7 +162,11 @@ export function AddPetScreen({ navigation }: AddPetScreenProps) {
           keyboardType="numeric"
         />
 
-        <Button title="Tier speichern" onPress={handleSave} style={styles.saveButton} />
+        <Button
+          title={isEditMode ? 'Änderungen speichern' : 'Tier speichern'}
+          onPress={handleSave}
+          style={styles.saveButton}
+        />
       </View>
     </ScrollView>
   );

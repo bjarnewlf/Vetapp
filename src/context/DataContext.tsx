@@ -33,6 +33,7 @@ interface DataContextType {
   saveVetContact: (data: Omit<VetContact, 'id'>) => Promise<void>;
   completeReminder: (id: string) => Promise<void>;
   updateReminder: (id: string, data: Partial<Pick<Reminder, 'title' | 'date' | 'description' | 'recurrence'>>) => Promise<void>;
+  updatePet: (id: string, data: Partial<Omit<Pet, 'id' | 'createdAt'>>) => Promise<void>;
   deletePet: (id: string) => Promise<void>;
   deleteReminder: (id: string) => Promise<void>;
   deleteVaccination: (id: string) => Promise<void>;
@@ -228,6 +229,18 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     await refresh();
   };
 
+  const updatePet = async (id: string, data: Partial<Omit<Pet, 'id' | 'createdAt'>>) => {
+    const updateData: any = {};
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.type !== undefined) updateData.type = data.type;
+    if (data.breed !== undefined) updateData.breed = data.breed;
+    if (data.birthDate !== undefined) updateData.birth_date = data.birthDate;
+    if (data.photo !== undefined) updateData.photo_url = data.photo;
+    if (data.microchipCode !== undefined) updateData.microchip_code = data.microchipCode;
+    const { error } = await supabase.from('pets').update(updateData).eq('id', id);
+    if (!error) await refresh();
+  };
+
   const deletePet = async (id: string) => {
     const { error } = await supabase.from('pets').delete().eq('id', id);
     if (!error) await refresh();
@@ -341,7 +354,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     <DataContext.Provider value={{
       pets, reminders, vaccinations, treatments, documents, vetContact,
       loading, addPet, addReminder, addVaccination, addTreatment, addDocument, deleteDocument,
-      saveVetContact, completeReminder, updateReminder, deletePet, deleteReminder,
+      saveVetContact, completeReminder, updateReminder, updatePet, deletePet, deleteReminder,
       deleteVaccination, deleteTreatment, refresh,
     }}>
       {children}

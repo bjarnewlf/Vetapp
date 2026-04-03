@@ -111,6 +111,9 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{pet.name}</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('AddPet', { pet })} style={styles.editButton}>
+          <Ionicons name="create-outline" size={22} color={colors.primary} />
+        </TouchableOpacity>
       </View>
 
       {/* Pet Information */}
@@ -181,7 +184,7 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
           <View style={styles.healthButtons}>
             <TouchableOpacity
               style={styles.healthButton}
-              onPress={() => navigation.navigate('AddEvent', { petId: pet.id })}
+              onPress={() => navigation.navigate('AddEvent', { petId: pet.id, eventType: 'checkup' })}
             >
               <Ionicons name="medical-outline" size={24} color={colors.accent} />
               <Text style={styles.healthButtonLabel}>Behandlung hinzufügen</Text>
@@ -372,11 +375,12 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   header: {
-    flexDirection: 'row', alignItems: 'center',
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingTop: 60, paddingHorizontal: spacing.md, paddingBottom: spacing.md,
   },
   backButton: { marginRight: spacing.md },
-  headerTitle: { ...typography.h2, color: colors.text },
+  headerTitle: { ...typography.h2, color: colors.text, flex: 1 },
+  editButton: { marginLeft: spacing.md },
   infoCard: { marginHorizontal: spacing.md, marginBottom: spacing.md },
   sectionLabel: { ...typography.sectionHeader, color: colors.textSecondary, marginBottom: spacing.md },
   petHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.md },
