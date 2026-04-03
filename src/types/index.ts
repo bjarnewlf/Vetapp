@@ -19,6 +19,7 @@ export interface Reminder {
   description?: string;
   recurrence: RecurrenceType;
   status: ReminderStatus;
+  notificationId?: string;
   createdAt: string;
 }
 
@@ -62,6 +63,14 @@ export interface Document {
   fileSize?: number;
   createdAt: string;
 }
+
+export const recurrenceDisplayLabels: Record<RecurrenceType, string> = {
+  Once: 'Einmalig',
+  Weekly: 'Wöchentlich',
+  Monthly: 'Monatlich',
+  Yearly: 'Jährlich',
+  Custom: 'Benutzerdefiniert',
+};
 
 export interface UserProfile {
   id: string;

@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card } from '../components';
 
@@ -17,8 +18,23 @@ const overdueOptions: { id: OverdueRule; label: string; description: string }[] 
   { id: 'custom', label: 'Alle X Tage', description: 'Eigenes Intervall festlegen' },
 ];
 
+const STORAGE_KEY = 'vetapp_overdue_rule';
+
 export function ReminderSettingsScreen({ navigation }: ReminderSettingsScreenProps) {
   const [selectedRule, setSelectedRule] = useState<OverdueRule>('daily');
+
+  useEffect(() => {
+    AsyncStorage.getItem(STORAGE_KEY).then(val => {
+      if (val && ['never', 'daily', 'weekly', 'custom'].includes(val)) {
+        setSelectedRule(val as OverdueRule);
+      }
+    });
+  }, []);
+
+  const handleSelectRule = (rule: OverdueRule) => {
+    setSelectedRule(rule);
+    AsyncStorage.setItem(STORAGE_KEY, rule);
+  };
 
   return (
     <View style={styles.container}>
@@ -42,7 +58,7 @@ export function ReminderSettingsScreen({ navigation }: ReminderSettingsScreenPro
               styles.optionCard,
               selectedRule === option.id && styles.optionCardSelected,
             ]}
-            onPress={() => setSelectedRule(option.id)}
+            onPress={() => handleSelectRule(option.id)}
             activeOpacity={0.7}
           >
             <View style={styles.optionRow}>

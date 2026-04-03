@@ -1,7 +1,20 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { Pet, Reminder, Vaccination, Treatment, VetContact, Document } from '../types';
+import { Pet, Reminder, Vaccination, Treatment, VetContact, Document, RecurrenceType } from '../types';
 import { supabase } from '../lib/supabase';
 import { useAuth } from './AuthContext';
+import { scheduleReminderNotification, cancelNotification } from '../services/notifications';
+import { uploadFile, deleteFile } from '../utils/fileUpload';
+
+function calculateNextDate(currentDate: string, recurrence: RecurrenceType): string | null {
+  if (recurrence === 'Once' || recurrence === 'Custom') return null;
+  const date = new Date(currentDate);
+  switch (recurrence) {
+    case 'Weekly': date.setDate(date.getDate() + 7); break;
+    case 'Monthly': date.setMonth(date.getMonth() + 1); break;
+    case 'Yearly': date.setFullYear(date.getFullYear() + 1); break;
+  }
+  return date.toISOString().split('T')[0];
+}
 
 interface DataContextType {
   pets: Pet[];
@@ -12,14 +25,18 @@ interface DataContextType {
   vetContact: VetContact | null;
   loading: boolean;
   addPet: (pet: Omit<Pet, 'id' | 'createdAt'>) => Promise<void>;
-  addReminder: (reminder: Omit<Reminder, 'id' | 'createdAt' | 'status'>) => Promise<void>;
+  addReminder: (reminder: Omit<Reminder, 'id' | 'createdAt' | 'status' | 'notificationId'>) => Promise<void>;
   addVaccination: (vaccination: Omit<Vaccination, 'id' | 'createdAt'>) => Promise<void>;
+  addTreatment: (treatment: Omit<Treatment, 'id' | 'createdAt'>) => Promise<void>;
   addDocument: (doc: Omit<Document, 'id' | 'createdAt'>) => Promise<void>;
   deleteDocument: (id: string) => Promise<void>;
   saveVetContact: (data: Omit<VetContact, 'id'>) => Promise<void>;
   completeReminder: (id: string) => Promise<void>;
+  updateReminder: (id: string, data: Partial<Pick<Reminder, 'title' | 'date' | 'description' | 'recurrence'>>) => Promise<void>;
   deletePet: (id: string) => Promise<void>;
   deleteReminder: (id: string) => Promise<void>;
+  deleteVaccination: (id: string) => Promise<void>;
+  deleteTreatment: (id: string) => Promise<void>;
   refresh: () => Promise<void>;
 }
 
@@ -54,6 +71,7 @@ function mapReminder(row: any): Reminder {
     description: row.description,
     recurrence: row.recurrence || 'Once',
     status: row.status === 'completed' ? 'completed' : getStatus(row.date),
+    notificationId: row.notification_id || undefined,
     createdAt: row.created_at,
   };
 }
@@ -142,8 +160,14 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     if (!error) await refresh();
   };
 
-  const addReminder = async (data: Omit<Reminder, 'id' | 'createdAt' | 'status'>) => {
+  const addReminder = async (data: Omit<Reminder, 'id' | 'createdAt' | 'status' | 'notificationId'>) => {
     if (!user) return;
+    // Schedule push notification
+    const notifId = await scheduleReminderNotification({
+      id: '', petId: data.petId, title: data.title, date: data.date,
+      description: data.description, recurrence: data.recurrence,
+      status: 'upcoming', createdAt: '',
+    });
     const { error } = await supabase.from('reminders').insert({
       user_id: user.id,
       pet_id: data.petId || null,
@@ -152,6 +176,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       description: data.description || null,
       recurrence: data.recurrence,
       status: getStatus(data.date),
+      notification_id: notifId || null,
     });
     if (!error) await refresh();
   };
@@ -170,11 +195,37 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   };
 
   const completeReminder = async (id: string) => {
+    const reminder = reminders.find(r => r.id === id);
+    // Cancel existing notification
+    if (reminder?.notificationId) {
+      await cancelNotification(reminder.notificationId);
+    }
     const { error } = await supabase
       .from('reminders')
       .update({ status: 'completed' })
       .eq('id', id);
-    if (!error) await refresh();
+    if (error) return;
+
+    // Auto-create next reminder for recurring events
+    if (reminder && reminder.recurrence !== 'Once' && reminder.recurrence !== 'Custom') {
+      const nextDate = calculateNextDate(reminder.date, reminder.recurrence);
+      if (nextDate) {
+        const nextNotifId = await scheduleReminderNotification({
+          ...reminder, date: nextDate, status: 'upcoming',
+        });
+        await supabase.from('reminders').insert({
+          user_id: user!.id,
+          pet_id: reminder.petId || null,
+          title: reminder.title,
+          date: nextDate,
+          description: reminder.description || null,
+          recurrence: reminder.recurrence,
+          status: getStatus(nextDate),
+          notification_id: nextNotifId || null,
+        });
+      }
+    }
+    await refresh();
   };
 
   const deletePet = async (id: string) => {
@@ -183,24 +234,81 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteReminder = async (id: string) => {
+    const reminder = reminders.find(r => r.id === id);
+    if (reminder?.notificationId) {
+      await cancelNotification(reminder.notificationId);
+    }
     const { error } = await supabase.from('reminders').delete().eq('id', id);
+    if (!error) await refresh();
+  };
+
+  const updateReminder = async (id: string, data: Partial<Pick<Reminder, 'title' | 'date' | 'description' | 'recurrence'>>) => {
+    const updateData: any = {};
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.date !== undefined) {
+      updateData.date = data.date;
+      updateData.status = getStatus(data.date);
+    }
+    if (data.description !== undefined) updateData.description = data.description;
+    if (data.recurrence !== undefined) updateData.recurrence = data.recurrence;
+    const { error } = await supabase.from('reminders').update(updateData).eq('id', id);
+    if (!error) await refresh();
+  };
+
+  const addTreatment = async (data: Omit<Treatment, 'id' | 'createdAt'>) => {
+    if (!user) return;
+    const { error } = await supabase.from('treatments').insert({
+      user_id: user.id,
+      pet_id: data.petId,
+      name: data.name,
+      date: data.date,
+      notes: data.notes || null,
+    });
+    if (!error) await refresh();
+  };
+
+  const deleteVaccination = async (id: string) => {
+    const { error } = await supabase.from('vaccinations').delete().eq('id', id);
+    if (!error) await refresh();
+  };
+
+  const deleteTreatment = async (id: string) => {
+    const { error } = await supabase.from('treatments').delete().eq('id', id);
     if (!error) await refresh();
   };
 
   const addDocument = async (data: Omit<Document, 'id' | 'createdAt'>) => {
     if (!user) return;
-    const { error } = await supabase.from('documents').insert({
-      user_id: user.id,
-      pet_id: data.petId,
-      name: data.name,
-      file_url: data.fileUrl,
-      file_type: data.fileType || null,
-      file_size: data.fileSize || null,
-    });
-    if (!error) await refresh();
+    try {
+      // Upload file to Supabase Storage
+      const { url, path } = await uploadFile(
+        user.id, data.petId, data.fileUrl, data.name, data.fileType,
+      );
+      const { error } = await supabase.from('documents').insert({
+        user_id: user.id,
+        pet_id: data.petId,
+        name: data.name,
+        file_url: url,
+        file_type: data.fileType || null,
+        file_size: data.fileSize || null,
+      });
+      if (!error) await refresh();
+    } catch (e: any) {
+      console.error('Dokument-Upload fehlgeschlagen:', e.message);
+      throw e;
+    }
   };
 
   const deleteDocument = async (id: string) => {
+    // Find the document to get its storage path
+    const doc = documents.find(d => d.id === id);
+    if (doc?.fileUrl) {
+      // Extract storage path from signed URL
+      const match = doc.fileUrl.match(/pet-documents\/(.+?)\?/);
+      if (match?.[1]) {
+        await deleteFile(decodeURIComponent(match[1]));
+      }
+    }
     const { error } = await supabase.from('documents').delete().eq('id', id);
     if (!error) await refresh();
   };
@@ -232,8 +340,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   return (
     <DataContext.Provider value={{
       pets, reminders, vaccinations, treatments, documents, vetContact,
-      loading, addPet, addReminder, addVaccination, addDocument, deleteDocument,
-      saveVetContact, completeReminder, deletePet, deleteReminder, refresh,
+      loading, addPet, addReminder, addVaccination, addTreatment, addDocument, deleteDocument,
+      saveVetContact, completeReminder, updateReminder, deletePet, deleteReminder,
+      deleteVaccination, deleteTreatment, refresh,
     }}>
       {children}
     </DataContext.Provider>

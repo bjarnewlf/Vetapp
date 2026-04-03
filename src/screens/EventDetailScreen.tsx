@@ -1,9 +1,10 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card, Button, StatusBadge } from '../components';
 import { useData } from '../context/DataContext';
+import { recurrenceDisplayLabels } from '../types';
 
 interface EventDetailScreenProps {
   navigation: any;
@@ -18,8 +19,10 @@ function formatDate(dateStr: string): string {
 
 export function EventDetailScreen({ navigation, route }: EventDetailScreenProps) {
   const { eventId } = route.params;
-  const { reminders, pets, completeReminder } = useData();
+  const { reminders, pets, completeReminder, updateReminder } = useData();
   const event = reminders.find(r => r.id === eventId);
+  const [showReschedule, setShowReschedule] = useState(false);
+  const [newDate, setNewDate] = useState('');
 
   if (!event) return null;
 
@@ -31,7 +34,36 @@ export function EventDetailScreen({ navigation, route }: EventDetailScreenProps)
   };
 
   const handleReschedule = () => {
-    Alert.alert('Verschieben', 'Diese Funktion wird bald verfügbar sein.');
+    if (!showReschedule) {
+      setShowReschedule(true);
+      return;
+    }
+    if (!newDate.trim()) {
+      Alert.alert('Fehler', 'Bitte gib ein neues Datum ein.');
+      return;
+    }
+    let isoDate = newDate;
+    const parts = newDate.split('.');
+    if (parts.length === 3) {
+      isoDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+    }
+    updateReminder(event.id, { date: isoDate });
+    setShowReschedule(false);
+    setNewDate('');
+    Alert.alert('Verschoben', `Event wurde auf ${newDate} verschoben.`);
+  };
+
+  const handleEdit = () => {
+    navigation.navigate('AddEvent', {
+      petId: event.petId,
+      editEvent: {
+        id: event.id,
+        title: event.title,
+        date: event.date,
+        description: event.description,
+        recurrence: event.recurrence,
+      },
+    });
   };
 
   return (
@@ -62,7 +94,7 @@ export function EventDetailScreen({ navigation, route }: EventDetailScreenProps)
 
           <View style={styles.detailRow}>
             <Ionicons name="repeat-outline" size={20} color={colors.primary} />
-            <Text style={styles.detailText}>{event.recurrence}</Text>
+            <Text style={styles.detailText}>{recurrenceDisplayLabels[event.recurrence]}</Text>
           </View>
         </View>
 
@@ -74,6 +106,19 @@ export function EventDetailScreen({ navigation, route }: EventDetailScreenProps)
         )}
       </Card>
 
+      {showReschedule && (
+        <Card style={styles.rescheduleCard}>
+          <Text style={styles.rescheduleLabel}>Neues Datum (tt.mm.jjjj)</Text>
+          <TextInput
+            style={styles.rescheduleInput}
+            placeholder="z.B. 15.05.2026"
+            value={newDate}
+            onChangeText={setNewDate}
+            placeholderTextColor={colors.textLight}
+          />
+        </Card>
+      )}
+
       <View style={styles.actions}>
         <Button
           title="Als erledigt markieren"
@@ -81,8 +126,13 @@ export function EventDetailScreen({ navigation, route }: EventDetailScreenProps)
           style={styles.completeButton}
         />
         <Button
-          title="Verschieben"
+          title={showReschedule ? 'Datum bestätigen' : 'Verschieben'}
           onPress={handleReschedule}
+          variant="outline"
+        />
+        <Button
+          title="Bearbeiten"
+          onPress={handleEdit}
           variant="outline"
         />
       </View>
@@ -150,5 +200,23 @@ const styles = StyleSheet.create({
   },
   completeButton: {
     // uses default primary style
+  },
+  rescheduleCard: {
+    marginBottom: spacing.md,
+  },
+  rescheduleLabel: {
+    ...typography.label,
+    color: colors.text,
+    marginBottom: spacing.sm,
+  },
+  rescheduleInput: {
+    ...typography.body,
+    color: colors.text,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.sm,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
   },
 });

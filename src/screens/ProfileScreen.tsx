@@ -6,7 +6,7 @@ import { Card, Button } from '../components';
 import { useAuth } from '../context/AuthContext';
 import { useSubscription } from '../context/SubscriptionContext';
 
-export function ProfileScreen() {
+export function ProfileScreen({ navigation }: { navigation: any }) {
   const { user: authUser, signOut } = useAuth();
   const { isPro, togglePro } = useSubscription();
   const user = {
@@ -23,9 +23,9 @@ export function ProfileScreen() {
   ];
 
   const settingsItems = [
-    'Benachrichtigungen',
-    'Datenschutz & Sicherheit',
-    'Hilfe & Support',
+    { label: 'Benachrichtigungen', onPress: () => navigation.navigate('ReminderSettings') },
+    { label: 'Datenschutz & Sicherheit', onPress: () => {} },
+    { label: 'Hilfe & Support', onPress: () => {} },
   ];
 
   return (
@@ -84,7 +84,7 @@ export function ProfileScreen() {
         </View>
         <Button
           title="Auf Premium upgraden →"
-          onPress={() => {}}
+          onPress={() => navigation.navigate('Paywall', { feature: 'premium' })}
           style={styles.upgradeButton}
         />
       </View>
@@ -111,13 +111,14 @@ export function ProfileScreen() {
       <Card style={styles.settingsCard}>
         {settingsItems.map((item, index) => (
           <TouchableOpacity
-            key={item}
+            key={item.label}
             style={[
               styles.settingsItem,
               index < settingsItems.length - 1 && styles.settingsItemBorder,
             ]}
+            onPress={item.onPress}
           >
-            <Text style={styles.settingsItemText}>{item}</Text>
+            <Text style={styles.settingsItemText}>{item.label}</Text>
             <Ionicons name="chevron-forward" size={18} color={colors.textLight} />
           </TouchableOpacity>
         ))}

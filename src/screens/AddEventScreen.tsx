@@ -7,7 +7,7 @@ import { colors, typography, spacing, borderRadius } from '../theme';
 import { InputField, Button, Card } from '../components';
 import { useData } from '../context/DataContext';
 import { useSubscription, FREE_LIMITS } from '../context/SubscriptionContext';
-import { RecurrenceType } from '../types';
+import { RecurrenceType, recurrenceDisplayLabels } from '../types';
 
 interface AddEventScreenProps {
   navigation: any;
@@ -27,16 +27,24 @@ const recurrenceOptions: RecurrenceType[] = ['Once', 'Weekly', 'Monthly', 'Yearl
 
 export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
   const { isPro } = useSubscription();
-  const { pets, addReminder } = useData();
+  const { pets, addReminder, addVaccination, addTreatment, updateReminder } = useData();
   const preselectedPetId = route.params?.petId;
+  const editEvent = route.params?.editEvent;
+  const isEditMode = !!editEvent;
 
-  const [step, setStep] = useState<Step>(preselectedPetId ? 'select-type' : 'select-pet');
+  const [step, setStep] = useState<Step>(isEditMode ? 'config' : (preselectedPetId ? 'select-type' : 'select-pet'));
   const [selectedPetId, setSelectedPetId] = useState(preselectedPetId || '');
-  const [selectedType, setSelectedType] = useState('');
-  const [title, setTitle] = useState('');
-  const [date, setDate] = useState('');
-  const [notes, setNotes] = useState('');
-  const [recurrence, setRecurrence] = useState<RecurrenceType>('Once');
+  const [selectedType, setSelectedType] = useState(editEvent?.type || '');
+  const [title, setTitle] = useState(editEvent?.title || '');
+  const [date, setDate] = useState(() => {
+    if (editEvent?.date) {
+      const d = new Date(editEvent.date);
+      return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}.${d.getFullYear()}`;
+    }
+    return '';
+  });
+  const [notes, setNotes] = useState(editEvent?.description || '');
+  const [recurrence, setRecurrence] = useState<RecurrenceType>(editEvent?.recurrence || 'Once');
   const [showRecurrencePicker, setShowRecurrencePicker] = useState(false);
 
   const selectedPet = pets.find(p => p.id === selectedPetId);
@@ -58,7 +66,7 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
     setStep('config');
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!title.trim() || !date.trim()) {
       Alert.alert('Fehlende Angaben', 'Bitte fülle Titel und Datum aus.');
       return;
@@ -74,13 +82,77 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
       isoDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
     }
 
-    addReminder({
-      petId: selectedPetId || undefined,
-      title: title.trim(),
-      date: isoDate,
-      description: notes.trim() || undefined,
-      recurrence,
-    });
+    // Calculate next date for recurrence
+    let nextDate: string | undefined;
+    if (recurrence !== 'Once' && recurrence !== 'Custom') {
+      const d = new Date(isoDate);
+      switch (recurrence) {
+        case 'Weekly': d.setDate(d.getDate() + 7); break;
+        case 'Monthly': d.setMonth(d.getMonth() + 1); break;
+        case 'Yearly': d.setFullYear(d.getFullYear() + 1); break;
+      }
+      nextDate = d.toISOString().split('T')[0];
+    }
+
+    // Edit mode: update existing reminder
+    if (isEditMode && editEvent?.id) {
+      await updateReminder(editEvent.id, {
+        title: title.trim(),
+        date: isoDate,
+        description: notes.trim() || undefined,
+        recurrence,
+      });
+      navigation.goBack();
+      return;
+    }
+
+    if (selectedType === 'vaccination') {
+      // Save as vaccination record + create reminder for next date
+      await addVaccination({
+        petId: selectedPetId,
+        name: title.trim(),
+        givenDate: isoDate,
+        nextDate,
+        recurrenceInterval: recurrence !== 'Once' ? recurrence : undefined,
+      });
+      // Auto-create reminder for next vaccination date
+      if (nextDate) {
+        await addReminder({
+          petId: selectedPetId,
+          title: `${title.trim()} fällig`,
+          date: nextDate,
+          description: `Nächste ${title.trim()} für dein Tier`,
+          recurrence,
+        });
+      }
+    } else if (selectedType === 'deworming' || selectedType === 'checkup') {
+      // Save as treatment record
+      await addTreatment({
+        petId: selectedPetId,
+        name: title.trim(),
+        date: isoDate,
+        notes: notes.trim() || undefined,
+      });
+      // Create reminder for next occurrence if recurring
+      if (nextDate) {
+        await addReminder({
+          petId: selectedPetId,
+          title: `${title.trim()} fällig`,
+          date: nextDate,
+          description: notes.trim() || undefined,
+          recurrence,
+        });
+      }
+    } else {
+      // Custom: save as reminder
+      await addReminder({
+        petId: selectedPetId || undefined,
+        title: title.trim(),
+        date: isoDate,
+        description: notes.trim() || undefined,
+        recurrence,
+      });
+    }
     navigation.goBack();
   };
 
@@ -214,7 +286,7 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
             style={styles.picker}
             onPress={() => setShowRecurrencePicker(!showRecurrencePicker)}
           >
-            <Text style={styles.pickerText}>{recurrence}</Text>
+            <Text style={styles.pickerText}>{recurrenceDisplayLabels[recurrence]}</Text>
             <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
               {recurrence !== 'Once' && !isPro && (
                 <View style={styles.proTag}>
@@ -236,13 +308,13 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
                   <Text style={[
                     styles.pickerOptionText,
                     recurrence === opt && styles.pickerOptionSelected,
-                  ]}>{opt}</Text>
+                  ]}>{recurrenceDisplayLabels[opt]}</Text>
                 </TouchableOpacity>
               ))}
             </View>
           )}
 
-          <Button title="Event speichern" onPress={handleSave} style={styles.saveButton} />
+          <Button title={isEditMode ? 'Aktualisieren' : 'Event speichern'} onPress={handleSave} style={styles.saveButton} />
         </View>
       )}
     </ScrollView>

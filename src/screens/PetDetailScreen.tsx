@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert, Linking } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert, Linking, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import { colors, typography, spacing, borderRadius } from '../theme';
@@ -37,6 +37,7 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
   const { isPro } = useSubscription();
   const { pets, vaccinations: allVaccinations, treatments: allTreatments, reminders: allReminders, documents: allDocuments, vetContact, addDocument, deleteDocument } = useData();
   const [activeTab, setActiveTab] = useState<DetailTab>('vaccinations');
+  const [uploading, setUploading] = useState(false);
 
   const pet = pets.find(p => p.id === petId);
   const vaccinations = allVaccinations.filter(v => v.petId === petId);
@@ -52,14 +53,27 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
     });
     if (!result.canceled && result.assets[0]) {
       const file = result.assets[0];
-      await addDocument({
-        petId,
-        name: file.name,
-        fileUrl: file.uri,
-        fileType: file.mimeType,
-        fileSize: file.size,
-      });
+      setUploading(true);
+      try {
+        await addDocument({
+          petId,
+          name: file.name,
+          fileUrl: file.uri,
+          fileType: file.mimeType,
+          fileSize: file.size,
+        });
+      } catch (e: any) {
+        Alert.alert('Upload fehlgeschlagen', e.message || 'Bitte versuche es erneut.');
+      } finally {
+        setUploading(false);
+      }
     }
+  };
+
+  const handleOpenDocument = (url: string) => {
+    Linking.openURL(url).catch(() => {
+      Alert.alert('Fehler', 'Dokument konnte nicht geöffnet werden.');
+    });
   };
 
   const handleDeleteDocument = (docId: string, docName: string) => {
@@ -221,7 +235,7 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
           {/* Reminders */}
           <Card style={styles.remindersSection}>
             <View style={styles.subSectionHeader}>
-              <Text style={styles.sectionLabel}>REMINDERS</Text>
+              <Text style={styles.sectionLabel}>ERINNERUNGEN</Text>
               <TouchableOpacity onPress={() => navigation.navigate('AddReminder', { petId })}>
                 <Ionicons name="add" size={22} color={colors.text} />
               </TouchableOpacity>
@@ -259,7 +273,7 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
             ) : (
               <View style={styles.documentList}>
                 {petDocuments.map(doc => (
-                  <View key={doc.id} style={styles.documentRow}>
+                  <TouchableOpacity key={doc.id} style={styles.documentRow} onPress={() => handleOpenDocument(doc.fileUrl)}>
                     <Ionicons
                       name={doc.fileType?.includes('pdf') ? 'document-text-outline' : 'image-outline'}
                       size={24}
@@ -275,13 +289,17 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
                     <TouchableOpacity onPress={() => handleDeleteDocument(doc.id, doc.name)}>
                       <Ionicons name="trash-outline" size={20} color={colors.error} />
                     </TouchableOpacity>
-                  </View>
+                  </TouchableOpacity>
                 ))}
               </View>
             )}
-            <TouchableOpacity style={styles.uploadButton} onPress={handlePickDocument}>
-              <Ionicons name="cloud-upload-outline" size={24} color={colors.primary} />
-              <Text style={styles.uploadText}>Dokument hochladen</Text>
+            <TouchableOpacity style={styles.uploadButton} onPress={handlePickDocument} disabled={uploading}>
+              {uploading ? (
+                <ActivityIndicator color={colors.primary} />
+              ) : (
+                <Ionicons name="cloud-upload-outline" size={24} color={colors.primary} />
+              )}
+              <Text style={styles.uploadText}>{uploading ? 'Wird hochgeladen...' : 'Dokument hochladen'}</Text>
             </TouchableOpacity>
           </Card>
         </View>
