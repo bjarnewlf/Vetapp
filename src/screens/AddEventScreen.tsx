@@ -31,13 +31,27 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
   const { isPro } = useSubscription();
   const { pets, addReminder, addVaccination, addTreatment, updateReminder } = useData();
   const preselectedPetId = route.params?.petId;
+  const preselectedEventType = route.params?.eventType;
   const editEvent = route.params?.editEvent;
   const isEditMode = !!editEvent;
 
-  const [step, setStep] = useState<Step>(isEditMode ? 'config' : (preselectedPetId ? 'select-type' : 'select-pet'));
+  const initialStep = (): Step => {
+    if (isEditMode || preselectedEventType) return 'config';
+    if (preselectedPetId) return 'select-type';
+    return 'select-pet';
+  };
+
+  const [step, setStep] = useState<Step>(initialStep);
   const [selectedPetId, setSelectedPetId] = useState(preselectedPetId || '');
-  const [selectedType, setSelectedType] = useState(editEvent?.type || '');
-  const [title, setTitle] = useState(editEvent?.title || '');
+  const [selectedType, setSelectedType] = useState(editEvent?.type || preselectedEventType || '');
+  const [title, setTitle] = useState(() => {
+    if (editEvent?.title) return editEvent.title;
+    if (preselectedEventType) {
+      const type = eventTypes.find(t => t.id === preselectedEventType);
+      return type?.label || '';
+    }
+    return '';
+  });
   const [date, setDate] = useState(() => {
     if (editEvent?.date) {
       const d = new Date(editEvent.date);
@@ -166,7 +180,7 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
   };
 
   const handleBack = () => {
-    if (step === 'config') setStep('select-type');
+    if (step === 'config' && !preselectedEventType) setStep('select-type');
     else if (step === 'select-type' && !preselectedPetId) setStep('select-pet');
     else navigation.goBack();
   };
