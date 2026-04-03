@@ -67,7 +67,7 @@ serve(async (req: Request) => {
   const userToken = req.headers.get('x-user-token');
   if (!userToken) {
     return new Response(
-      JSON.stringify({ error: 'Nicht autorisiert.', debug: 'Kein x-user-token-Header vorhanden' }),
+      JSON.stringify({ error: 'Nicht autorisiert.' }),
       { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
@@ -78,10 +78,7 @@ serve(async (req: Request) => {
   // Debug: Env-Vars prüfen
   if (!supabaseUrl || !supabaseAnonKey) {
     return new Response(
-      JSON.stringify({
-        error: 'Server-Konfigurationsfehler.',
-        debug: `SUPABASE_URL: ${supabaseUrl ? 'gesetzt' : 'FEHLT'}, SUPABASE_ANON_KEY: ${supabaseAnonKey ? 'gesetzt' : 'FEHLT'}`,
-      }),
+      JSON.stringify({ error: 'Server-Konfigurationsfehler.' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
@@ -93,17 +90,7 @@ serve(async (req: Request) => {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) {
     return new Response(
-      JSON.stringify({
-        error: 'Nicht autorisiert.',
-        debug: {
-          authError: authError?.message,
-          authErrorStatus: authError?.status,
-          hasUser: !!user,
-          userTokenPresent: !!userToken,
-          userTokenPrefix: userToken.substring(0, 15) + '...',
-          supabaseUrl: supabaseUrl.substring(0, 30) + '...',
-        },
-      }),
+      JSON.stringify({ error: 'Nicht autorisiert.' }),
       { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
@@ -197,10 +184,7 @@ serve(async (req: Request) => {
     const errorBody = await anthropicResponse.text();
     console.error('[ai-chat] Anthropic API error:', anthropicResponse.status, errorBody);
     return new Response(
-      JSON.stringify({
-        error: 'KI-Dienst nicht verfügbar. Bitte versuche es später erneut.',
-        debug: { status: anthropicResponse.status, body: errorBody }
-      }),
+      JSON.stringify({ error: 'KI-Dienst nicht verfügbar. Bitte versuche es später erneut.' }),
       { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

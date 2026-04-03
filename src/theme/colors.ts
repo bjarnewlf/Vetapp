@@ -24,6 +24,7 @@ export const colors = {
   tabActive: '#E8895C',
   cardShadow: 'rgba(0, 0, 0, 0.08)',
   overlay: 'rgba(0, 0, 0, 0.5)',
+  overlayLight: 'rgba(255, 255, 255, 0.2)',
   premiumGradientStart: '#1B6B5A',
   premiumGradientEnd: '#145244',
 } as const;

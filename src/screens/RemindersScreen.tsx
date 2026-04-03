@@ -121,8 +121,8 @@ const styles = StyleSheet.create({
   reminderCard: {
     flexDirection: 'row', backgroundColor: colors.surface, borderRadius: borderRadius.lg,
     padding: spacing.md, borderLeftWidth: 4,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
+    shadowColor: colors.cardShadow, shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1, shadowRadius: 8, elevation: 2,
   },
   reminderContent: { flex: 1, gap: 6 },
   reminderTitle: { ...typography.h3, color: colors.text },

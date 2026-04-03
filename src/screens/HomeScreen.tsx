@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   overdueTitle: { ...typography.label, color: colors.error, flex: 1 },
   overdueItem: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingVertical: 6, borderTopWidth: 1, borderTopColor: '#F5C6C6',
+    paddingVertical: 6, borderTopWidth: 1, borderTopColor: colors.errorLight,
   },
   overdueItemTitle: { ...typography.bodySmall, color: colors.text, flex: 1 },
   overdueItemDate: { ...typography.caption, color: colors.error },
@@ -230,8 +230,8 @@ const styles = StyleSheet.create({
   petsGrid: { flexDirection: 'row', gap: spacing.md, marginBottom: spacing.lg, flexWrap: 'wrap' },
   petCard: {
     flex: 1, minWidth: 140, backgroundColor: colors.surface, borderRadius: borderRadius.lg,
-    padding: spacing.md, shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
+    padding: spacing.md, shadowColor: colors.cardShadow, shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1, shadowRadius: 8, elevation: 2,
   },
   petImage: {
     width: '100%', aspectRatio: 1.3, borderRadius: borderRadius.md, marginBottom: spacing.sm,
@@ -251,8 +251,8 @@ const styles = StyleSheet.create({
   statLabel: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
   aiCard: {
     backgroundColor: colors.surface, borderRadius: borderRadius.lg, padding: spacing.md,
-    marginBottom: spacing.lg, shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
+    marginBottom: spacing.lg, shadowColor: colors.cardShadow, shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1, shadowRadius: 8, elevation: 2,
   },
   aiCardRow: { flexDirection: 'row', alignItems: 'center' },
   aiCardIcon: {

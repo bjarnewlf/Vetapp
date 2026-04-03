@@ -111,7 +111,7 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
   if (!pet) return null;
 
   const tabs: { id: DetailTab; label: string; icon: keyof typeof Ionicons.glyphMap; pro?: boolean }[] = [
-    { id: 'vaccinations', label: 'Impfungen', icon: 'bandage-outline' },
+    { id: 'vaccinations', label: 'Gesundheit', icon: 'bandage-outline' },
     { id: 'documents', label: 'Dokumente', icon: 'document-outline', pro: true },
     { id: 'vet', label: 'Tierarzt', icon: 'medkit-outline' },
   ];
@@ -201,28 +201,12 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
       {/* Tab Content: Impfungen */}
       {activeTab === 'vaccinations' && (
         <View style={styles.tabContent}>
-          {/* Health Buttons */}
-          <View style={styles.healthButtons}>
-            <TouchableOpacity
-              style={styles.healthButton}
-              onPress={() => navigation.navigate('AddEvent', { petId: pet.id, eventType: 'checkup' })}
-            >
-              <Ionicons name="medical-outline" size={24} color={colors.accent} />
-              <Text style={styles.healthButtonLabel}>Behandlung hinzufügen</Text>
-              <Text style={styles.healthButtonCount}>{treatments.length} erfasst</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.healthButton, styles.healthButtonActive]}
-              onPress={() => navigation.navigate('AddEvent', { petId: pet.id })}
-            >
-              <Ionicons name="bandage-outline" size={24} color={colors.primary} />
-              <Text style={styles.healthButtonLabel}>Impfung hinzufügen</Text>
-            </TouchableOpacity>
-          </View>
-
           {/* Recent Treatments */}
           <View style={styles.subSectionHeader}>
             <Text style={styles.subSectionTitle}>Letzte Behandlungen</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('AddEvent', { petId: pet.id, eventType: 'checkup' })}>
+              <Ionicons name="add" size={22} color={colors.text} />
+            </TouchableOpacity>
           </View>
           {treatments.length === 0 && (
             <Text style={styles.emptyText}>Noch keine Behandlungen erfasst</Text>
@@ -440,20 +424,11 @@ const styles = StyleSheet.create({
 
   // Tab Content
   tabContent: { paddingHorizontal: spacing.md },
-  healthButtons: { flexDirection: 'row', gap: spacing.md, marginBottom: spacing.md },
-  healthButton: {
-    flex: 1, padding: spacing.md, borderRadius: borderRadius.md,
-    borderWidth: 1, borderColor: colors.borderLight, alignItems: 'center', gap: 4,
-  },
-  healthButtonActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
-  healthButtonLabel: { ...typography.caption, color: colors.text, fontWeight: '600' },
-  healthButtonCount: { ...typography.caption, color: colors.textSecondary },
   subSectionHeader: {
     flexDirection: 'row', justifyContent: 'space-between',
     alignItems: 'center', marginBottom: spacing.sm, marginTop: spacing.md,
   },
   subSectionTitle: { ...typography.h3, color: colors.text },
-  viewAll: { ...typography.bodySmall, color: colors.textSecondary },
   emptyText: { ...typography.bodySmall, color: colors.textLight },
   vaccinationCard: {
     backgroundColor: colors.primaryLight, borderRadius: borderRadius.md,

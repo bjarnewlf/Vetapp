@@ -80,8 +80,8 @@ const styles = StyleSheet.create({
   petRow: {
     flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surface,
     borderRadius: borderRadius.lg, padding: spacing.md,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
+    shadowColor: colors.cardShadow, shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1, shadowRadius: 8, elevation: 2,
   },
   petAvatar: {
     width: 56, height: 56, borderRadius: 28, marginRight: spacing.md,
