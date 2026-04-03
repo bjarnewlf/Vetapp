@@ -5,10 +5,12 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { colors, typography, spacing, borderRadius } from '../theme';
-import { InputField, Button } from '../components';
+import { InputField, Button, SelectField } from '../components';
+import type { SelectFieldOption } from '../components';
 import { AnimalType, animalTypeDisplayLabels } from '../types';
 import { useData } from '../context/DataContext';
 import { useSubscription, FREE_LIMITS } from '../context/SubscriptionContext';
+import { parseGermanDate } from '../utils/petHelpers';
 
 const animalTypes: AnimalType[] = ['Dog', 'Cat', 'Bird', 'Rabbit', 'Fish', 'Reptile', 'Other'];
 
@@ -25,8 +27,6 @@ export function AddPetScreen({ navigation }: AddPetScreenProps) {
   const [birthDate, setBirthDate] = useState('');
   const [microchip, setMicrochip] = useState('');
   const [photoUri, setPhotoUri] = useState<string | null>(null);
-  const [showTypePicker, setShowTypePicker] = useState(false);
-
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
@@ -56,11 +56,12 @@ export function AddPetScreen({ navigation }: AddPetScreenProps) {
     }
 
     // Parse date from tt.mm.jjjj to ISO
-    let isoDate = '';
+    let isoDate: string | null = null;
     if (birthDate.trim()) {
-      const parts = birthDate.split('.');
-      if (parts.length === 3) {
-        isoDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      isoDate = parseGermanDate(birthDate);
+      if (!isoDate) {
+        Alert.alert('Ungültiges Datum', 'Bitte gib ein gültiges Datum im Format tt.mm.jjjj ein.');
+        return;
       }
     }
 
@@ -68,7 +69,7 @@ export function AddPetScreen({ navigation }: AddPetScreenProps) {
       name: name.trim(),
       type: animalType,
       breed: breed.trim(),
-      birthDate: isoDate || new Date().toISOString().split('T')[0],
+      birthDate: isoDate ?? new Date().toISOString().split('T')[0],
       microchipCode: microchip.trim() || undefined,
       photo: photoUri || undefined,
     });
@@ -107,32 +108,13 @@ export function AddPetScreen({ navigation }: AddPetScreenProps) {
         />
 
         {/* Animal Type Picker */}
-        <Text style={styles.label}>Tierart</Text>
-        <TouchableOpacity
-          style={styles.picker}
-          onPress={() => setShowTypePicker(!showTypePicker)}
-        >
-          <Text style={animalType ? styles.pickerText : styles.pickerPlaceholder}>
-            {animalType ? animalTypeDisplayLabels[animalType] : 'Tierart wählen'}
-          </Text>
-          <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
-        </TouchableOpacity>
-        {showTypePicker && (
-          <View style={styles.pickerOptions}>
-            {animalTypes.map(type => (
-              <TouchableOpacity
-                key={type}
-                style={styles.pickerOption}
-                onPress={() => { setAnimalType(type); setShowTypePicker(false); }}
-              >
-                <Text style={[
-                  styles.pickerOptionText,
-                  animalType === type && styles.pickerOptionSelected,
-                ]}>{animalTypeDisplayLabels[type]}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
+        <SelectField
+          label="Tierart"
+          placeholder="Tierart wählen"
+          value={animalType}
+          options={animalTypes.map<SelectFieldOption>(t => ({ value: t, label: animalTypeDisplayLabels[t] }))}
+          onSelect={v => setAnimalType(v as AnimalType)}
+        />
 
         <InputField
           label="Rasse"
@@ -179,21 +161,5 @@ const styles = StyleSheet.create({
   },
   photoText: { ...typography.bodySmall, color: colors.textSecondary, marginTop: spacing.sm },
   photoPreview: { width: 120, height: 120, borderRadius: borderRadius.md },
-  picker: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    backgroundColor: colors.surface, borderRadius: borderRadius.sm,
-    borderWidth: 1, borderColor: colors.borderLight,
-    paddingHorizontal: 14, paddingVertical: 12, marginBottom: spacing.md,
-  },
-  pickerText: { ...typography.body, color: colors.text },
-  pickerPlaceholder: { ...typography.body, color: colors.textLight },
-  pickerOptions: {
-    backgroundColor: colors.surface, borderRadius: borderRadius.sm,
-    borderWidth: 1, borderColor: colors.border,
-    marginTop: -12, marginBottom: spacing.md, overflow: 'hidden',
-  },
-  pickerOption: { paddingHorizontal: 14, paddingVertical: 10 },
-  pickerOptionText: { ...typography.body, color: colors.text },
-  pickerOptionSelected: { color: colors.primary, fontWeight: '600' },
   saveButton: { marginTop: spacing.md },
 });

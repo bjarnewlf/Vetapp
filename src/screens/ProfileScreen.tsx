@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card, Button } from '../components';
@@ -40,7 +40,7 @@ export function ProfileScreen({ navigation }: { navigation: any }) {
             <Text style={styles.userEmail}>{user.email}</Text>
             <Text style={styles.userPhone}>{user.phone}</Text>
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => Alert.alert('Profil bearbeiten', 'Diese Funktion ist noch in Entwicklung.')}>
             <Ionicons name="pencil-outline" size={20} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
@@ -83,7 +83,7 @@ export function ProfileScreen({ navigation }: { navigation: any }) {
         <Text style={styles.aiDescription}>
           Kommt bald: Personalisierte Gesundheitsempfehlungen, Frühwarnzeichen und Expertenrat — powered by KI.
         </Text>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Paywall', { feature: 'premium' })}>
           <Text style={styles.previewLink}>✨ Premium-Funktionen ansehen →</Text>
         </TouchableOpacity>
       </Card>

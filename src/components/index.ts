@@ -2,3 +2,5 @@ export { Card } from './Card';
 export { Button } from './Button';
 export { StatusBadge } from './StatusBadge';
 export { InputField } from './InputField';
+export { SelectField } from './SelectField';
+export type { SelectFieldOption } from './SelectField';

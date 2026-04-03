@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card, Button, StatusBadge } from '../components';
 import { useData } from '../context/DataContext';
+import { parseGermanDate } from '../utils/petHelpers';
 import { recurrenceDisplayLabels, animalTypeDisplayLabels } from '../types';
 
 interface EventDetailScreenProps {
@@ -42,10 +43,10 @@ export function EventDetailScreen({ navigation, route }: EventDetailScreenProps)
       Alert.alert('Fehler', 'Bitte gib ein neues Datum ein.');
       return;
     }
-    let isoDate = newDate;
-    const parts = newDate.split('.');
-    if (parts.length === 3) {
-      isoDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+    const isoDate = parseGermanDate(newDate);
+    if (!isoDate) {
+      Alert.alert('Ungültiges Datum', 'Bitte gib ein gültiges Datum im Format tt.mm.jjjj ein.');
+      return;
     }
     updateReminder(event.id, { date: isoDate });
     setShowReschedule(false);

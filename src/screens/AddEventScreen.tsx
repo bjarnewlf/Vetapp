@@ -4,8 +4,10 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
-import { InputField, Button, Card } from '../components';
+import { InputField, Button, Card, SelectField } from '../components';
+import type { SelectFieldOption } from '../components';
 import { useData } from '../context/DataContext';
+import { parseGermanDate } from '../utils/petHelpers';
 import { useSubscription, FREE_LIMITS } from '../context/SubscriptionContext';
 import { RecurrenceType, recurrenceDisplayLabels } from '../types';
 
@@ -45,7 +47,6 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
   });
   const [notes, setNotes] = useState(editEvent?.description || '');
   const [recurrence, setRecurrence] = useState<RecurrenceType>(editEvent?.recurrence || 'Once');
-  const [showRecurrencePicker, setShowRecurrencePicker] = useState(false);
 
   const selectedPet = pets.find(p => p.id === selectedPetId);
 
@@ -76,10 +77,10 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
       return;
     }
     // Parse date
-    let isoDate = date;
-    const parts = date.split('.');
-    if (parts.length === 3) {
-      isoDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+    const isoDate = parseGermanDate(date);
+    if (!isoDate) {
+      Alert.alert('Ungültiges Datum', 'Bitte gib ein gültiges Datum im Format tt.mm.jjjj ein.');
+      return;
     }
 
     // Calculate next date for recurrence
@@ -281,38 +282,18 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
           />
 
           {/* Recurrence */}
-          <Text style={styles.label}>Wiederholung</Text>
-          <TouchableOpacity
-            style={styles.picker}
-            onPress={() => setShowRecurrencePicker(!showRecurrencePicker)}
-          >
-            <Text style={styles.pickerText}>{recurrenceDisplayLabels[recurrence]}</Text>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-              {recurrence !== 'Once' && !isPro && (
-                <View style={styles.proTag}>
-                  <Ionicons name="lock-closed" size={10} color={colors.accent} />
-                  <Text style={styles.proTagText}>Pro</Text>
-                </View>
-              )}
-              <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
-            </View>
-          </TouchableOpacity>
-          {showRecurrencePicker && (
-            <View style={styles.pickerOptions}>
-              {recurrenceOptions.map(opt => (
-                <TouchableOpacity
-                  key={opt}
-                  style={styles.pickerOption}
-                  onPress={() => { setRecurrence(opt); setShowRecurrencePicker(false); }}
-                >
-                  <Text style={[
-                    styles.pickerOptionText,
-                    recurrence === opt && styles.pickerOptionSelected,
-                  ]}>{recurrenceDisplayLabels[opt]}</Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          )}
+          <SelectField
+            label="Wiederholung"
+            value={recurrence}
+            options={recurrenceOptions.map<SelectFieldOption>(opt => ({ value: opt, label: recurrenceDisplayLabels[opt] }))}
+            onSelect={v => setRecurrence(v as RecurrenceType)}
+            rightElement={recurrence !== 'Once' && !isPro ? (
+              <View style={styles.proTag}>
+                <Ionicons name="lock-closed" size={10} color={colors.accent} />
+                <Text style={styles.proTagText}>Pro</Text>
+              </View>
+            ) : undefined}
+          />
 
           <Button title={isEditMode ? 'Aktualisieren' : 'Event speichern'} onPress={handleSave} style={styles.saveButton} />
         </View>
@@ -424,45 +405,6 @@ const styles = StyleSheet.create({
     ...typography.label,
     color: colors.primary,
     textAlign: 'center',
-  },
-  label: {
-    ...typography.label,
-    color: colors.text,
-    marginBottom: 6,
-  },
-  picker: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.sm,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-  },
-  pickerText: {
-    ...typography.body,
-    color: colors.text,
-  },
-  pickerOptions: {
-    backgroundColor: colors.surface,
-    borderRadius: borderRadius.sm,
-    borderWidth: 1,
-    borderColor: colors.border,
-    overflow: 'hidden',
-  },
-  pickerOption: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-  },
-  pickerOptionText: {
-    ...typography.body,
-    color: colors.text,
-  },
-  pickerOptionSelected: {
-    color: colors.primary,
-    fontWeight: '600',
   },
   saveButton: {
     marginTop: spacing.md,

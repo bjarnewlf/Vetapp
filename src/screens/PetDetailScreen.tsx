@@ -179,9 +179,12 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
         <View style={styles.tabContent}>
           {/* Health Buttons */}
           <View style={styles.healthButtons}>
-            <TouchableOpacity style={styles.healthButton}>
+            <TouchableOpacity
+              style={styles.healthButton}
+              onPress={() => navigation.navigate('AddEvent', { petId: pet.id })}
+            >
               <Ionicons name="medical-outline" size={24} color={colors.accent} />
-              <Text style={styles.healthButtonLabel}>Behandlungen</Text>
+              <Text style={styles.healthButtonLabel}>Behandlung hinzufügen</Text>
               <Text style={styles.healthButtonCount}>{treatments.length} erfasst</Text>
             </TouchableOpacity>
             <TouchableOpacity

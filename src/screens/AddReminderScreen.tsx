@@ -3,10 +3,12 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, typography, spacing, borderRadius } from '../theme';
-import { InputField, Button } from '../components';
+import { colors, typography, spacing } from '../theme';
+import { InputField, Button, SelectField } from '../components';
+import type { SelectFieldOption } from '../components';
 import { RecurrenceType } from '../types';
 import { useData } from '../context/DataContext';
+import { parseGermanDate } from '../utils/petHelpers';
 
 const recurrenceOptions: RecurrenceType[] = ['Once', 'Weekly', 'Monthly', 'Yearly', 'Custom'];
 
@@ -21,10 +23,6 @@ export function AddReminderScreen({ navigation }: AddReminderScreenProps) {
   const [date, setDate] = useState('');
   const [description, setDescription] = useState('');
   const [recurrence, setRecurrence] = useState<RecurrenceType>('Once');
-  const [showPetPicker, setShowPetPicker] = useState(false);
-  const [showRecurrencePicker, setShowRecurrencePicker] = useState(false);
-
-  const selectedPet = pets.find(p => p.id === petId);
 
   const handleSave = () => {
     if (!title.trim()) {
@@ -37,12 +35,10 @@ export function AddReminderScreen({ navigation }: AddReminderScreenProps) {
     }
 
     // Parse date from tt.mm.jjjj to ISO
-    let isoDate = '';
-    const parts = date.split('.');
-    if (parts.length === 3) {
-      isoDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
-    } else {
-      isoDate = date; // fallback: try raw input
+    const isoDate = parseGermanDate(date);
+    if (!isoDate) {
+      Alert.alert('Ungültiges Datum', 'Bitte gib ein gültiges Datum im Format tt.mm.jjjj ein.');
+      return;
     }
 
     addReminder({
@@ -56,6 +52,11 @@ export function AddReminderScreen({ navigation }: AddReminderScreenProps) {
     navigation.goBack();
   };
 
+  const petOptions: SelectFieldOption[] = [
+    { value: '', label: 'Allgemeine Erinnerung' },
+    ...pets.map(pet => ({ value: pet.id, label: pet.name })),
+  ];
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
@@ -67,38 +68,13 @@ export function AddReminderScreen({ navigation }: AddReminderScreenProps) {
 
       <View style={styles.form}>
         {/* Pet Picker */}
-        <Text style={styles.label}>Tier (Optional)</Text>
-        <TouchableOpacity
-          style={styles.picker}
-          onPress={() => setShowPetPicker(!showPetPicker)}
-        >
-          <Text style={selectedPet ? styles.pickerText : styles.pickerPlaceholder}>
-            {selectedPet ? selectedPet.name : 'Allgemeine Erinnerung'}
-          </Text>
-          <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
-        </TouchableOpacity>
-        {showPetPicker && (
-          <View style={styles.pickerOptions}>
-            <TouchableOpacity
-              style={styles.pickerOption}
-              onPress={() => { setPetId(''); setShowPetPicker(false); }}
-            >
-              <Text style={styles.pickerOptionText}>Allgemeine Erinnerung</Text>
-            </TouchableOpacity>
-            {pets.map(pet => (
-              <TouchableOpacity
-                key={pet.id}
-                style={styles.pickerOption}
-                onPress={() => { setPetId(pet.id); setShowPetPicker(false); }}
-              >
-                <Text style={[
-                  styles.pickerOptionText,
-                  petId === pet.id && styles.pickerOptionSelected,
-                ]}>{pet.name}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
+        <SelectField
+          label="Tier (Optional)"
+          placeholder="Allgemeine Erinnerung"
+          value={petId}
+          options={petOptions}
+          onSelect={v => setPetId(v)}
+        />
 
         <InputField
           label="Titel"
@@ -125,30 +101,12 @@ export function AddReminderScreen({ navigation }: AddReminderScreenProps) {
         />
 
         {/* Recurrence Picker */}
-        <Text style={styles.label}>Wiederholung</Text>
-        <TouchableOpacity
-          style={styles.picker}
-          onPress={() => setShowRecurrencePicker(!showRecurrencePicker)}
-        >
-          <Text style={styles.pickerText}>{recurrence}</Text>
-          <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
-        </TouchableOpacity>
-        {showRecurrencePicker && (
-          <View style={styles.pickerOptions}>
-            {recurrenceOptions.map(opt => (
-              <TouchableOpacity
-                key={opt}
-                style={styles.pickerOption}
-                onPress={() => { setRecurrence(opt); setShowRecurrencePicker(false); }}
-              >
-                <Text style={[
-                  styles.pickerOptionText,
-                  recurrence === opt && styles.pickerOptionSelected,
-                ]}>{opt}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
+        <SelectField
+          label="Wiederholung"
+          value={recurrence}
+          options={recurrenceOptions.map<SelectFieldOption>(opt => ({ value: opt, label: opt }))}
+          onSelect={v => setRecurrence(v as RecurrenceType)}
+        />
 
         <Button title="Erinnerung speichern" onPress={handleSave} style={styles.saveButton} />
       </View>
@@ -165,22 +123,5 @@ const styles = StyleSheet.create({
   backButton: { marginRight: spacing.md },
   headerTitle: { ...typography.h2, color: colors.text },
   form: { paddingHorizontal: spacing.md, paddingBottom: spacing.xxl },
-  label: { ...typography.label, color: colors.text, marginBottom: 6 },
-  picker: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    backgroundColor: colors.surface, borderRadius: borderRadius.sm,
-    borderWidth: 1, borderColor: colors.borderLight,
-    paddingHorizontal: 14, paddingVertical: 12, marginBottom: spacing.md,
-  },
-  pickerText: { ...typography.body, color: colors.text },
-  pickerPlaceholder: { ...typography.body, color: colors.textLight },
-  pickerOptions: {
-    backgroundColor: colors.surface, borderRadius: borderRadius.sm,
-    borderWidth: 1, borderColor: colors.border,
-    marginTop: -12, marginBottom: spacing.md, overflow: 'hidden',
-  },
-  pickerOption: { paddingHorizontal: 14, paddingVertical: 10 },
-  pickerOptionText: { ...typography.body, color: colors.text },
-  pickerOptionSelected: { color: colors.primary, fontWeight: '600' },
   saveButton: { marginTop: spacing.md },
 });
