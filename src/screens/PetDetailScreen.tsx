@@ -7,6 +7,7 @@ import { Card } from '../components';
 import { useData } from '../context/DataContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { animalTypeDisplayLabels, recurrenceDisplayLabels } from '../types';
+import { getAge } from '../utils/petHelpers';
 
 interface PetDetailScreenProps {
   navigation: any;
@@ -14,18 +15,6 @@ interface PetDetailScreenProps {
 }
 
 type DetailTab = 'vaccinations' | 'documents' | 'vet';
-
-function getAge(birthDate: string): string {
-  const birth = new Date(birthDate);
-  const now = new Date();
-  let years = now.getFullYear() - birth.getFullYear();
-  const monthDiff = now.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) {
-    years--;
-  }
-  if (years < 1) return 'Unter 1 Jahr';
-  return `${years} Jahre`;
-}
 
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('de-DE', {

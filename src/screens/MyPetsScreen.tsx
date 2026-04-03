@@ -5,21 +5,10 @@ import { colors, typography, spacing, borderRadius } from '../theme';
 import { Button } from '../components';
 import { useData } from '../context/DataContext';
 import { Pet } from '../types';
+import { getAge } from '../utils/petHelpers';
 
 interface MyPetsScreenProps {
   navigation: any;
-}
-
-function getAge(birthDate: string): string {
-  const birth = new Date(birthDate);
-  const now = new Date();
-  let years = now.getFullYear() - birth.getFullYear();
-  const monthDiff = now.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) {
-    years--;
-  }
-  if (years < 1) return 'Unter 1 Jahr';
-  return `${years} Jahre`;
 }
 
 export function MyPetsScreen({ navigation }: MyPetsScreenProps) {

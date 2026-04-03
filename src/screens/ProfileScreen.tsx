@@ -4,11 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card, Button } from '../components';
 import { useAuth } from '../context/AuthContext';
-import { useSubscription } from '../context/SubscriptionContext';
-
 export function ProfileScreen({ navigation }: { navigation: any }) {
   const { user: authUser, signOut } = useAuth();
-  const { isPro, togglePro } = useSubscription();
   const user = {
     name: authUser?.user_metadata?.name || 'User',
     email: authUser?.email || '',
@@ -45,22 +42,6 @@ export function ProfileScreen({ navigation }: { navigation: any }) {
           </View>
           <TouchableOpacity>
             <Ionicons name="pencil-outline" size={20} color={colors.textSecondary} />
-          </TouchableOpacity>
-        </View>
-      </Card>
-
-      {/* Dev Mode: Premium Toggle */}
-      <Card style={styles.devCard}>
-        <View style={styles.devToggleRow}>
-          <View>
-            <Text style={styles.devLabel}>Dev: Premium-Modus</Text>
-            <Text style={styles.devStatus}>{isPro ? '✓ Aktiviert' : '○ Deaktiviert'}</Text>
-          </View>
-          <TouchableOpacity
-            style={[styles.devToggleButton, isPro && styles.devToggleButtonActive]}
-            onPress={togglePro}
-          >
-            <Text style={styles.devToggleText}>{isPro ? 'Aus' : 'An'}</Text>
           </TouchableOpacity>
         </View>
       </Card>
@@ -146,41 +127,6 @@ const styles = StyleSheet.create({
   },
   userCard: {
     marginBottom: spacing.md,
-  },
-  devCard: {
-    marginBottom: spacing.md,
-    backgroundColor: '#f5f0e8',
-    borderLeftWidth: 3,
-    borderLeftColor: colors.accent,
-  },
-  devToggleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  devLabel: {
-    ...typography.body,
-    color: colors.text,
-    fontWeight: '600',
-  },
-  devStatus: {
-    ...typography.bodySmall,
-    color: colors.textSecondary,
-    marginTop: 4,
-  },
-  devToggleButton: {
-    backgroundColor: colors.textLight,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 6,
-  },
-  devToggleButtonActive: {
-    backgroundColor: colors.primary,
-  },
-  devToggleText: {
-    ...typography.bodySmall,
-    color: colors.surface,
-    fontWeight: '600',
   },
   userRow: {
     flexDirection: 'row',
