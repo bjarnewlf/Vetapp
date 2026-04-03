@@ -6,16 +6,11 @@ import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { InputField, Button } from '../components';
-import { AnimalType } from '../types';
+import { AnimalType, animalTypeDisplayLabels } from '../types';
 import { useData } from '../context/DataContext';
 import { useSubscription, FREE_LIMITS } from '../context/SubscriptionContext';
 
 const animalTypes: AnimalType[] = ['Dog', 'Cat', 'Bird', 'Rabbit', 'Fish', 'Reptile', 'Other'];
-
-const animalTypeLabels: Record<AnimalType, string> = {
-  Dog: 'Hund', Cat: 'Katze', Bird: 'Vogel', Rabbit: 'Kaninchen',
-  Fish: 'Fisch', Reptile: 'Reptil', Other: 'Andere',
-};
 
 interface AddPetScreenProps {
   navigation: any;
@@ -118,7 +113,7 @@ export function AddPetScreen({ navigation }: AddPetScreenProps) {
           onPress={() => setShowTypePicker(!showTypePicker)}
         >
           <Text style={animalType ? styles.pickerText : styles.pickerPlaceholder}>
-            {animalType ? animalTypeLabels[animalType] : 'Tierart wählen'}
+            {animalType ? animalTypeDisplayLabels[animalType] : 'Tierart wählen'}
           </Text>
           <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
         </TouchableOpacity>
@@ -133,7 +128,7 @@ export function AddPetScreen({ navigation }: AddPetScreenProps) {
                 <Text style={[
                   styles.pickerOptionText,
                   animalType === type && styles.pickerOptionSelected,
-                ]}>{animalTypeLabels[type]}</Text>
+                ]}>{animalTypeDisplayLabels[type]}</Text>
               </TouchableOpacity>
             ))}
           </View>

@@ -4,20 +4,23 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card } from '../components';
 import { useData } from '../context/DataContext';
+import { useAuth } from '../context/AuthContext';
+import { animalTypeDisplayLabels } from '../types';
 
 interface HomeScreenProps {
   navigation: any;
 }
 
 export function HomeScreen({ navigation }: HomeScreenProps) {
-  const { pets, reminders, vaccinations } = useData();
+  const { pets, reminders, vaccinations, treatments } = useData();
+  const { user } = useAuth();
+  const userName = user?.user_metadata?.name;
   const nextReminder = reminders.find(r => r.status === 'upcoming');
-  const treatments = 0; // placeholder
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <Text style={styles.greeting}>Hallo! 👋</Text>
+        <Text style={styles.greeting}>Hallo{userName ? `, ${userName}` : ''}! 👋</Text>
         <Text style={styles.welcomeText}>Willkommen zurück bei VetApp</Text>
       </View>
 
@@ -79,7 +82,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
                   </View>
                 )}
                 <Text style={styles.petName}>{pet.name}</Text>
-                <Text style={styles.petType}>{pet.type}</Text>
+                <Text style={styles.petType}>{animalTypeDisplayLabels[pet.type]}</Text>
               </TouchableOpacity>
             ))}
           </View>
@@ -95,6 +98,10 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
             <View style={styles.statItem}>
               <Text style={[styles.statNumber, { color: colors.primary }]}>{vaccinations.length}</Text>
               <Text style={styles.statLabel}>Impfungen</Text>
+            </View>
+            <View style={styles.statItem}>
+              <Text style={[styles.statNumber, { color: colors.primary }]}>{treatments.length}</Text>
+              <Text style={styles.statLabel}>Behandlungen</Text>
             </View>
             <View style={styles.statItem}>
               <Text style={[styles.statNumber, { color: colors.primary }]}>

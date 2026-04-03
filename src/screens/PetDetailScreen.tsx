@@ -6,6 +6,7 @@ import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card } from '../components';
 import { useData } from '../context/DataContext';
 import { useSubscription } from '../context/SubscriptionContext';
+import { animalTypeDisplayLabels, recurrenceDisplayLabels } from '../types';
 
 interface PetDetailScreenProps {
   navigation: any;
@@ -35,7 +36,7 @@ function formatDate(dateStr: string): string {
 export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
   const { petId } = route.params;
   const { isPro } = useSubscription();
-  const { pets, vaccinations: allVaccinations, treatments: allTreatments, reminders: allReminders, documents: allDocuments, vetContact, addDocument, deleteDocument } = useData();
+  const { pets, vaccinations: allVaccinations, treatments: allTreatments, reminders: allReminders, documents: allDocuments, vetContact, addDocument, deleteDocument, deleteVaccination, deleteTreatment } = useData();
   const [activeTab, setActiveTab] = useState<DetailTab>('vaccinations');
   const [uploading, setUploading] = useState(false);
 
@@ -80,6 +81,20 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
     Alert.alert('Dokument löschen', `"${docName}" wirklich löschen?`, [
       { text: 'Abbrechen', style: 'cancel' },
       { text: 'Löschen', style: 'destructive', onPress: () => deleteDocument(docId) },
+    ]);
+  };
+
+  const handleDeleteVaccination = (id: string, name: string) => {
+    Alert.alert('Impfung löschen', `"${name}" wirklich löschen?`, [
+      { text: 'Abbrechen', style: 'cancel' },
+      { text: 'Löschen', style: 'destructive', onPress: () => deleteVaccination(id) },
+    ]);
+  };
+
+  const handleDeleteTreatment = (id: string, name: string) => {
+    Alert.alert('Behandlung löschen', `"${name}" wirklich löschen?`, [
+      { text: 'Abbrechen', style: 'cancel' },
+      { text: 'Löschen', style: 'destructive', onPress: () => deleteTreatment(id) },
     ]);
   };
 
@@ -128,7 +143,7 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
         <View style={styles.infoRows}>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Tierart</Text>
-            <Text style={styles.infoValue}>{pet.type}</Text>
+            <Text style={styles.infoValue}>{animalTypeDisplayLabels[pet.type]}</Text>
           </View>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Alter</Text>
@@ -192,11 +207,27 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
           {/* Recent Treatments */}
           <View style={styles.subSectionHeader}>
             <Text style={styles.subSectionTitle}>Letzte Behandlungen</Text>
-            <TouchableOpacity><Text style={styles.viewAll}>Alle anzeigen</Text></TouchableOpacity>
           </View>
           {treatments.length === 0 && (
             <Text style={styles.emptyText}>Noch keine Behandlungen erfasst</Text>
           )}
+          {treatments.map(treatment => (
+            <View key={treatment.id} style={[styles.vaccinationCard, styles.vaccinationCardRow]}>
+              <View style={styles.vaccinationCardContent}>
+                <Text style={styles.vaccinationName}>{treatment.name}</Text>
+                <View style={styles.vaccinationRow}>
+                  <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
+                  <Text style={styles.vaccinationDate}>{formatDate(treatment.date)}</Text>
+                </View>
+                {treatment.notes && (
+                  <Text style={styles.vaccinationDate}>{treatment.notes}</Text>
+                )}
+              </View>
+              <TouchableOpacity onPress={() => handleDeleteTreatment(treatment.id, treatment.name)}>
+                <Ionicons name="trash-outline" size={18} color={colors.error} />
+              </TouchableOpacity>
+            </View>
+          ))}
 
           {/* Vaccinations */}
           <View style={styles.subSectionHeader}>
@@ -206,26 +237,33 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
             </TouchableOpacity>
           </View>
           {vaccinations.map(vax => (
-            <View key={vax.id} style={styles.vaccinationCard}>
-              <Text style={styles.vaccinationName}>{vax.name}</Text>
-              <View style={styles.vaccinationRow}>
-                <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
-                <Text style={styles.vaccinationDate}>Verabreicht: {formatDate(vax.givenDate)}</Text>
+            <View key={vax.id} style={[styles.vaccinationCard, styles.vaccinationCardRow]}>
+              <View style={styles.vaccinationCardContent}>
+                <Text style={styles.vaccinationName}>{vax.name}</Text>
+                <View style={styles.vaccinationRow}>
+                  <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
+                  <Text style={styles.vaccinationDate}>Verabreicht: {formatDate(vax.givenDate)}</Text>
+                </View>
+                {vax.nextDate && (
+                  <View style={styles.vaccinationRow}>
+                    <Ionicons name="calendar" size={14} color={colors.primary} />
+                    <Text style={[styles.vaccinationDate, { color: colors.primary }]}>
+                      Nächste: {formatDate(vax.nextDate)}
+                    </Text>
+                  </View>
+                )}
+                {vax.recurrenceInterval && (
+                  <View style={styles.vaccinationRow}>
+                    <Ionicons name="repeat" size={14} color={colors.textSecondary} />
+                    <Text style={styles.vaccinationDate}>
+                      {recurrenceDisplayLabels[vax.recurrenceInterval] || vax.recurrenceInterval}
+                    </Text>
+                  </View>
+                )}
               </View>
-              {vax.nextDate && (
-                <View style={styles.vaccinationRow}>
-                  <Ionicons name="calendar" size={14} color={colors.primary} />
-                  <Text style={[styles.vaccinationDate, { color: colors.primary }]}>
-                    Nächste: {formatDate(vax.nextDate)}
-                  </Text>
-                </View>
-              )}
-              {vax.recurrenceInterval && (
-                <View style={styles.vaccinationRow}>
-                  <Ionicons name="repeat" size={14} color={colors.textSecondary} />
-                  <Text style={styles.vaccinationDate}>{vax.recurrenceInterval}</Text>
-                </View>
-              )}
+              <TouchableOpacity onPress={() => handleDeleteVaccination(vax.id, vax.name)}>
+                <Ionicons name="trash-outline" size={18} color={colors.error} />
+              </TouchableOpacity>
             </View>
           ))}
           {vaccinations.length === 0 && (
@@ -400,6 +438,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primaryLight, borderRadius: borderRadius.md,
     padding: spacing.md, marginTop: spacing.sm, gap: 6,
   },
+  vaccinationCardRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 0 },
+  vaccinationCardContent: { flex: 1, gap: 6 },
   vaccinationName: { ...typography.h3, color: colors.text },
   vaccinationRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   vaccinationDate: { ...typography.bodySmall, color: colors.textSecondary },

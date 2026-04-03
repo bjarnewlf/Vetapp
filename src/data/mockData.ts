@@ -53,7 +53,7 @@ export const mockVaccinations: Vaccination[] = [
     name: 'FVRCP',
     givenDate: '2024-02-20',
     nextDate: '2027-02-20',
-    recurrenceInterval: 'Every 3 years',
+    recurrenceInterval: 'Yearly',
     createdAt: '2024-02-20',
   },
 ];

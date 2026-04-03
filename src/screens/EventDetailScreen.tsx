@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card, Button, StatusBadge } from '../components';
 import { useData } from '../context/DataContext';
-import { recurrenceDisplayLabels } from '../types';
+import { recurrenceDisplayLabels, animalTypeDisplayLabels } from '../types';
 
 interface EventDetailScreenProps {
   navigation: any;
@@ -88,7 +88,7 @@ export function EventDetailScreen({ navigation, route }: EventDetailScreenProps)
           {pet && (
             <View style={styles.detailRow}>
               <Ionicons name="paw-outline" size={20} color={colors.primary} />
-              <Text style={styles.detailText}>{pet.name} ({pet.type})</Text>
+              <Text style={styles.detailText}>{pet.name} ({animalTypeDisplayLabels[pet.type]})</Text>
             </View>
           )}
 

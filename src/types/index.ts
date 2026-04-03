@@ -32,7 +32,7 @@ export interface Vaccination {
   name: string;
   givenDate: string;
   nextDate?: string;
-  recurrenceInterval?: string;
+  recurrenceInterval?: RecurrenceType;
   createdAt: string;
 }
 
@@ -70,6 +70,11 @@ export const recurrenceDisplayLabels: Record<RecurrenceType, string> = {
   Monthly: 'Monatlich',
   Yearly: 'Jährlich',
   Custom: 'Benutzerdefiniert',
+};
+
+export const animalTypeDisplayLabels: Record<AnimalType, string> = {
+  Dog: 'Hund', Cat: 'Katze', Bird: 'Vogel', Rabbit: 'Kaninchen',
+  Fish: 'Fisch', Reptile: 'Reptil', Other: 'Andere',
 };
 
 export interface UserProfile {
