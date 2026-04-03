@@ -105,3 +105,43 @@ Beispiel: Neuer Screen
 - Wenn der Auftrag unklar ist
 - Wenn die Umsetzung vom Plan abweichen muss
 - Wenn sie auf Probleme stoßen die den Scope betreffen
+
+## Uebergabeprotokoll (handoff.md)
+
+Damit Zwischenschritte nicht verloren gehen, fuehrt die Agentur ein Uebergabeprotokoll — wie beim Schichtwechsel.
+
+### Regeln
+
+- **Developer und Designer** aktualisieren `handoff.md` bevor sie fertig sind
+- **QA** hat keinen Schreibzugriff — Brian uebernimmt QA-Findings in `handoff.md`
+- **Brian** liest `handoff.md` bei jedem Session-Start als erstes
+- **Dokumentar** raeumt alte Eintraege auf, sobald sie im Changelog erfasst sind
+
+### Format eines Eintrags
+
+```
+## Aktuelle Uebergabe
+
+**Agent:** [Name]
+**Zeitpunkt:** [YYYY-MM-DD HH:MM]
+**Auftrag:** [Was war der Auftrag?]
+
+### Erledigt
+- [Was wurde gemacht, konkret]
+
+### Offen / Nicht fertig
+- [Was noch fehlt, warum]
+
+### Naechster Schritt
+- [Was sollte als naechstes passieren, wer sollte es tun]
+
+### Wichtig fuer den Naechsten
+- [Stolperfallen, Abhaengigkeiten, Entscheidungen die getroffen wurden]
+```
+
+### Lebenszyklus
+
+1. Agent arbeitet → schreibt Uebergabe in `handoff.md` (Bereich "Aktuelle Uebergabe")
+2. Naechster Agent startet → vorherige Uebergabe rutscht nach "Vorherige Uebergaben"
+3. Commit wird gemacht → `handoff.md` wird mitcommittet
+4. Dokumentar laeuft → alte Eintraege werden aufgeraeumt

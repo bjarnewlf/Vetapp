@@ -21,8 +21,19 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       <View style={styles.header}>
-        <Text style={styles.greeting}>Hallo{userName ? `, ${userName}` : ''}! 👋</Text>
-        <Text style={styles.welcomeText}>Willkommen zurück bei VetApp</Text>
+        <View style={styles.headerTopRow}>
+          <View style={styles.headerTextGroup}>
+            <Text style={styles.greeting}>Hallo{userName ? `, ${userName}` : ''}! 👋</Text>
+            <Text style={styles.welcomeText}>Willkommen zurück bei VetApp</Text>
+          </View>
+          <TouchableOpacity
+            style={styles.profileButton}
+            onPress={() => navigation.navigate('Profile')}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="person-circle-outline" size={30} color={colors.textOnPrimary} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <View style={styles.body}>
@@ -142,7 +153,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
 
         <TouchableOpacity
           style={styles.aiCard}
-          onPress={() => navigation.navigate('AIAssistant')}
+          onPress={() => navigation.navigate('AI')}
           activeOpacity={0.8}
         >
           <View style={styles.aiCardRow}>
@@ -167,6 +178,21 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary, paddingHorizontal: spacing.lg,
     paddingTop: 60, paddingBottom: spacing.lg,
     borderBottomLeftRadius: borderRadius.xl, borderBottomRightRadius: borderRadius.xl,
+  },
+  headerTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  headerTextGroup: {
+    flex: 1,
+  },
+  profileButton: {
+    width: 44,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: spacing.sm,
   },
   greeting: { ...typography.h1, color: colors.textOnPrimary },
   welcomeText: { ...typography.bodySmall, color: colors.textOnPrimary, opacity: 0.85, marginTop: 4 },

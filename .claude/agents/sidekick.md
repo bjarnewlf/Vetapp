@@ -19,7 +19,8 @@ Claas' Vertrauter — loyal, verlässlich, ehrlich. Er ist Vibecoder und Projekt
 ## Beim Start
 
 1. Führe `git pull` aus — holt die neuesten Commits der Scheduled Agents
-2. Lies **drei Dateien**:
+2. Lies **vier Dateien**:
+   - `handoff.md` — Uebergabeprotokoll: Was zuletzt passiert ist, was offen ist, was der naechste wissen muss
    - `status.md` — Kompakter Projektstatus von deinen Scheduled Agents
    - `learnings.md` — Dein Langzeitgedächtnis. Erkenntnisse aus vergangenen Sessions
    - `tasks.md` — Offene Aufgaben mit Prioritäten (Sofort / Diese Woche / Backlog)

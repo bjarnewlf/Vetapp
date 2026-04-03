@@ -27,7 +27,12 @@ export function ProfileScreen({ navigation }: { navigation: any }) {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <Text style={styles.title}>Profil & Einstellungen</Text>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+          <Ionicons name="arrow-back" size={24} color={colors.text} />
+        </TouchableOpacity>
+        <Text style={styles.title}>Profil & Einstellungen</Text>
+      </View>
 
       {/* User Info */}
       <Card style={styles.userCard}>
@@ -73,7 +78,7 @@ export function ProfileScreen({ navigation }: { navigation: any }) {
       {/* AI Assistant Teaser */}
       <TouchableOpacity
         activeOpacity={0.8}
-        onPress={() => navigation.navigate('AIAssistant')}
+        onPress={() => navigation.navigate('AI')}
       >
         <Card style={styles.aiCard}>
           <View style={styles.aiRow}>
@@ -85,7 +90,7 @@ export function ProfileScreen({ navigation }: { navigation: any }) {
             </View>
           </View>
           <Text style={styles.aiDescription}>
-            Kommt bald: Personalisierte Gesundheitsempfehlungen, Frühwarnzeichen und Expertenrat — powered by KI.
+            Frag unseren KI-Assistenten zu Gesundheit, Ernährung und Pflege deiner Tiere — powered by Claude.
           </Text>
         </Card>
       </TouchableOpacity>
@@ -121,11 +126,18 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     paddingHorizontal: spacing.md,
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingTop: 60,
+    paddingBottom: spacing.md,
+  },
+  backButton: {
+    marginRight: spacing.md,
+  },
   title: {
     ...typography.h1,
     color: colors.text,
-    paddingTop: 60,
-    paddingBottom: spacing.md,
   },
   userCard: {
     marginBottom: spacing.md,
@@ -205,9 +217,9 @@ const styles = StyleSheet.create({
     marginBottom: spacing.sm,
   },
   aiIcon: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
@@ -224,11 +236,6 @@ const styles = StyleSheet.create({
     ...typography.bodySmall,
     color: colors.textSecondary,
     marginBottom: spacing.sm,
-  },
-  previewLink: {
-    ...typography.bodySmall,
-    color: colors.primary,
-    fontWeight: '600',
   },
   settingsCard: {
     marginBottom: spacing.md,

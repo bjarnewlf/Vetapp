@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import {
   View,
   Text,
@@ -8,12 +8,12 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   ScrollView,
   SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { sendChatMessage, buildPetContext, ChatMessage } from '../services/aiService';
 import { useData } from '../context/DataContext';
@@ -30,7 +30,7 @@ interface LocalMessage extends ChatMessage {
 }
 
 export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
-  const { isPro } = useSubscription();
+  const { isPro, loading: subscriptionLoading } = useSubscription();
   const { pets, vaccinations, treatments } = useData();
 
   const [messages, setMessages] = useState<LocalMessage[]>([]);
@@ -38,20 +38,34 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
   const [loading, setLoading] = useState(false);
   const flatListRef = useRef<FlatList>(null);
 
-  useEffect(() => {
-    if (!isPro) {
-      navigation.replace('Paywall', { feature: 'ai_assistant' });
-    }
-  }, [isPro, navigation]);
+  const paywallShown = useRef(false);
+  useFocusEffect(
+    useCallback(() => {
+      if (!subscriptionLoading && !isPro && !paywallShown.current) {
+        paywallShown.current = true;
+        navigation.navigate('Paywall', { feature: 'ai_assistant' });
+      }
+      return () => { paywallShown.current = false; };
+    }, [subscriptionLoading, isPro, navigation])
+  );
+
+  if (subscriptionLoading) {
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
 
   if (!isPro) {
     return <View style={{ flex: 1, backgroundColor: colors.surface }} />;
   }
 
   const quickActions: string[] = [
-    ...(pets.length > 0 ? [`Fragen zu ${pets[0].name}`] : []),
+    ...(pets.length > 0 ? [`Was sollte ich bei ${pets[0].name} beachten?`] : []),
     'Impfplan erklären',
     'Symptome einschätzen',
+    'Ernährungsempfehlungen',
   ];
 
   async function doSend(text: string) {
@@ -91,45 +105,22 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
     doSend(msg.content);
   }
 
-  function showInfo() {
-    Alert.alert(
-      'Hinweis',
-      'Ich bin ein KI-Assistent und kein Ersatz für professionellen tierärztlichen Rat. Bei ernsten Symptomen bitte immer einen Tierarzt aufsuchen.',
-      [{ text: 'Verstanden' }]
-    );
+  function handleClearChat() {
+    setMessages([]);
   }
 
-  const hasUserMessages = messages.length > 0;
-
-  // Disclaimer always shown at bottom of inverted list (appears at top visually)
-  const disclaimerItem: LocalMessage = {
-    id: '__disclaimer__',
-    role: 'assistant',
-    content:
-      'Hinweis: Ich bin ein KI-Assistent und kein Ersatz für tierärztlichen Rat. Bei medizinischen Notfällen wende dich bitte sofort an einen Tierarzt.',
-  };
-
-  const invertedData: LocalMessage[] = [
-    ...[...messages].reverse(),
-    disclaimerItem,
-  ];
+  const hasChat = messages.length > 0;
+  const invertedData: LocalMessage[] = [...messages].reverse();
 
   function renderMessage({ item }: { item: LocalMessage }) {
-    if (item.id === '__disclaimer__') {
-      return (
-        <View style={styles.disclaimerBubble}>
-          <Ionicons name="warning-outline" size={14} color={colors.warning} style={styles.disclaimerIcon} />
-          <Text style={[typography.caption, styles.disclaimerText]}>{item.content}</Text>
-        </View>
-      );
-    }
-
     if (item.isTyping) {
       return (
         <View style={styles.aiBubbleWrapper}>
-          <Ionicons name="sparkles-outline" size={14} color={colors.primary} style={styles.aiIcon} />
+          <View style={styles.aiAvatarBadge}>
+            <Ionicons name="sparkles" size={14} color={colors.primary} />
+          </View>
           <View style={styles.aiBubble}>
-            <Text style={[typography.body, { color: colors.textLight, letterSpacing: 2 }]}>...</Text>
+            <ActivityIndicator size="small" color={colors.primary} />
           </View>
         </View>
       );
@@ -142,7 +133,11 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
             <Text style={[typography.body, { color: colors.textOnPrimary }]}>{item.content}</Text>
           </View>
           {item.error && (
-            <TouchableOpacity style={styles.errorRow} onPress={() => handleRetry(item)}>
+            <TouchableOpacity
+              style={[styles.errorRow, loading && { opacity: 0.5 }]}
+              onPress={() => handleRetry(item)}
+              disabled={loading}
+            >
               <Ionicons name="refresh-outline" size={14} color={colors.error} />
               <Text style={[typography.caption, styles.errorText]}>
                 Fehler beim Senden. Erneut versuchen.
@@ -155,7 +150,9 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
 
     return (
       <View style={styles.aiBubbleWrapper}>
-        <Ionicons name="sparkles-outline" size={14} color={colors.primary} style={styles.aiIcon} />
+        <View style={styles.aiAvatarBadge}>
+          <Ionicons name="sparkles" size={14} color={colors.primary} />
+        </View>
         <View style={styles.aiBubble}>
           <Text style={[typography.body, { color: colors.text }]}>{item.content}</Text>
         </View>
@@ -172,60 +169,106 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
       >
         {/* Header */}
         <View style={styles.header}>
-          <TouchableOpacity style={styles.headerButton} onPress={() => navigation.goBack()}>
-            <Ionicons name="chevron-back-outline" size={24} color={colors.text} />
-          </TouchableOpacity>
-          <Text style={[typography.h3, styles.headerTitle]}>KI-Assistent</Text>
-          <TouchableOpacity style={styles.headerButton} onPress={showInfo}>
-            <Ionicons name="information-circle-outline" size={24} color={colors.text} />
-          </TouchableOpacity>
+          <View style={styles.headerSpacer} />
+          <View style={styles.headerTitleGroup}>
+            <Ionicons name="sparkles" size={16} color={colors.primary} style={styles.headerTitleIcon} />
+            <Text style={[typography.h3, styles.headerTitle]}>KI-Assistent</Text>
+          </View>
+          <View style={styles.headerButtonSlot}>
+            {hasChat && (
+              <TouchableOpacity style={styles.headerButton} onPress={handleClearChat}>
+                <Ionicons name="trash-outline" size={20} color={colors.textSecondary} />
+              </TouchableOpacity>
+            )}
+          </View>
         </View>
 
-        {/* Chat */}
-        <View style={styles.chatContainer}>
-          {!hasUserMessages && (
-            <View style={styles.emptyContainer}>
-              <Ionicons name="sparkles-outline" size={48} color={colors.primary} />
-              <Text style={[typography.h3, styles.emptyTitle]}>Wie kann ich helfen?</Text>
-              <Text style={[typography.bodySmall, styles.emptySubtitle]}>
-                Ich kenne deine Tiere und beantworte Gesundheitsfragen.
+        {/* Inhalt: Empty-State oder Chat */}
+        {!hasChat ? (
+          <ScrollView
+            style={styles.flex}
+            contentContainerStyle={styles.emptyScrollContent}
+            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
+          >
+            {/* Hero */}
+            <View style={styles.heroBlock}>
+              <View style={styles.heroBadge}>
+                <Ionicons name="sparkles" size={36} color={colors.primary} />
+              </View>
+              <Text style={[typography.h2, styles.heroTitle]}>Wie kann ich helfen?</Text>
+              <Text style={[typography.body, styles.heroSubtitle]}>
+                Ich kenne deine Tiere und beantworte Gesundheitsfragen persönlich für dich.
               </Text>
-              <ScrollView
-                horizontal
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={styles.chipsContainer}
-              >
-                {quickActions.map((action) => (
-                  <TouchableOpacity key={action} style={styles.chip} onPress={() => doSend(action)}>
-                    <Text style={[typography.label, styles.chipText]}>{action}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
             </View>
-          )}
 
+            {/* Feature-Cards */}
+            <View style={styles.featureRow}>
+              <View style={styles.featureCard}>
+                <Ionicons name="medical-outline" size={22} color={colors.primary} style={styles.featureIcon} />
+                <Text style={[typography.caption, styles.featureLabel]}>Gesundheit</Text>
+              </View>
+              <View style={styles.featureCard}>
+                <Ionicons name="nutrition-outline" size={22} color={colors.primary} style={styles.featureIcon} />
+                <Text style={[typography.caption, styles.featureLabel]}>Ernährung</Text>
+              </View>
+              <View style={styles.featureCard}>
+                <Ionicons name="pulse-outline" size={22} color={colors.primary} style={styles.featureIcon} />
+                <Text style={[typography.caption, styles.featureLabel]}>Vorsorge</Text>
+              </View>
+            </View>
+
+            {/* Quick-Actions */}
+            <Text style={[typography.caption, styles.quickActionsLabel]}>DIREKT LOSLEGEN</Text>
+            <View style={styles.quickActionsColumn}>
+              {quickActions.map((action) => (
+                <TouchableOpacity
+                  key={action}
+                  style={styles.quickActionChip}
+                  onPress={() => doSend(action)}
+                  activeOpacity={0.7}
+                >
+                  <Ionicons name="chevron-forward" size={16} color={colors.primary} style={styles.chipLeadIcon} />
+                  <Text style={[typography.label, styles.chipLabel]}>{action}</Text>
+                  <Ionicons name="arrow-forward-outline" size={16} color={colors.textLight} />
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+        ) : (
           <FlatList
             ref={flatListRef}
-            data={hasUserMessages ? invertedData : [disclaimerItem]}
+            data={invertedData}
             keyExtractor={(item) => item.id}
             renderItem={renderMessage}
-            inverted={hasUserMessages}
+            inverted
             contentContainerStyle={styles.listContent}
-            ItemSeparatorComponent={() => <View style={{ height: spacing.sm }} />}
+            ItemSeparatorComponent={() => <View style={{ height: spacing.md }} />}
+            keyboardShouldPersistTaps="handled"
           />
+        )}
+
+        {/* Disclaimer-Strip */}
+        <View style={styles.disclaimerStrip}>
+          <Ionicons name="warning-outline" size={12} color={colors.warning} />
+          <Text style={[typography.caption, styles.disclaimerText]}>
+            Kein Ersatz für tierärztlichen Rat. Bei Notfällen sofort Tierarzt kontaktieren.
+          </Text>
         </View>
 
-        {/* Input */}
+        {/* Input-Bar */}
         <View style={styles.inputContainer}>
-          <TextInput
-            style={[typography.body, styles.textInput]}
-            value={input}
-            onChangeText={setInput}
-            placeholder="Frage stellen..."
-            placeholderTextColor={colors.textLight}
-            multiline
-            editable={!loading}
-          />
+          <View style={styles.inputInner}>
+            <TextInput
+              style={[typography.body, styles.textInput]}
+              value={input}
+              onChangeText={setInput}
+              placeholder="Frage stellen..."
+              placeholderTextColor={colors.textLight}
+              multiline
+              editable={!loading}
+            />
+          </View>
           <TouchableOpacity
             style={[styles.sendButton, (!input.trim() || loading) && styles.sendButtonDisabled]}
             onPress={() => doSend(input)}
@@ -251,13 +294,36 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.surface,
   },
+
+  // --- Header ---
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
     backgroundColor: colors.surface,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
-    paddingHorizontal: spacing.sm,
+    minHeight: 56,
+  },
+  headerSpacer: {
+    width: 44,
+  },
+  headerTitleGroup: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerTitleIcon: {
+    marginRight: spacing.xs,
+  },
+  headerTitle: {
+    color: colors.text,
+  },
+  headerButtonSlot: {
+    width: 44,
+    alignItems: 'flex-end',
   },
   headerButton: {
     width: 44,
@@ -265,53 +331,104 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerTitle: {
-    flex: 1,
+
+  // --- Empty State ---
+  emptyScrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: 32,
+  },
+  heroBlock: {
+    alignItems: 'center',
+  },
+  heroBadge: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  heroTitle: {
+    marginTop: spacing.md,
     textAlign: 'center',
     color: colors.text,
   },
-  chatContainer: {
-    flex: 1,
-    backgroundColor: colors.background,
+  heroSubtitle: {
+    marginTop: spacing.sm,
+    textAlign: 'center',
+    color: colors.textSecondary,
   },
-  listContent: {
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.md,
-  },
-  emptyContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.lg,
+  featureRow: {
+    flexDirection: 'row',
+    marginTop: spacing.xl,
     gap: spacing.sm,
   },
-  emptyTitle: {
-    color: colors.text,
-    marginTop: spacing.sm,
+  featureCard: {
+    flex: 1,
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.md,
+    padding: spacing.md,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
   },
-  emptySubtitle: {
+  featureIcon: {
+    marginBottom: spacing.xs,
+  },
+  featureLabel: {
     color: colors.textSecondary,
     textAlign: 'center',
   },
-  chipsContainer: {
-    paddingTop: spacing.md,
+  quickActionsLabel: {
+    marginTop: spacing.xl,
+    marginBottom: spacing.md,
+    color: colors.textLight,
+    letterSpacing: 0.5,
+  },
+  quickActionsColumn: {
     gap: spacing.sm,
   },
-  chip: {
-    backgroundColor: colors.primaryLight,
+  quickActionChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.md,
     borderWidth: 1,
-    borderColor: colors.primary,
-    borderRadius: borderRadius.full,
-    paddingVertical: spacing.sm,
+    borderColor: colors.border,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 1,
+  },
+  chipLeadIcon: {
+    marginRight: spacing.sm,
+  },
+  chipLabel: {
+    flex: 1,
+    color: colors.text,
+  },
+
+  // --- Chat-Liste ---
+  listContent: {
+    paddingTop: spacing.lg,
+    paddingBottom: spacing.sm,
     paddingHorizontal: spacing.md,
   },
-  chipText: {
-    color: colors.primary,
-  },
+
+  // --- User-Bubble ---
   userMsgGroup: {
     alignItems: 'flex-end',
   },
@@ -322,19 +439,35 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     borderBottomRightRadius: 8,
     borderBottomLeftRadius: 24,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
     maxWidth: '80%',
+    shadowColor: colors.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.20,
+    shadowRadius: 6,
+    elevation: 3,
   },
+
+  // --- AI-Bubble ---
   aiBubbleWrapper: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
     alignSelf: 'flex-start',
-    maxWidth: '80%',
+    maxWidth: '85%',
   },
-  aiIcon: {
-    marginBottom: 4,
-    marginLeft: 2,
+  aiAvatarBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: colors.primaryLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.xs,
+    marginBottom: 2, // visuelle Ausrichtung auf Bubble-Unterkante
   },
   aiBubble: {
+    flex: 1,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
@@ -342,37 +475,44 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     borderBottomRightRadius: 24,
     borderBottomLeftRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 1,
   },
-  disclaimerBubble: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    backgroundColor: '#FFF8E1',
-    borderLeftWidth: 3,
-    borderLeftColor: '#D4A020',
-    borderRadius: borderRadius.sm,
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-  },
-  disclaimerIcon: {
-    marginRight: spacing.xs,
-    marginTop: 1,
-  },
-  disclaimerText: {
-    color: colors.text,
-    flex: 1,
-  },
+
+  // --- Fehler ---
   errorRow: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-end',
-    gap: 4,
-    marginTop: 4,
+    gap: spacing.xs,
+    marginTop: spacing.xs,
   },
   errorText: {
     color: colors.error,
   },
+
+  // --- Disclaimer-Strip ---
+  disclaimerStrip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.warningLight,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    gap: spacing.xs,
+  },
+  disclaimerText: {
+    flex: 1,
+    color: colors.textSecondary,
+  },
+
+  // --- Input-Bar ---
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'flex-end',
@@ -380,25 +520,39 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.border,
     paddingHorizontal: spacing.md,
+    paddingTop: spacing.sm,
+    paddingBottom: spacing.md,
+  },
+  inputInner: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    backgroundColor: colors.background,
+    borderRadius: borderRadius.xl,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
-    gap: spacing.sm,
+    marginRight: spacing.sm,
   },
   textInput: {
     flex: 1,
     color: colors.text,
-    maxHeight: 100,
-    paddingTop: 0,
-    paddingBottom: 0,
+    minHeight: 40,
+    maxHeight: 120,
+    paddingTop: spacing.xs,
+    paddingBottom: spacing.xs,
   },
   sendButton: {
-    width: 40,
-    height: 40,
+    width: 44,
+    height: 44,
     borderRadius: borderRadius.full,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
+    alignSelf: 'flex-end',
   },
   sendButtonDisabled: {
-    backgroundColor: colors.textLight,
+    backgroundColor: colors.border,
   },
 });

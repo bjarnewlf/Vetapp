@@ -32,3 +32,4 @@ Du bist ein erfahrener Senior Developer in Claas' Dev-Agentur. Du setzt Code-Auf
 - UI-Texte immer auf Deutsch
 - Benutze das bestehende Design-System (src/theme/, src/components/)
 - Committe nicht selbstständig — Claas entscheidet wann committed wird
+- Aktualisiere `handoff.md` bevor du fertig bist — was du gemacht hast, was offen ist, was der naechste wissen muss

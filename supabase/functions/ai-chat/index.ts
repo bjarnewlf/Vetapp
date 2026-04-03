@@ -3,7 +3,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-user-token',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
@@ -64,24 +64,46 @@ serve(async (req: Request) => {
   }
 
   // JWT verifizieren
-  const authHeader = req.headers.get('Authorization');
-  if (!authHeader) {
+  const userToken = req.headers.get('x-user-token');
+  if (!userToken) {
     return new Response(
-      JSON.stringify({ error: 'Nicht autorisiert.' }),
+      JSON.stringify({ error: 'Nicht autorisiert.', debug: 'Kein x-user-token-Header vorhanden' }),
       { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+
+  // Debug: Env-Vars prüfen
+  if (!supabaseUrl || !supabaseAnonKey) {
+    return new Response(
+      JSON.stringify({
+        error: 'Server-Konfigurationsfehler.',
+        debug: `SUPABASE_URL: ${supabaseUrl ? 'gesetzt' : 'FEHLT'}, SUPABASE_ANON_KEY: ${supabaseAnonKey ? 'gesetzt' : 'FEHLT'}`,
+      }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
   const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-    global: { headers: { Authorization: authHeader } },
+    global: { headers: { Authorization: `Bearer ${userToken}` } },
   });
 
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   if (authError || !user) {
     return new Response(
-      JSON.stringify({ error: 'Nicht autorisiert.' }),
+      JSON.stringify({
+        error: 'Nicht autorisiert.',
+        debug: {
+          authError: authError?.message,
+          authErrorStatus: authError?.status,
+          hasUser: !!user,
+          userTokenPresent: !!userToken,
+          userTokenPrefix: userToken.substring(0, 15) + '...',
+          supabaseUrl: supabaseUrl.substring(0, 30) + '...',
+        },
+      }),
       { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
@@ -151,7 +173,7 @@ serve(async (req: Request) => {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-3-haiku-20240307',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1024,
         system: buildSystemPrompt(petContext),
         messages,
@@ -172,8 +194,13 @@ serve(async (req: Request) => {
   }
 
   if (!anthropicResponse.ok) {
+    const errorBody = await anthropicResponse.text();
+    console.error('[ai-chat] Anthropic API error:', anthropicResponse.status, errorBody);
     return new Response(
-      JSON.stringify({ error: 'Ein Fehler ist aufgetreten. Bitte versuche es erneut.' }),
+      JSON.stringify({
+        error: 'KI-Dienst nicht verfügbar. Bitte versuche es später erneut.',
+        debug: { status: anthropicResponse.status, body: errorBody }
+      }),
       { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }

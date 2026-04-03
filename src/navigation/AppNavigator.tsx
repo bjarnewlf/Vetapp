@@ -40,9 +40,9 @@ function TabNavigator() {
           switch (route.name) {
             case 'Home': iconName = focused ? 'home' : 'home-outline'; break;
             case 'My Pets': iconName = focused ? 'paw' : 'paw-outline'; break;
+            case 'AI': iconName = focused ? 'chatbubble-ellipses' : 'chatbubble-ellipses-outline'; break;
             case 'Reminders': iconName = focused ? 'notifications' : 'notifications-outline'; break;
             case 'Vet Contact': iconName = focused ? 'medkit' : 'medkit-outline'; break;
-            case 'Profile': iconName = focused ? 'person' : 'person-outline'; break;
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -63,9 +63,9 @@ function TabNavigator() {
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: 'Start' }} />
       <Tab.Screen name="My Pets" component={MyPetsScreen} options={{ tabBarLabel: 'Tiere' }} />
+      <Tab.Screen name="AI" component={AIAssistantScreen} options={{ tabBarLabel: 'KI-Assistent' }} />
       <Tab.Screen name="Reminders" component={RemindersScreen} options={{ tabBarLabel: 'Erinnerungen' }} />
       <Tab.Screen name="Vet Contact" component={VetContactScreen} options={{ tabBarLabel: 'Tierarzt' }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: 'Profil' }} />
     </Tab.Navigator>
   );
 }
@@ -132,7 +132,7 @@ export function AppNavigator() {
             <Stack.Screen name="EventDetail" component={EventDetailScreen} />
             <Stack.Screen name="ReminderSettings" component={ReminderSettingsScreen} />
             <Stack.Screen name="AddVetContact" component={AddVetContactScreen} />
-            <Stack.Screen name="AIAssistant" component={AIAssistantScreen} />
+            <Stack.Screen name="Profile" component={ProfileScreen} />
             <Stack.Screen
               name="Paywall"
               component={PaywallScreen}
