@@ -2,8 +2,12 @@ import 'react-native-url-polyfill/auto';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://aapafgnvztpwjchgnrtt.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFhcGFmZ252enRwd2pjaGducnR0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQ5NDMyNzIsImV4cCI6MjA5MDUxOTI3Mn0.FPSjGEFeex6uM4p3uexVOKnz3CHoBfoNThs2FlZkSHM';
+const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Supabase-Credentials fehlen. Bitte .env Datei anlegen (siehe .env.example).');
+}
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {

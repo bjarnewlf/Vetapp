@@ -209,12 +209,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     // Auto-create next reminder for recurring events
     if (reminder && reminder.recurrence !== 'Once' && reminder.recurrence !== 'Custom') {
       const nextDate = calculateNextDate(reminder.date, reminder.recurrence);
-      if (nextDate) {
+      if (nextDate && user) {
         const nextNotifId = await scheduleReminderNotification({
           ...reminder, date: nextDate, status: 'upcoming',
         });
         await supabase.from('reminders').insert({
-          user_id: user!.id,
+          user_id: user.id,
           pet_id: reminder.petId || null,
           title: reminder.title,
           date: nextDate,
