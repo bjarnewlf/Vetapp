@@ -8,6 +8,7 @@ import { useData } from '../context/DataContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { animalTypeDisplayLabels, recurrenceDisplayLabels } from '../types';
 import { getAge } from '../utils/petHelpers';
+import { supabase } from '../lib/supabase';
 
 interface PetDetailScreenProps {
   navigation: any;
@@ -28,6 +29,7 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
   const { pets, vaccinations: allVaccinations, treatments: allTreatments, reminders: allReminders, documents: allDocuments, vetContact, addDocument, deleteDocument, deleteVaccination, deleteTreatment } = useData();
   const [activeTab, setActiveTab] = useState<DetailTab>('vaccinations');
   const [uploading, setUploading] = useState(false);
+  const [openingDocId, setOpeningDocId] = useState<string | null>(null);
 
   const pet = pets.find(p => p.id === petId);
   const vaccinations = allVaccinations.filter(v => v.petId === petId);
@@ -60,10 +62,26 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
     }
   };
 
-  const handleOpenDocument = (url: string) => {
-    Linking.openURL(url).catch(() => {
+  const getSignedUrl = async (storagePath: string): Promise<string> => {
+    const { data, error } = await supabase.storage
+      .from('pet-documents')
+      .createSignedUrl(storagePath, 3600);
+    if (error || !data?.signedUrl) {
+      throw new Error('Signierte URL konnte nicht erstellt werden.');
+    }
+    return data.signedUrl;
+  };
+
+  const handleOpenDocument = async (docId: string, storagePath: string) => {
+    setOpeningDocId(docId);
+    try {
+      const signedUrl = await getSignedUrl(storagePath);
+      await Linking.openURL(signedUrl);
+    } catch {
       Alert.alert('Fehler', 'Dokument konnte nicht geöffnet werden.');
-    });
+    } finally {
+      setOpeningDocId(null);
+    }
   };
 
   const handleDeleteDocument = (docId: string, docName: string) => {
@@ -306,12 +324,16 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
             ) : (
               <View style={styles.documentList}>
                 {petDocuments.map(doc => (
-                  <TouchableOpacity key={doc.id} style={styles.documentRow} onPress={() => handleOpenDocument(doc.fileUrl)}>
-                    <Ionicons
-                      name={doc.fileType?.includes('pdf') ? 'document-text-outline' : 'image-outline'}
-                      size={24}
-                      color={colors.primary}
-                    />
+                  <TouchableOpacity key={doc.id} style={styles.documentRow} onPress={() => handleOpenDocument(doc.id, doc.storagePath ?? doc.fileUrl)} disabled={openingDocId === doc.id}>
+                    {openingDocId === doc.id ? (
+                      <ActivityIndicator size="small" color={colors.primary} />
+                    ) : (
+                      <Ionicons
+                        name={doc.fileType?.includes('pdf') ? 'document-text-outline' : 'image-outline'}
+                        size={24}
+                        color={colors.primary}
+                      />
+                    )}
                     <View style={styles.documentInfo}>
                       <Text style={styles.documentName} numberOfLines={1}>{doc.name}</Text>
                       <Text style={styles.documentMeta}>

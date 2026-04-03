@@ -39,6 +39,7 @@ export function AddPetScreen({ navigation, route }: AddPetScreenProps) {
   const [birthDate, setBirthDate] = useState(editPet ? toGermanDate(editPet.birthDate) : '');
   const [microchip, setMicrochip] = useState(editPet?.microchipCode ?? '');
   const [photoUri, setPhotoUri] = useState<string | null>(editPet?.photo ?? null);
+  const [saving, setSaving] = useState(false);
 
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -52,7 +53,8 @@ export function AddPetScreen({ navigation, route }: AddPetScreenProps) {
     }
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (saving) return;
     if (!name.trim()) {
       Alert.alert('Fehlende Angabe', 'Bitte gib einen Namen ein.');
       return;
@@ -78,27 +80,33 @@ export function AddPetScreen({ navigation, route }: AddPetScreenProps) {
       }
     }
 
-    if (isEditMode && editPet) {
-      updatePet(editPet.id, {
-        name: name.trim(),
-        type: animalType,
-        breed: breed.trim(),
-        birthDate: isoDate ?? editPet.birthDate,
-        microchipCode: microchip.trim() || undefined,
-        photo: photoUri || undefined,
-      });
-    } else {
-      addPet({
-        name: name.trim(),
-        type: animalType,
-        breed: breed.trim(),
-        birthDate: isoDate ?? new Date().toISOString().split('T')[0],
-        microchipCode: microchip.trim() || undefined,
-        photo: photoUri || undefined,
-      });
+    setSaving(true);
+    try {
+      if (isEditMode && editPet) {
+        await updatePet(editPet.id, {
+          name: name.trim(),
+          type: animalType,
+          breed: breed.trim(),
+          birthDate: isoDate ?? editPet.birthDate,
+          microchipCode: microchip.trim() || undefined,
+          photo: photoUri || undefined,
+        });
+      } else {
+        await addPet({
+          name: name.trim(),
+          type: animalType,
+          breed: breed.trim(),
+          birthDate: isoDate ?? new Date().toISOString().split('T')[0],
+          microchipCode: microchip.trim() || undefined,
+          photo: photoUri || undefined,
+        });
+      }
+      navigation.goBack();
+    } catch (e: any) {
+      Alert.alert('Fehler', e.message || 'Bitte versuche es erneut.');
+    } finally {
+      setSaving(false);
     }
-
-    navigation.goBack();
   };
 
   return (
@@ -163,9 +171,10 @@ export function AddPetScreen({ navigation, route }: AddPetScreenProps) {
         />
 
         <Button
-          title={isEditMode ? 'Änderungen speichern' : 'Tier speichern'}
+          title={saving ? 'Wird gespeichert...' : (isEditMode ? 'Änderungen speichern' : 'Tier speichern')}
           onPress={handleSave}
           style={styles.saveButton}
+          disabled={saving}
         />
       </View>
     </ScrollView>

@@ -7,13 +7,14 @@ interface ButtonProps {
   onPress: () => void;
   variant?: 'primary' | 'secondary' | 'outline';
   style?: ViewStyle;
+  disabled?: boolean;
 }
 
-export function Button({ title, onPress, variant = 'primary', style }: ButtonProps) {
+export function Button({ title, onPress, variant = 'primary', style, disabled }: ButtonProps) {
   return (
     <TouchableOpacity
-      style={[styles.base, styles[variant], style]}
-      onPress={onPress}
+      style={[styles.base, styles[variant], style, disabled && styles.disabled]}
+      onPress={disabled ? undefined : onPress}
       activeOpacity={0.8}
     >
       <Text style={[styles.text, variant === 'outline' && styles.outlineText]}>
@@ -48,5 +49,8 @@ const styles = StyleSheet.create({
   },
   outlineText: {
     color: colors.accent,
+  },
+  disabled: {
+    opacity: 0.5,
   },
 });

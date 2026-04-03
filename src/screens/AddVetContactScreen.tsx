@@ -25,21 +25,27 @@ export function AddVetContactScreen({ navigation, route }: AddVetContactScreenPr
   const [saving, setSaving] = useState(false);
 
   const handleSave = async () => {
+    if (saving) return;
     if (!name.trim()) {
       Alert.alert('Fehlende Angabe', 'Bitte gib den Namen des Tierarztes ein.');
       return;
     }
 
     setSaving(true);
-    await saveVetContact({
-      name: name.trim(),
-      clinic: clinic.trim(),
-      phone: phone.trim(),
-      email: email.trim(),
-      address: address.trim(),
-    });
-    setSaving(false);
-    navigation.goBack();
+    try {
+      await saveVetContact({
+        name: name.trim(),
+        clinic: clinic.trim(),
+        phone: phone.trim(),
+        email: email.trim(),
+        address: address.trim(),
+      });
+      navigation.goBack();
+    } catch (e: any) {
+      Alert.alert('Fehler', e.message || 'Bitte versuche es erneut.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -96,6 +102,7 @@ export function AddVetContactScreen({ navigation, route }: AddVetContactScreenPr
           title={saving ? 'Wird gespeichert...' : (isEditing ? 'Speichern' : 'Tierarzt hinzufügen')}
           onPress={handleSave}
           style={styles.saveButton}
+          disabled={saving}
         />
       </View>
     </ScrollView>

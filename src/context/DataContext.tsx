@@ -126,8 +126,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     if (vacsRes.data) setVaccinations(vacsRes.data.map(mapVaccination));
     if (docsRes.data) setDocuments(docsRes.data.map((row: any) => ({
       id: row.id, petId: row.pet_id, name: row.name,
-      fileUrl: row.file_url, fileType: row.file_type,
-      fileSize: row.file_size, createdAt: row.created_at,
+      fileUrl: row.file_url, storagePath: row.file_url,
+      fileType: row.file_type, fileSize: row.file_size, createdAt: row.created_at,
     })));
     if (treatRes.data) setTreatments(treatRes.data.map((row: any) => ({
       id: row.id, petId: row.pet_id, name: row.name,
@@ -301,7 +301,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         user_id: user.id,
         pet_id: data.petId,
         name: data.name,
-        file_url: url,
+        file_url: path,
         file_type: data.fileType || null,
         file_size: data.fileSize || null,
       });
@@ -313,14 +313,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   };
 
   const deleteDocument = async (id: string) => {
-    // Find the document to get its storage path
     const doc = documents.find(d => d.id === id);
-    if (doc?.fileUrl) {
-      // Extract storage path from signed URL
-      const match = doc.fileUrl.match(/pet-documents\/(.+?)\?/);
-      if (match?.[1]) {
-        await deleteFile(decodeURIComponent(match[1]));
-      }
+    if (doc?.storagePath) {
+      await deleteFile(doc.storagePath);
     }
     const { error } = await supabase.from('documents').delete().eq('id', id);
     if (!error) await refresh();

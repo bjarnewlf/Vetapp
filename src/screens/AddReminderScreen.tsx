@@ -23,8 +23,10 @@ export function AddReminderScreen({ navigation }: AddReminderScreenProps) {
   const [date, setDate] = useState('');
   const [description, setDescription] = useState('');
   const [recurrence, setRecurrence] = useState<RecurrenceType>('Once');
+  const [saving, setSaving] = useState(false);
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    if (saving) return;
     if (!title.trim()) {
       Alert.alert('Fehlende Angabe', 'Bitte gib einen Titel ein.');
       return;
@@ -41,15 +43,21 @@ export function AddReminderScreen({ navigation }: AddReminderScreenProps) {
       return;
     }
 
-    addReminder({
-      petId: petId || undefined,
-      title: title.trim(),
-      date: isoDate,
-      description: description.trim() || undefined,
-      recurrence,
-    });
-
-    navigation.goBack();
+    setSaving(true);
+    try {
+      await addReminder({
+        petId: petId || undefined,
+        title: title.trim(),
+        date: isoDate,
+        description: description.trim() || undefined,
+        recurrence,
+      });
+      navigation.goBack();
+    } catch (e: any) {
+      Alert.alert('Fehler', e.message || 'Bitte versuche es erneut.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const petOptions: SelectFieldOption[] = [
@@ -108,7 +116,7 @@ export function AddReminderScreen({ navigation }: AddReminderScreenProps) {
           onSelect={v => setRecurrence(v as RecurrenceType)}
         />
 
-        <Button title="Erinnerung speichern" onPress={handleSave} style={styles.saveButton} />
+        <Button title={saving ? 'Wird gespeichert...' : 'Erinnerung speichern'} onPress={handleSave} style={styles.saveButton} disabled={saving} />
       </View>
     </ScrollView>
   );

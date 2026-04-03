@@ -61,6 +61,7 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
   });
   const [notes, setNotes] = useState(editEvent?.description || '');
   const [recurrence, setRecurrence] = useState<RecurrenceType>(editEvent?.recurrence || 'Once');
+  const [saving, setSaving] = useState(false);
 
   const selectedPet = pets.find(p => p.id === selectedPetId);
 
@@ -82,6 +83,7 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
   };
 
   const handleSave = async () => {
+    if (saving) return;
     if (!title.trim() || !date.trim()) {
       Alert.alert('Fehlende Angaben', 'Bitte fülle Titel und Datum aus.');
       return;
@@ -109,66 +111,73 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
       nextDate = d.toISOString().split('T')[0];
     }
 
-    // Edit mode: update existing reminder
-    if (isEditMode && editEvent?.id) {
-      await updateReminder(editEvent.id, {
-        title: title.trim(),
-        date: isoDate,
-        description: notes.trim() || undefined,
-        recurrence,
-      });
-      navigation.goBack();
-      return;
-    }
-
-    if (selectedType === 'vaccination') {
-      // Save as vaccination record + create reminder for next date
-      await addVaccination({
-        petId: selectedPetId,
-        name: title.trim(),
-        givenDate: isoDate,
-        nextDate,
-        recurrenceInterval: recurrence !== 'Once' ? recurrence : undefined,
-      });
-      // Auto-create reminder for next vaccination date
-      if (nextDate) {
-        await addReminder({
-          petId: selectedPetId,
-          title: `${title.trim()} fällig`,
-          date: nextDate,
-          description: `Nächste ${title.trim()} für dein Tier`,
+    setSaving(true);
+    try {
+      // Edit mode: update existing reminder
+      if (isEditMode && editEvent?.id) {
+        await updateReminder(editEvent.id, {
+          title: title.trim(),
+          date: isoDate,
+          description: notes.trim() || undefined,
           recurrence,
         });
+        navigation.goBack();
+        return;
       }
-    } else if (selectedType === 'deworming' || selectedType === 'checkup') {
-      // Save as treatment record
-      await addTreatment({
-        petId: selectedPetId,
-        name: title.trim(),
-        date: isoDate,
-        notes: notes.trim() || undefined,
-      });
-      // Create reminder for next occurrence if recurring
-      if (nextDate) {
-        await addReminder({
+
+      if (selectedType === 'vaccination') {
+        // Save as vaccination record + create reminder for next date
+        await addVaccination({
           petId: selectedPetId,
-          title: `${title.trim()} fällig`,
-          date: nextDate,
+          name: title.trim(),
+          givenDate: isoDate,
+          nextDate,
+          recurrenceInterval: recurrence !== 'Once' ? recurrence : undefined,
+        });
+        // Auto-create reminder for next vaccination date
+        if (nextDate) {
+          await addReminder({
+            petId: selectedPetId,
+            title: `${title.trim()} fällig`,
+            date: nextDate,
+            description: `Nächste ${title.trim()} für dein Tier`,
+            recurrence,
+          });
+        }
+      } else if (selectedType === 'deworming' || selectedType === 'checkup') {
+        // Save as treatment record
+        await addTreatment({
+          petId: selectedPetId,
+          name: title.trim(),
+          date: isoDate,
+          notes: notes.trim() || undefined,
+        });
+        // Create reminder for next occurrence if recurring
+        if (nextDate) {
+          await addReminder({
+            petId: selectedPetId,
+            title: `${title.trim()} fällig`,
+            date: nextDate,
+            description: notes.trim() || undefined,
+            recurrence,
+          });
+        }
+      } else {
+        // Custom: save as reminder
+        await addReminder({
+          petId: selectedPetId || undefined,
+          title: title.trim(),
+          date: isoDate,
           description: notes.trim() || undefined,
           recurrence,
         });
       }
-    } else {
-      // Custom: save as reminder
-      await addReminder({
-        petId: selectedPetId || undefined,
-        title: title.trim(),
-        date: isoDate,
-        description: notes.trim() || undefined,
-        recurrence,
-      });
+      navigation.goBack();
+    } catch (e: any) {
+      Alert.alert('Fehler', e.message || 'Bitte versuche es erneut.');
+    } finally {
+      setSaving(false);
     }
-    navigation.goBack();
   };
 
   const getStepTitle = () => {
@@ -309,7 +318,7 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
             ) : undefined}
           />
 
-          <Button title={isEditMode ? 'Aktualisieren' : 'Event speichern'} onPress={handleSave} style={styles.saveButton} />
+          <Button title={saving ? 'Wird gespeichert...' : (isEditMode ? 'Aktualisieren' : 'Event speichern')} onPress={handleSave} style={styles.saveButton} disabled={saving} />
         </View>
       )}
     </ScrollView>

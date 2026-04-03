@@ -59,6 +59,7 @@ export interface Document {
   petId: string;
   name: string;
   fileUrl: string;
+  storagePath?: string;
   fileType?: string;
   fileSize?: number;
   createdAt: string;

@@ -24,21 +24,31 @@ export function EventDetailScreen({ navigation, route }: EventDetailScreenProps)
   const event = reminders.find(r => r.id === eventId);
   const [showReschedule, setShowReschedule] = useState(false);
   const [newDate, setNewDate] = useState('');
+  const [saving, setSaving] = useState(false);
 
   if (!event) return null;
 
   const pet = pets.find(p => p.id === event.petId);
 
-  const handleComplete = () => {
-    completeReminder(event.id);
-    navigation.goBack();
+  const handleComplete = async () => {
+    if (saving) return;
+    setSaving(true);
+    try {
+      await completeReminder(event.id);
+      navigation.goBack();
+    } catch (e: any) {
+      Alert.alert('Fehler', e.message || 'Bitte versuche es erneut.');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleReschedule = () => {
+  const handleReschedule = async () => {
     if (!showReschedule) {
       setShowReschedule(true);
       return;
     }
+    if (saving) return;
     if (!newDate.trim()) {
       Alert.alert('Fehler', 'Bitte gib ein neues Datum ein.');
       return;
@@ -48,10 +58,17 @@ export function EventDetailScreen({ navigation, route }: EventDetailScreenProps)
       Alert.alert('Ungültiges Datum', 'Bitte gib ein gültiges Datum im Format tt.mm.jjjj ein.');
       return;
     }
-    updateReminder(event.id, { date: isoDate });
-    setShowReschedule(false);
-    setNewDate('');
-    Alert.alert('Verschoben', `Event wurde auf ${newDate} verschoben.`);
+    setSaving(true);
+    try {
+      await updateReminder(event.id, { date: isoDate });
+      setShowReschedule(false);
+      setNewDate('');
+      Alert.alert('Verschoben', `Event wurde auf ${newDate} verschoben.`);
+    } catch (e: any) {
+      Alert.alert('Fehler', e.message || 'Bitte versuche es erneut.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleEdit = () => {
@@ -122,14 +139,16 @@ export function EventDetailScreen({ navigation, route }: EventDetailScreenProps)
 
       <View style={styles.actions}>
         <Button
-          title="Als erledigt markieren"
+          title={saving ? 'Wird gespeichert...' : 'Als erledigt markieren'}
           onPress={handleComplete}
           style={styles.completeButton}
+          disabled={saving}
         />
         <Button
-          title={showReschedule ? 'Datum bestätigen' : 'Verschieben'}
+          title={saving ? 'Wird gespeichert...' : (showReschedule ? 'Datum bestätigen' : 'Verschieben')}
           onPress={handleReschedule}
           variant="outline"
+          disabled={saving}
         />
         <Button
           title="Bearbeiten"
