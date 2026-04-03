@@ -71,22 +71,24 @@ export function ProfileScreen({ navigation }: { navigation: any }) {
       </View>
 
       {/* AI Assistant Teaser */}
-      <Card style={styles.aiCard}>
-        <View style={styles.aiRow}>
-          <View style={styles.aiIcon}>
-            <Ionicons name="sparkles" size={22} color={colors.primary} />
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={() => navigation.navigate('AIAssistant')}
+      >
+        <Card style={styles.aiCard}>
+          <View style={styles.aiRow}>
+            <View style={styles.aiIcon}>
+              <Ionicons name="sparkles" size={22} color={colors.primary} />
+            </View>
+            <View style={styles.aiContent}>
+              <Text style={styles.aiTitle}>KI-Gesundheitsassistent →</Text>
+            </View>
           </View>
-          <View style={styles.aiContent}>
-            <Text style={styles.aiTitle}>KI-Gesundheitsassistent →</Text>
-          </View>
-        </View>
-        <Text style={styles.aiDescription}>
-          Kommt bald: Personalisierte Gesundheitsempfehlungen, Frühwarnzeichen und Expertenrat — powered by KI.
-        </Text>
-        <TouchableOpacity onPress={() => navigation.navigate('Paywall', { feature: 'premium' })}>
-          <Text style={styles.previewLink}>✨ Premium-Funktionen ansehen →</Text>
-        </TouchableOpacity>
-      </Card>
+          <Text style={styles.aiDescription}>
+            Kommt bald: Personalisierte Gesundheitsempfehlungen, Frühwarnzeichen und Expertenrat — powered by KI.
+          </Text>
+        </Card>
+      </TouchableOpacity>
 
       {/* Settings Items */}
       <Card style={styles.settingsCard}>

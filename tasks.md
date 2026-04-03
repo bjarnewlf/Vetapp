@@ -8,9 +8,10 @@
 ## DIESE WOCHE
 - [ ] D1: Accessibility Basics (Labels, Touch-Targets min. 44px)
 - [ ] D4: Inkonsistente Farben — Theme konsequent nutzen
+- [ ] AI-Assistent: Edge Function deployen + ANTHROPIC_API_KEY setzen
+- [ ] AI-Assistent: ProfileScreen "Kommt bald" Text aktualisieren
 
 ## BACKLOG
-- [ ] Paket 3: AI-Assistent (Claude Haiku, Premium-only) — geparkt
 - [ ] Paket 6: QA-Review ueber alles — nach Phase 2
 - [ ] M7: DataContext refactoren (God-Object, ~350 Zeilen)
 - [ ] Chat-Historie persistent machen (nach MVP)
@@ -18,6 +19,8 @@
 - [ ] ProfileScreen: Settings-Items "Datenschutz" + "Hilfe" noch ohne Handler
 
 ## ERLEDIGT
+- [x] Paket 3: AI-Assistent (Claude Haiku, Premium-only)
+- [x] AI-Assistent: QA-Findings gefixt (Premium-Gate useEffect, Input-Validierung)
 - [x] K1: Supabase-Credentials in .env auslagern
 - [x] K2: user!.id Non-Null-Assertion in completeReminder
 - [x] M5: Dev-Toggle entfernen (Security)

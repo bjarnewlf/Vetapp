@@ -139,6 +139,23 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
             </View>
           </View>
         </Card>
+
+        <TouchableOpacity
+          style={styles.aiCard}
+          onPress={() => navigation.navigate('AIAssistant')}
+          activeOpacity={0.8}
+        >
+          <View style={styles.aiCardRow}>
+            <View style={styles.aiCardIcon}>
+              <Ionicons name="sparkles" size={22} color={colors.primary} />
+            </View>
+            <View style={styles.aiCardContent}>
+              <Text style={styles.aiCardTitle}>KI-Gesundheitsassistent</Text>
+              <Text style={styles.aiCardSub}>Fragen zur Tiergesundheit? Frag die KI.</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.textLight} />
+          </View>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -206,4 +223,17 @@ const styles = StyleSheet.create({
   statItem: { alignItems: 'center' },
   statNumber: { ...typography.stat },
   statLabel: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
+  aiCard: {
+    backgroundColor: colors.surface, borderRadius: borderRadius.lg, padding: spacing.md,
+    marginBottom: spacing.lg, shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.06, shadowRadius: 8, elevation: 2,
+  },
+  aiCardRow: { flexDirection: 'row', alignItems: 'center' },
+  aiCardIcon: {
+    width: 44, height: 44, borderRadius: 22, backgroundColor: colors.primaryLight,
+    alignItems: 'center', justifyContent: 'center', marginRight: spacing.md,
+  },
+  aiCardContent: { flex: 1 },
+  aiCardTitle: { ...typography.h3, color: colors.text },
+  aiCardSub: { ...typography.bodySmall, color: colors.textSecondary },
 });

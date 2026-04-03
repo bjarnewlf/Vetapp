@@ -24,6 +24,7 @@ import {
   ReminderSettingsScreen,
   OnboardingScreen,
   AddVetContactScreen,
+  AIAssistantScreen,
 } from '../screens';
 
 const Stack = createNativeStackNavigator();
@@ -131,6 +132,7 @@ export function AppNavigator() {
             <Stack.Screen name="EventDetail" component={EventDetailScreen} />
             <Stack.Screen name="ReminderSettings" component={ReminderSettingsScreen} />
             <Stack.Screen name="AddVetContact" component={AddVetContactScreen} />
+            <Stack.Screen name="AIAssistant" component={AIAssistantScreen} />
             <Stack.Screen
               name="Paywall"
               component={PaywallScreen}

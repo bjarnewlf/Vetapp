@@ -1,0 +1,1691 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>KI-Gesundheitsassistent — VetApp Feature-Konzept</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:        #1B6B5A;
+      --primary-dark:   #145244;
+      --primary-light:  #E8F5F1;
+      --accent:         #E8895C;
+      --accent-light:   #FDF0E8;
+      --bg:             #FAF6F1;
+      --surface:        #FFFFFF;
+      --text:           #1A1A1A;
+      --text-sec:       #6B7280;
+      --error:          #DC2626;
+      --error-light:    #FEF2F2;
+      --warning:        #D97706;
+      --warning-light:  #FFFBEB;
+      --success:        #059669;
+      --success-light:  #ECFDF5;
+      --border:         #D1D5DB;
+      --r-sm:           8px;
+      --r-md:           12px;
+      --r-lg:           16px;
+      --r-xl:           24px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #0D1117;
+      color: var(--text);
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* ── Slideshow ── */
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 80px;
+      pointer-events: none;
+    }
+
+    .slide.active {
+      display: flex;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .slide.exit-left { display: none; }
+
+    .slide.exit-right { display: none; }
+
+    .slide-inner {
+      width: 100%;
+      max-width: 960px;
+    }
+
+    /* ── Nav buttons ── */
+    .nav-btn {
+      position: fixed;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.6);
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, color 0.2s;
+      z-index: 100;
+    }
+    .nav-btn:hover {
+      background: rgba(255,255,255,0.16);
+      color: #fff;
+    }
+    .nav-btn:disabled {
+      opacity: 0.2;
+      cursor: default;
+    }
+    .nav-btn.prev { left: 20px; }
+    .nav-btn.next { right: 20px; }
+
+    /* ── Counter ── */
+    .counter {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.05em;
+      z-index: 100;
+    }
+
+    /* ── Progress dots ── */
+    .dots {
+      position: fixed;
+      bottom: 46px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 8px;
+      z-index: 100;
+    }
+    .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.2);
+      transition: background 0.3s, width 0.3s;
+    }
+    .dot.active {
+      background: var(--accent);
+      width: 20px;
+    }
+
+    /* ════════════════════════════════════════
+       SLIDE 1 — TITEL
+    ════════════════════════════════════════ */
+    .s1-bg {
+      background: linear-gradient(135deg, #0D1A17 0%, #0F2420 40%, #1B2D2A 100%);
+    }
+
+    .s1-tag {
+      display: inline-block;
+      background: rgba(27,107,90,0.25);
+      border: 1px solid rgba(27,107,90,0.5);
+      color: #5BBFA8;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      border-radius: 20px;
+      margin-bottom: 28px;
+    }
+
+    .s1-title {
+      font-size: clamp(40px, 6vw, 72px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    .s1-title span {
+      color: var(--accent);
+    }
+
+    .s1-sub {
+      font-size: clamp(16px, 2vw, 20px);
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 48px;
+      font-weight: 400;
+    }
+
+    .s1-meta {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+    }
+
+    .s1-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+
+    .s1-meta-text {
+      font-size: 13px;
+      color: rgba(255,255,255,0.4);
+    }
+    .s1-meta-text strong {
+      display: block;
+      color: rgba(255,255,255,0.7);
+      font-weight: 500;
+    }
+
+    .s1-deco {
+      position: absolute;
+      right: 8%;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(27,107,90,0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .s1-deco-ring {
+      position: absolute;
+      right: 6%;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 380px;
+      height: 380px;
+      border-radius: 50%;
+      border: 1px solid rgba(27,107,90,0.15);
+      pointer-events: none;
+    }
+    .s1-icon-big {
+      position: absolute;
+      right: calc(8% + 100px);
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 120px;
+      opacity: 0.12;
+      pointer-events: none;
+    }
+
+    /* ════════════════════════════════════════
+       SLIDE 2 — DAS FEATURE
+    ════════════════════════════════════════ */
+    .s2-bg {
+      background: var(--bg);
+    }
+
+    .slide-header {
+      margin-bottom: 40px;
+    }
+
+    .slide-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+
+    .slide-title {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      line-height: 1.15;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .feature-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 24px;
+    }
+
+    .feature-card-icon {
+      font-size: 28px;
+      margin-bottom: 12px;
+    }
+
+    .feature-card-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .feature-card-desc {
+      font-size: 13px;
+      color: var(--text-sec);
+      line-height: 1.6;
+    }
+
+    .feature-card.accent-border {
+      border-color: var(--primary);
+      border-left: 3px solid var(--primary);
+    }
+
+    .premium-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, var(--accent), #D4703E);
+      color: white;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      padding: 4px 12px;
+      border-radius: 20px;
+      margin-bottom: 20px;
+    }
+
+    .disclaimer-box {
+      background: var(--warning-light);
+      border: 1px solid rgba(217,119,6,0.3);
+      border-radius: var(--r-md);
+      padding: 14px 18px;
+      font-size: 13px;
+      color: var(--warning);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 16px;
+      grid-column: 1 / -1;
+    }
+
+    /* ════════════════════════════════════════
+       SLIDE 3 — CHAT UI MOCKUP
+    ════════════════════════════════════════ */
+    .s3-bg {
+      background: #1A1F2E;
+    }
+
+    .mockup-wrapper {
+      display: flex;
+      gap: 48px;
+      align-items: center;
+    }
+
+    .mockup-labels {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .mockup-label-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .mockup-label-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .mockup-label-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 3px;
+    }
+
+    .mockup-label-desc {
+      font-size: 12px;
+      color: rgba(255,255,255,0.4);
+      line-height: 1.5;
+    }
+
+    /* Phone frame */
+    .phone-frame {
+      flex-shrink: 0;
+      width: 280px;
+      height: 520px;
+      background: #1A1A1A;
+      border-radius: 40px;
+      padding: 10px;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.1),
+        0 40px 80px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.1);
+      position: relative;
+    }
+
+    .phone-notch {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 20px;
+      background: #0D0D0D;
+      border-radius: 12px;
+      z-index: 10;
+    }
+
+    .phone-screen {
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      border-radius: 32px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .phone-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 40px 14px 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .phone-header-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+
+    .phone-header-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .phone-header-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .phone-header-sub {
+      font-size: 9px;
+      color: var(--text-sec);
+      margin-top: 2px;
+    }
+
+    .online-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      flex-shrink: 0;
+    }
+
+    .phone-messages {
+      flex: 1;
+      overflow: hidden;
+      padding: 10px 10px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .msg-disclaimer {
+      background: var(--warning-light);
+      border: 1px solid rgba(217,119,6,0.25);
+      border-radius: var(--r-md);
+      padding: 7px 10px;
+      font-size: 9px;
+      color: var(--warning);
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    .msg-bubble {
+      max-width: 85%;
+      padding: 7px 10px;
+      border-radius: var(--r-md);
+      font-size: 10px;
+      line-height: 1.5;
+    }
+
+    .msg-user {
+      background: var(--primary);
+      color: white;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+
+    .msg-ai {
+      background: var(--surface);
+      color: var(--text);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .msg-typing {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      border-bottom-left-radius: 4px;
+      padding: 10px 14px;
+      align-self: flex-start;
+      display: flex;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .typing-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--text-sec);
+      animation: bounce 1.2s infinite;
+    }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-4px); }
+    }
+
+    .phone-chips {
+      padding: 4px 10px 6px;
+      display: flex;
+      gap: 5px;
+      flex-wrap: nowrap;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .chip {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 9px;
+      font-size: 8.5px;
+      color: var(--primary);
+      font-weight: 500;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .phone-input-area {
+      padding: 6px 10px 10px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .phone-input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 10px;
+      font-size: 9px;
+      color: var(--text-sec);
+    }
+
+    .phone-send-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    /* ════════════════════════════════════════
+       SLIDE 4 — USER FLOW
+    ════════════════════════════════════════ */
+    .s4-bg {
+      background: var(--bg);
+    }
+
+    .flow-container {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .flow-row {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .flow-node {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-md);
+      padding: 12px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      text-align: center;
+      flex-shrink: 0;
+      min-width: 140px;
+    }
+
+    .flow-node.primary {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+
+    .flow-node.accent {
+      background: var(--accent-light);
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    .flow-node.warning {
+      background: var(--warning-light);
+      border-color: rgba(217,119,6,0.4);
+      color: var(--warning);
+    }
+
+    .flow-node.success {
+      background: var(--success-light);
+      border-color: rgba(5,150,105,0.4);
+      color: var(--success);
+      font-weight: 600;
+    }
+
+    .flow-node.error {
+      background: var(--error-light);
+      border-color: rgba(220,38,38,0.3);
+      color: var(--error);
+    }
+
+    .flow-node-small {
+      font-size: 11px;
+      padding: 9px 14px;
+      min-width: 110px;
+    }
+
+    .flow-arrow {
+      color: var(--text-sec);
+      font-size: 16px;
+      padding: 0 8px;
+      flex-shrink: 0;
+    }
+
+    .flow-label {
+      font-size: 10px;
+      color: var(--text-sec);
+      text-align: center;
+      margin-top: 4px;
+    }
+
+    .flow-fork {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .flow-fork-item {
+      display: flex;
+      align-items: center;
+      gap: 0;
+    }
+
+    .flow-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-sec);
+      margin-bottom: 10px;
+    }
+
+    .flow-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 20px 24px;
+    }
+
+    /* ════════════════════════════════════════
+       SLIDE 5 — ARCHITEKTUR
+    ════════════════════════════════════════ */
+    .s5-bg {
+      background: #0D1117;
+    }
+
+    .arch-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    .arch-diagram {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--r-xl);
+      padding: 32px 24px;
+    }
+
+    .arch-node {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--r-md);
+      padding: 16px 20px;
+      text-align: center;
+      position: relative;
+    }
+
+    .arch-node.highlight {
+      background: rgba(27,107,90,0.15);
+      border-color: rgba(27,107,90,0.4);
+    }
+
+    .arch-node.api {
+      background: rgba(232,137,92,0.1);
+      border-color: rgba(232,137,92,0.3);
+    }
+
+    .arch-node-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .arch-node-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 3px;
+    }
+
+    .arch-node-sub {
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .arch-arrow-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 0;
+      position: relative;
+    }
+
+    .arch-arrow-line {
+      width: 2px;
+      height: 32px;
+      background: linear-gradient(to bottom, rgba(27,107,90,0.5), rgba(27,107,90,0.2));
+      margin: 0 auto;
+    }
+
+    .arch-arrow-label {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 10px;
+      color: rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.05);
+      border-radius: 4px;
+      padding: 2px 7px;
+      white-space: nowrap;
+    }
+
+    .arch-facts {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .arch-fact {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: var(--r-md);
+      padding: 16px 18px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    .arch-fact-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .arch-fact-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 3px;
+    }
+
+    .arch-fact-desc {
+      font-size: 12px;
+      color: rgba(255,255,255,0.35);
+      line-height: 1.55;
+    }
+
+    /* ════════════════════════════════════════
+       SLIDE 6 — UMSETZUNGSPLAN
+    ════════════════════════════════════════ */
+    .s6-bg {
+      background: var(--bg);
+    }
+
+    .plan-layout {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 32px;
+      align-items: start;
+    }
+
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      position: relative;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 19px;
+      top: 20px;
+      bottom: 20px;
+      width: 2px;
+      background: var(--border);
+    }
+
+    .tl-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 0 0 20px;
+      position: relative;
+    }
+
+    .tl-item:last-child {
+      padding-bottom: 0;
+    }
+
+    .tl-num {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      font-size: 14px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+      border: 3px solid var(--bg);
+    }
+
+    .tl-content {
+      padding-top: 6px;
+      flex: 1;
+    }
+
+    .tl-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 3px;
+    }
+
+    .tl-desc {
+      font-size: 12px;
+      color: var(--text-sec);
+      line-height: 1.5;
+    }
+
+    .tl-file {
+      display: inline-block;
+      margin-top: 5px;
+      font-size: 11px;
+      font-family: "SF Mono", "Fira Code", monospace;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .plan-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 20px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-sec);
+    }
+
+    .file-summary {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 16px 18px;
+    }
+
+    .file-summary-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-sec);
+      margin-bottom: 12px;
+    }
+
+    .file-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 7px;
+    }
+
+    .file-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .file-dot.new { background: var(--success); }
+    .file-dot.changed { background: var(--accent); }
+
+    .file-name {
+      font-size: 11px;
+      font-family: "SF Mono", "Fira Code", monospace;
+      color: var(--text);
+    }
+
+    .file-badge {
+      margin-left: auto;
+      font-size: 9px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .file-badge.new {
+      background: var(--success-light);
+      color: var(--success);
+    }
+
+    .file-badge.changed {
+      background: var(--accent-light);
+      color: var(--accent);
+    }
+
+    /* ════════════════════════════════════════
+       SLIDE 7 — MVP-SCOPE
+    ════════════════════════════════════════ */
+    .s7-bg {
+      background: #0D1117;
+    }
+
+    .scope-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+    }
+
+    .scope-col {
+      border-radius: var(--r-xl);
+      padding: 24px;
+    }
+
+    .scope-col.in {
+      background: rgba(5,150,105,0.08);
+      border: 1px solid rgba(5,150,105,0.25);
+    }
+
+    .scope-col.out {
+      background: rgba(220,38,38,0.06);
+      border: 1px solid rgba(220,38,38,0.2);
+    }
+
+    .scope-col.future {
+      background: rgba(232,137,92,0.07);
+      border: 1px solid rgba(232,137,92,0.25);
+    }
+
+    .scope-col-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .scope-col-icon {
+      font-size: 20px;
+    }
+
+    .scope-col-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.8);
+    }
+
+    .scope-col-subtitle {
+      font-size: 10px;
+      color: rgba(255,255,255,0.35);
+      margin-top: 1px;
+    }
+
+    .scope-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      margin-bottom: 12px;
+    }
+
+    .scope-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .scope-check {
+      font-size: 13px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .scope-text {
+      font-size: 12px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.5;
+    }
+
+    .scope-text strong {
+      color: rgba(255,255,255,0.85);
+      font-weight: 600;
+    }
+
+    /* Dark slide headings */
+    .slide-title-dark {
+      font-size: clamp(26px, 3.5vw, 40px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: rgba(255,255,255,0.9);
+      line-height: 1.2;
+    }
+
+    .slide-eyebrow-dark {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #5BBFA8;
+      margin-bottom: 10px;
+    }
+
+    /* ── Shared light-bg heading ── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--primary);
+    }
+  </style>
+</head>
+<body>
+
+<div class="slideshow" id="slideshow">
+
+  <!-- ────── SLIDE 1: TITEL ────── -->
+  <div class="slide s1-bg active" id="slide-1">
+    <div class="s1-deco"></div>
+    <div class="s1-deco-ring"></div>
+    <div class="s1-icon-big">🐾</div>
+    <div class="slide-inner">
+      <div class="s1-tag">Feature-Konzept</div>
+      <h1 class="s1-title">KI-Gesundheits<br><span>assistent</span></h1>
+      <p class="s1-sub">VetApp &mdash; Intelligente Tiergesundheit</p>
+      <div class="s1-meta">
+        <div class="s1-avatar">🩺</div>
+        <div class="s1-meta-text">
+          <strong>Konzept-Präsentation</strong>
+          03. April 2026
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────── SLIDE 2: DAS FEATURE ────── -->
+  <div class="slide s2-bg" id="slide-2">
+    <div class="slide-inner">
+      <div class="slide-header">
+        <div class="slide-eyebrow">Das Feature</div>
+        <h2 class="slide-title">Chat-basierter<br>Tiergesundheits-Assistent</h2>
+      </div>
+
+      <div class="premium-badge">
+        ★&nbsp; Premium-Feature
+      </div>
+
+      <div class="feature-grid">
+        <div class="feature-card accent-border">
+          <div class="feature-card-icon">💬</div>
+          <div class="feature-card-title">Natürlichsprachiger Chat</div>
+          <div class="feature-card-desc">User stellen Fragen in natürlicher Sprache — keine Formulare, keine Checkboxen. Der Assistent antwortet kontextuell und auf Deutsch.</div>
+        </div>
+
+        <div class="feature-card accent-border">
+          <div class="feature-card-icon">🐶</div>
+          <div class="feature-card-title">Persönlicher Tier-Kontext</div>
+          <div class="feature-card-desc">Der Assistent kennt Name, Rasse, Alter, Gewicht und Impfstatus des Tieres. Antworten sind individuell — nicht generisch.</div>
+        </div>
+
+        <div class="feature-card accent-border">
+          <div class="feature-card-icon">⚡</div>
+          <div class="feature-card-title">Powered by Claude Haiku</div>
+          <div class="feature-card-desc">Anthropic Claude Haiku — schnell, kosteneffizient, präzise. API-Key bleibt serverseitig (Supabase Edge Function), nie im Client.</div>
+        </div>
+
+        <div class="feature-card accent-border">
+          <div class="feature-card-icon">🔒</div>
+          <div class="feature-card-title">Premium-Gate</div>
+          <div class="feature-card-desc">Kostenloser Teaser auf dem Profil-Screen. Vollzugriff nur für Pro-User. Free-User sehen eine Paywall mit klarem Mehrwert-Versprechen.</div>
+        </div>
+
+        <div class="disclaimer-box">
+          <span style="font-size: 16px; flex-shrink: 0;">⚠️</span>
+          <span><strong>Wichtiger Hinweis:</strong> Der KI-Assistent ist kein Ersatz für eine tierärztliche Untersuchung. Bei ernsthaften Symptomen immer einen Tierarzt aufsuchen. Dieser Hinweis erscheint prominent zu Beginn jeder Chat-Session.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────── SLIDE 3: CHAT UI MOCKUP ────── -->
+  <div class="slide s3-bg" id="slide-3">
+    <div class="slide-inner">
+      <div class="slide-header" style="margin-bottom: 28px;">
+        <div class="slide-eyebrow-dark">Chat-Interface</div>
+        <h2 class="slide-title-dark">Mockup: So sieht es der User</h2>
+      </div>
+
+      <div class="mockup-wrapper">
+        <!-- Phone -->
+        <div class="phone-frame">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <!-- Header -->
+            <div class="phone-header">
+              <div class="phone-header-avatar">🩺</div>
+              <div class="phone-header-info">
+                <div class="phone-header-name">Tiergesundheits-Assistent</div>
+                <div class="phone-header-sub">Für Luna &bull; Golden Retriever</div>
+              </div>
+              <div class="online-dot"></div>
+            </div>
+
+            <!-- Messages -->
+            <div class="phone-messages">
+              <div class="msg-disclaimer">
+                ⚠️ KI-Assistent — kein Ersatz für den Tierarzt. Bei ernsten Symptomen bitte direkt zum Veterinär.
+              </div>
+
+              <div class="msg-bubble msg-user">
+                Luna kratzt sich ständig am Ohr, was könnte das sein?
+              </div>
+
+              <div class="msg-bubble msg-ai">
+                Bei Luna (Golden Retriever, 3 Jahre) könnte häufiges Ohrkratzen auf Ohrenentzündung, Milben, Allergien oder einen Fremdkörper hindeuten. Da Luna regelmäßig geimpft ist, ist eine Infektion weniger wahrscheinlich.<br><br>
+                Ohr vorsichtig auf Rötungen oder Geruch prüfen. Bei Auffälligkeiten bitte zeitnah zum Tierarzt.
+              </div>
+
+              <div class="msg-bubble msg-user">
+                Danke, soll ich das Ohr reinigen?
+              </div>
+
+              <div class="msg-typing">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+              </div>
+            </div>
+
+            <!-- Quick actions -->
+            <div class="phone-chips">
+              <div class="chip">Wann zum Tierarzt?</div>
+              <div class="chip">Hausmittel</div>
+              <div class="chip">Mehr Info</div>
+            </div>
+
+            <!-- Input -->
+            <div class="phone-input-area">
+              <div class="phone-input">Neue Frage stellen…</div>
+              <div class="phone-send-btn">&#10148;</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Labels -->
+        <div class="mockup-labels">
+          <div class="mockup-label-item">
+            <div class="mockup-label-num">1</div>
+            <div>
+              <div class="mockup-label-title">Disclaimer immer sichtbar</div>
+              <div class="mockup-label-desc">Warnhinweis erscheint zu Beginn jeder Session — nicht wegschiebbar.</div>
+            </div>
+          </div>
+          <div class="mockup-label-item">
+            <div class="mockup-label-num">2</div>
+            <div>
+              <div class="mockup-label-title">Tier-Kontext im Header</div>
+              <div class="mockup-label-desc">User sieht sofort für welches Tier der Chat läuft.</div>
+            </div>
+          </div>
+          <div class="mockup-label-item">
+            <div class="mockup-label-num">3</div>
+            <div>
+              <div class="mockup-label-title">Typing-Indikator</div>
+              <div class="mockup-label-desc">Animierte Punkte während die KI die Antwort generiert — kein leeres Warten.</div>
+            </div>
+          </div>
+          <div class="mockup-label-item">
+            <div class="mockup-label-num">4</div>
+            <div>
+              <div class="mockup-label-title">Quick-Action-Chips</div>
+              <div class="mockup-label-desc">Vorgeschlagene Folgefragen reduzieren den Aufwand für den User.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────── SLIDE 4: USER FLOW ────── -->
+  <div class="slide s4-bg" id="slide-4">
+    <div class="slide-inner">
+      <div class="slide-header" style="margin-bottom: 28px;">
+        <div class="slide-eyebrow">User Flow</div>
+        <h2 class="slide-title">Vom Einstieg zur Antwort</h2>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+
+        <!-- Row 1: Einstieg -->
+        <div class="flow-section">
+          <div class="flow-section-title">Einstieg</div>
+          <div class="flow-row" style="flex-wrap: wrap; gap: 4px;">
+            <div class="flow-node flow-node-small" style="min-width: 120px;">HomeScreen<br><span style="font-size: 10px; font-weight: 400; color: var(--text-sec);">CTA-Button</span></div>
+            <div class="flow-arrow">+</div>
+            <div class="flow-node flow-node-small" style="min-width: 130px;">ProfileScreen<br><span style="font-size: 10px; font-weight: 400; color: var(--text-sec);">Feature-Teaser</span></div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-node flow-node-small" style="background: #F3F4F6; min-width: 110px;">Premium-Check<br><span style="font-size: 10px; font-weight: 400; color: var(--text-sec);">isPremium?</span></div>
+            <div class="flow-arrow">&rarr;</div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+              <div class="flow-row" style="gap: 0;">
+                <div class="flow-arrow" style="color: var(--success);">&#10003;&nbsp;</div>
+                <div class="flow-node flow-node-small success">ChatScreen öffnet</div>
+              </div>
+              <div class="flow-row" style="gap: 0;">
+                <div class="flow-arrow" style="color: var(--error);">&#10007;&nbsp;</div>
+                <div class="flow-node flow-node-small error">Paywall anzeigen</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Im Chat -->
+        <div class="flow-section">
+          <div class="flow-section-title">Im Chat</div>
+          <div class="flow-row">
+            <div class="flow-node flow-node-small primary">Frage eingeben</div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-node flow-node-small" style="background: var(--primary-light); border-color: var(--primary);">KI verarbeitet<br><span style="font-size: 10px; color: var(--text-sec);">Typing-Indikator</span></div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-node flow-node-small success">Antwort anzeigen</div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-node flow-node-small accent">Quick-Actions<br><span style="font-size: 10px;">optional</span></div>
+          </div>
+        </div>
+
+        <!-- Row 3: Fehler-Pfad -->
+        <div class="flow-section">
+          <div class="flow-section-title">Fehler-Pfad</div>
+          <div class="flow-row">
+            <div class="flow-node flow-node-small primary">API-Aufruf</div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-node flow-node-small error">Netzwerkfehler<br>/ Timeout</div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-node flow-node-small warning">Toast-Hinweis<br>+ Retry-Button</div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-node flow-node-small" style="background: var(--primary-light); border-color: var(--primary);">Erneut senden</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ────── SLIDE 5: ARCHITEKTUR ────── -->
+  <div class="slide s5-bg" id="slide-5">
+    <div class="slide-inner">
+      <div class="slide-header" style="margin-bottom: 28px;">
+        <div class="slide-eyebrow-dark">Technik</div>
+        <h2 class="slide-title-dark">Technische Architektur</h2>
+      </div>
+
+      <div class="arch-wrapper">
+        <!-- Diagramm -->
+        <div class="arch-diagram">
+          <div class="arch-node highlight">
+            <div class="arch-node-icon">📱</div>
+            <div class="arch-node-title">React Native App</div>
+            <div class="arch-node-sub">ChatScreen + aiService.ts</div>
+          </div>
+
+          <div class="arch-arrow-wrap">
+            <div class="arch-arrow-line"></div>
+            <div class="arch-arrow-label">HTTPS + JWT-Auth</div>
+          </div>
+
+          <div class="arch-node highlight">
+            <div class="arch-node-icon">⚙️</div>
+            <div class="arch-node-title">Supabase Edge Function</div>
+            <div class="arch-node-sub">ai-chat / Deno-Runtime</div>
+          </div>
+
+          <div class="arch-arrow-wrap">
+            <div class="arch-arrow-line"></div>
+            <div class="arch-arrow-label">Anthropic SDK</div>
+          </div>
+
+          <div class="arch-node api">
+            <div class="arch-node-icon">🤖</div>
+            <div class="arch-node-title">Claude Haiku API</div>
+            <div class="arch-node-sub">Anthropic &bull; claude-haiku-4-5</div>
+          </div>
+        </div>
+
+        <!-- Fakten -->
+        <div class="arch-facts">
+          <div class="arch-fact">
+            <div class="arch-fact-icon">🔑</div>
+            <div>
+              <div class="arch-fact-title">API-Key nur serverseitig</div>
+              <div class="arch-fact-desc">Der Anthropic-API-Key liegt ausschließlich in der Edge Function als Umgebungsvariable. Kein Zugriff über den Client möglich.</div>
+            </div>
+          </div>
+
+          <div class="arch-fact">
+            <div class="arch-fact-icon">🛡️</div>
+            <div>
+              <div class="arch-fact-title">JWT-Authentifizierung</div>
+              <div class="arch-fact-desc">Jeder Aufruf der Edge Function erfordert ein gültiges Supabase-JWT. Unauthentifizierte Anfragen werden abgelehnt.</div>
+            </div>
+          </div>
+
+          <div class="arch-fact">
+            <div class="arch-fact-icon">🐾</div>
+            <div>
+              <div class="arch-fact-title">Pet-Daten als System-Prompt</div>
+              <div class="arch-fact-desc">Name, Rasse, Alter, Gewicht, Impfstatus werden in den System-Prompt injiziert. Das Modell "kennt" das Tier ohne separate DB-Abfrage.</div>
+            </div>
+          </div>
+
+          <div class="arch-fact">
+            <div class="arch-fact-icon">💰</div>
+            <div>
+              <div class="arch-fact-title">Claude Haiku = kosteneffizient</div>
+              <div class="arch-fact-desc">Haiku ist ~25x günstiger als Opus bei vergleichbarer Qualität für medizinische Kurztexte. Ideal für Chat-Anwendungen.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────── SLIDE 6: UMSETZUNGSPLAN ────── -->
+  <div class="slide s6-bg" id="slide-6">
+    <div class="slide-inner">
+      <div class="slide-header" style="margin-bottom: 28px;">
+        <div class="slide-eyebrow">Umsetzung</div>
+        <h2 class="slide-title">Schritt-für-Schritt-Plan</h2>
+      </div>
+
+      <div class="plan-layout">
+        <!-- Timeline -->
+        <div class="timeline">
+          <div class="tl-item">
+            <div class="tl-num">1</div>
+            <div class="tl-content">
+              <div class="tl-title">Edge Function (Backend)</div>
+              <div class="tl-desc">Supabase Edge Function einrichten, Anthropic SDK integrieren, JWT-Auth prüfen, Pet-Daten in System-Prompt bauen.</div>
+              <span class="tl-file">supabase/functions/ai-chat/index.ts</span>
+            </div>
+          </div>
+
+          <div class="tl-item">
+            <div class="tl-num">2</div>
+            <div class="tl-content">
+              <div class="tl-title">Client-Service (aiService.ts)</div>
+              <div class="tl-desc">Typen definieren, Fetch-Logik kapseln, Error-Handling standardisieren. Saubere Schnittstelle für den Screen.</div>
+              <span class="tl-file">src/services/aiService.ts</span>
+            </div>
+          </div>
+
+          <div class="tl-item">
+            <div class="tl-num">3</div>
+            <div class="tl-content">
+              <div class="tl-title">Chat-Screen (UI)</div>
+              <div class="tl-desc">ChatScreen.tsx mit Message-Bubbles, Typing-Indikator, Disclaimer, Quick-Actions und Input-Feld. Mobile-first, Accessibility-ready.</div>
+              <span class="tl-file">src/screens/ChatScreen.tsx</span>
+            </div>
+          </div>
+
+          <div class="tl-item">
+            <div class="tl-num">4</div>
+            <div class="tl-content">
+              <div class="tl-title">Navigation + Einstiegspunkte</div>
+              <div class="tl-desc">ChatScreen in den Navigator einbinden, CTA auf HomeScreen und ProfileScreen ergänzen, Premium-Gate verdrahten.</div>
+              <span class="tl-file">src/navigation/AppNavigator.tsx</span>
+            </div>
+          </div>
+
+          <div class="tl-item">
+            <div class="tl-num">5</div>
+            <div class="tl-content">
+              <div class="tl-title">QA-Review</div>
+              <div class="tl-desc">TypeScript-Check (tsc --noEmit), manuelle Tests auf Android + iOS, Edge-Cases prüfen (kein Netz, leere Pet-Daten, lange Antworten).</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="plan-sidebar">
+          <div class="stat-card">
+            <div class="stat-value">~7h</div>
+            <div class="stat-label">Geschätzter Aufwand</div>
+          </div>
+
+          <div class="file-summary">
+            <div class="file-summary-title">Dateien</div>
+
+            <div style="font-size: 10px; font-weight: 600; color: var(--success); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 7px;">Neu</div>
+            <div class="file-row">
+              <div class="file-dot new"></div>
+              <div class="file-name">ai-chat/index.ts</div>
+              <div class="file-badge new">neu</div>
+            </div>
+            <div class="file-row">
+              <div class="file-dot new"></div>
+              <div class="file-name">aiService.ts</div>
+              <div class="file-badge new">neu</div>
+            </div>
+            <div class="file-row">
+              <div class="file-dot new"></div>
+              <div class="file-name">ChatScreen.tsx</div>
+              <div class="file-badge new">neu</div>
+            </div>
+
+            <div style="font-size: 10px; font-weight: 600; color: var(--accent); text-transform: uppercase; letter-spacing: 0.06em; margin: 12px 0 7px;">Geändert</div>
+            <div class="file-row">
+              <div class="file-dot changed"></div>
+              <div class="file-name">AppNavigator.tsx</div>
+              <div class="file-badge changed">edit</div>
+            </div>
+            <div class="file-row">
+              <div class="file-dot changed"></div>
+              <div class="file-name">HomeScreen.tsx</div>
+              <div class="file-badge changed">edit</div>
+            </div>
+            <div class="file-row">
+              <div class="file-dot changed"></div>
+              <div class="file-name">ProfileScreen.tsx</div>
+              <div class="file-badge changed">edit</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────── SLIDE 7: MVP-SCOPE ────── -->
+  <div class="slide s7-bg" id="slide-7">
+    <div class="slide-inner">
+      <div class="slide-header" style="margin-bottom: 28px;">
+        <div class="slide-eyebrow-dark">MVP</div>
+        <h2 class="slide-title-dark">Scope — Was ist drin, was nicht</h2>
+      </div>
+
+      <div class="scope-grid">
+        <!-- In scope -->
+        <div class="scope-col in">
+          <div class="scope-col-header">
+            <div class="scope-col-icon">✅</div>
+            <div>
+              <div class="scope-col-title">Im MVP enthalten</div>
+              <div class="scope-col-subtitle">Solides Fundament</div>
+            </div>
+          </div>
+          <div class="scope-item">
+            <div class="scope-check" style="color: #34D399;">&#10003;</div>
+            <div class="scope-text"><strong>Chat-Interface</strong> mit Message-Bubbles und Typing-Indikator</div>
+          </div>
+          <div class="scope-item">
+            <div class="scope-check" style="color: #34D399;">&#10003;</div>
+            <div class="scope-text"><strong>Pet-Kontext</strong> im System-Prompt — individualisierte Antworten</div>
+          </div>
+          <div class="scope-item">
+            <div class="scope-check" style="color: #34D399;">&#10003;</div>
+            <div class="scope-text"><strong>Disclaimer</strong> prominent zu Beginn jeder Session</div>
+          </div>
+          <div class="scope-item">
+            <div class="scope-check" style="color: #34D399;">&#10003;</div>
+            <div class="scope-text"><strong>Error-Handling</strong> mit Retry für Netzwerkfehler</div>
+          </div>
+          <div class="scope-item">
+            <div class="scope-check" style="color: #34D399;">&#10003;</div>
+            <div class="scope-text"><strong>Premium-Gate</strong> — Free-User sehen die Paywall</div>
+          </div>
+          <div class="scope-item">
+            <div class="scope-check" style="color: #34D399;">&#10003;</div>
+            <div class="scope-text"><strong>Quick-Action-Chips</strong> für häufige Folgefragen</div>
+          </div>
+        </div>
+
+        <!-- Out of scope -->
+        <div class="scope-col out">
+          <div class="scope-col-header">
+            <div class="scope-col-icon">🚫</div>
+            <div>
+              <div class="scope-col-title">Bewusst ausgelassen</div>
+              <div class="scope-col-subtitle">Scope-Kontrolle</div>
+            </div>
+          </div>
+          <div class="scope-item">
+            <div class="scope-check" style="color: #F87171;">&#10007;</div>
+            <div class="scope-text"><strong>Streaming</strong> — Antwort Wort für Wort (Komplexität)</div>
+          </div>
+          <div class="scope-item">
+            <div class="scope-check" style="color: #F87171;">&#10007;</div>
+            <div class="scope-text"><strong>Chat-Historie</strong> — keine DB-Persistenz im MVP</div>
+          </div>
+          <div class="scope-item">
+            <div class="scope-check" style="color: #F87171;">&#10007;</div>
+            <div class="scope-text"><strong>Rate-Limiting</strong> — kein Token-Budget pro User</div>
+          </div>
+          <div class="scope-item">
+            <div class="scope-check" style="color: #F87171;">&#10007;</div>
+            <div class="scope-text"><strong>Bild-Analyse</strong> — kein Foto-Upload von Symptomen</div>
+          </div>
+          <div class="scope-item">
+            <div class="scope-check" style="color: #F87171;">&#10007;</div>
+            <div class="scope-text"><strong>Multi-Tier-Kontext</strong> — immer nur ein Tier pro Session</div>
+          </div>
+        </div>
+
+        <!-- Phase 2 -->
+        <div class="scope-col future">
+          <div class="scope-col-header">
+            <div class="scope-col-icon">🚀</div>
+            <div>
+              <div class="scope-col-title">Phase 2 — Ausblick</div>
+              <div class="scope-col-subtitle">Nach dem MVP</div>
+            </div>
+          </div>
+          <div class="scope-item">
+            <div class="scope-check" style="color: #FBBF24;">&#8594;</div>
+            <div class="scope-text"><strong>Chat-Persistenz</strong> — Verlauf in Supabase speichern</div>
+          </div>
+          <div class="scope-item">
+            <div class="scope-check" style="color: #FBBF24;">&#8594;</div>
+            <div class="scope-text"><strong>Symptom-Fotoanalyse</strong> — Bild-Upload und Vision-API</div>
+          </div>
+          <div class="scope-item">
+            <div class="scope-check" style="color: #FBBF24;">&#8594;</div>
+            <div class="scope-text"><strong>Gesundheitstrends</strong> — KI analysiert Gesundheitsverlauf</div>
+          </div>
+          <div class="scope-item">
+            <div class="scope-check" style="color: #FBBF24;">&#8594;</div>
+            <div class="scope-text"><strong>Tierarzt-Empfehlung</strong> — Weiterleitung zu verifizierten Praxen</div>
+          </div>
+          <div class="scope-item">
+            <div class="scope-check" style="color: #FBBF24;">&#8594;</div>
+            <div class="scope-text"><strong>Streaming-Antworten</strong> — Real-time Token-Ausgabe</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /slideshow -->
+
+<!-- Navigation -->
+<button class="nav-btn prev" id="prevBtn" onclick="navigate(-1)" disabled>&#8592;</button>
+<button class="nav-btn next" id="nextBtn" onclick="navigate(1)">&#8594;</button>
+
+<!-- Dots -->
+<div class="dots" id="dots"></div>
+
+<!-- Counter -->
+<div class="counter" id="counter">1 / 7</div>
+
+<script>
+  const totalSlides = 7;
+  let current = 1;
+
+  // Build dots
+  const dotsEl = document.getElementById('dots');
+  for (let i = 1; i <= totalSlides; i++) {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 1 ? ' active' : '');
+    d.setAttribute('data-n', i);
+    d.onclick = () => goTo(i);
+    dotsEl.appendChild(d);
+  }
+
+  function goTo(n) {
+    if (n < 1 || n > totalSlides || n === current) return;
+    var prev = document.getElementById('slide-' + current);
+    var next = document.getElementById('slide-' + n);
+    prev.classList.remove('active', 'exit-left', 'exit-right');
+    prev.removeAttribute('style');
+    next.classList.remove('exit-left', 'exit-right');
+    next.removeAttribute('style');
+    next.classList.add('active');
+    current = n;
+    updateUI();
+  }
+
+  function navigate(dir) {
+    goTo(current + dir);
+  }
+
+  function updateUI() {
+    document.getElementById('counter').textContent = current + ' / ' + totalSlides;
+    document.getElementById('prevBtn').disabled = current === 1;
+    document.getElementById('nextBtn').disabled = current === totalSlides;
+
+    document.querySelectorAll('.dot').forEach(d => {
+      d.classList.toggle('active', parseInt(d.getAttribute('data-n')) === current);
+    });
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') navigate(1);
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') navigate(-1);
+  });
+</script>
+</body>
+</html>

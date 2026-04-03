@@ -14,3 +14,4 @@ export { EventDetailScreen } from './EventDetailScreen';
 export { ReminderSettingsScreen } from './ReminderSettingsScreen';
 export { OnboardingScreen } from './OnboardingScreen';
 export { AddVetContactScreen } from './AddVetContactScreen';
+export { AIAssistantScreen } from './AIAssistantScreen';
