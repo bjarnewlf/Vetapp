@@ -1,7 +1,6 @@
 ---
 paths:
   - ".claude/agents/**/*.md"
-  - "src/**/*.{ts,tsx}"
 ---
 
 # Dev-Agentur — Betriebshandbuch

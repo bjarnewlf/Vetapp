@@ -2,7 +2,7 @@
 name: qa
 description: QA Engineer — Bug-Hunting, Code-Review, TypeScript-Checks, Security. Wird von Brian delegiert.
 model: sonnet
-tools: Read, Grep, Glob, Bash
+tools: Read, Grep, Glob
 disallowedTools: Write, Edit
 color: red
 ---
