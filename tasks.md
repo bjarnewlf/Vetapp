@@ -1,15 +1,11 @@
 # Offene Aufgaben
 
-## SOFORT — Housekeeping
-- [ ] tasks.md + status.md aktuell halten
+## SOFORT
+- [ ] Gesundheits-UX: Quick Fixes (Tab umbenennen, Sektionen labeln, Button-Bug)
+- [ ] Gesundheits-UX: Datenmodell vereinheitlichen (MedicalEvent)
+- [ ] Gesundheits-UX: DataContext + Screens umbauen
 
-## DIESE WOCHE — Phase 2 (parallel)
-- [ ] Paket 2: Ueberfaellig-Regeln aktivieren (Notifications)
-- [ ] Paket 5: Loading/Error-States + Doppel-Submit-Schutz
-
-## DIESE WOCHE — Audit-Findings (nicht durch Phase 2 abgedeckt)
-- [ ] M1: Signierte URLs — Storage-Pfad statt URL speichern
-- [ ] M6: Fragile Storage-URL-Extraktion — Pfad als eigenes DB-Feld
+## DIESE WOCHE
 - [ ] D1: Accessibility Basics (Labels, Touch-Targets min. 44px)
 - [ ] D4: Inkonsistente Farben — Theme konsequent nutzen
 
@@ -22,16 +18,18 @@
 - [ ] ProfileScreen: Settings-Items "Datenschutz" + "Hilfe" noch ohne Handler
 
 ## ERLEDIGT
-- [x] K1: Supabase-Credentials in .env auslagern (Commit 01af070)
-- [x] K2: user!.id Non-Null-Assertion in completeReminder (Commit 01af070)
-- [x] M5: Dev-Toggle entfernen (ProfileScreen) — Security
-- [x] D6: getAge() dedupliziert + Fallback fuer ungueltige Daten
-- [x] Temp-Bild entfernt (227d64a...webp)
-- [x] M2: Datums-Validierung — parseGermanDate() zentral geloest
-- [x] D3: SelectField-Komponente — 4x Picker-Duplikation beseitigt
-- [x] Paket 4: Tote Buttons gefixt (PetDetail, ProfileScreen)
+- [x] K1: Supabase-Credentials in .env auslagern
+- [x] K2: user!.id Non-Null-Assertion in completeReminder
+- [x] M5: Dev-Toggle entfernen (Security)
+- [x] D6: getAge() dedupliziert + Fallback
+- [x] Temp-Bild entfernt
+- [x] M2: Datums-Validierung — parseGermanDate() zentral
+- [x] D3: SelectField-Komponente extrahiert
+- [x] Paket 4: Tote Buttons gefixt
 - [x] Paket 1: Haustier bearbeiten (updatePet + Edit-Modus)
-- [x] Lokale Commits gepusht
+- [x] M1/M6: Storage-URLs refactored (Pfad statt signed URL)
+- [x] Paket 5: Loading/Error-States + Doppel-Submit-Schutz
+- [x] Paket 2: Ueberfaellig-Regeln aktivieren (Notifications)
 
 ---
 Zuletzt aktualisiert: 2026-04-03

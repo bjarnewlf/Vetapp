@@ -15,6 +15,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
   const { pets, reminders, vaccinations, treatments } = useData();
   const { user } = useAuth();
   const userName = user?.user_metadata?.name;
+  const overdueReminders = reminders.filter(r => r.status === 'overdue');
   const nextReminder = reminders.find(r => r.status === 'upcoming');
 
   return (
@@ -25,6 +26,33 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
       </View>
 
       <View style={styles.body}>
+        {overdueReminders.length > 0 && (
+          <Card style={styles.overdueCard}>
+            <View style={styles.overdueHeader}>
+              <Ionicons name="alert-circle" size={22} color={colors.error} />
+              <Text style={styles.overdueTitle}>
+                {overdueReminders.length} überfällige Erinnerung{overdueReminders.length !== 1 ? 'en' : ''}
+              </Text>
+            </View>
+            {overdueReminders.slice(0, 3).map(r => (
+              <TouchableOpacity
+                key={r.id}
+                style={styles.overdueItem}
+                onPress={() => navigation.navigate('EventDetail', { eventId: r.id })}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.overdueItemTitle}>{r.title}</Text>
+                <Text style={styles.overdueItemDate}>
+                  {new Date(r.date).toLocaleDateString('de-DE', { day: 'numeric', month: 'short' })}
+                </Text>
+              </TouchableOpacity>
+            ))}
+            {overdueReminders.length > 3 && (
+              <Text style={styles.overdueMore}>+{overdueReminders.length - 3} weitere</Text>
+            )}
+          </Card>
+        )}
+
         {nextReminder && (
           <Card style={styles.reminderCard}>
             <View style={styles.reminderRow}>
@@ -126,6 +154,16 @@ const styles = StyleSheet.create({
   greeting: { ...typography.h1, color: colors.textOnPrimary },
   welcomeText: { ...typography.bodySmall, color: colors.textOnPrimary, opacity: 0.85, marginTop: 4 },
   body: { padding: spacing.md },
+  overdueCard: { marginBottom: spacing.md, backgroundColor: colors.errorLight },
+  overdueHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.sm },
+  overdueTitle: { ...typography.label, color: colors.error, flex: 1 },
+  overdueItem: {
+    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+    paddingVertical: 6, borderTopWidth: 1, borderTopColor: '#F5C6C6',
+  },
+  overdueItemTitle: { ...typography.bodySmall, color: colors.text, flex: 1 },
+  overdueItemDate: { ...typography.caption, color: colors.error },
+  overdueMore: { ...typography.caption, color: colors.error, marginTop: spacing.sm },
   reminderCard: { marginBottom: spacing.md },
   reminderRow: { flexDirection: 'row', alignItems: 'center' },
   reminderIcon: {

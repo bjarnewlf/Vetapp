@@ -12,7 +12,14 @@ interface RemindersScreenProps {
 
 export function RemindersScreen({ navigation }: RemindersScreenProps) {
   const { reminders, completeReminder } = useData();
-  const activeReminders = reminders.filter(r => r.status !== 'completed');
+  const activeReminders = reminders
+    .filter(r => r.status !== 'completed')
+    .sort((a, b) => {
+      if (a.status === 'overdue' && b.status !== 'overdue') return -1;
+      if (a.status !== 'overdue' && b.status === 'overdue') return 1;
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
+    });
+  const overdueCount = activeReminders.filter(r => r.status === 'overdue').length;
 
   const handleToggle = (reminder: Reminder) => {
     if (reminder.status !== 'completed') {
@@ -66,6 +73,12 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
           onPress={() => navigation.navigate('AddReminder')}
           style={styles.addButton}
         />
+        {overdueCount > 0 && (
+          <View style={styles.overdueBanner}>
+            <Ionicons name="alert-circle" size={16} color={colors.error} />
+            <Text style={styles.overdueBannerText}>{overdueCount} überfällig</Text>
+          </View>
+        )}
         {activeReminders.length === 0 ? (
           <View style={styles.empty}>
             <Ionicons name="notifications-outline" size={48} color={colors.textLight} />
@@ -94,6 +107,13 @@ const styles = StyleSheet.create({
   },
   content: { flex: 1, paddingHorizontal: spacing.md },
   addButton: { marginBottom: spacing.md },
+  overdueBanner: {
+    flexDirection: 'row', alignItems: 'center', gap: 6,
+    backgroundColor: colors.errorLight, borderRadius: borderRadius.md,
+    paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
+    marginBottom: spacing.md,
+  },
+  overdueBannerText: { ...typography.label, color: colors.error },
   list: { gap: spacing.md, paddingBottom: spacing.xl },
   empty: { alignItems: 'center', marginTop: spacing.xxl, gap: spacing.sm },
   emptyText: { ...typography.h3, color: colors.textLight },

@@ -147,6 +147,19 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     refresh();
   }, [refresh]);
 
+  // Overdue-Status jede Minute neu berechnen (falls App über Nacht offen bleibt)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setReminders(prev => prev.map(r => {
+        if (r.status === 'completed') return r;
+        const newStatus = getStatus(r.date);
+        if (newStatus !== r.status) return { ...r, status: newStatus };
+        return r;
+      }));
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
   const addPet = async (petData: Omit<Pet, 'id' | 'createdAt'>) => {
     if (!user) return;
     const { error } = await supabase.from('pets').insert({
