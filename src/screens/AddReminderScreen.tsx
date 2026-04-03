@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing } from '../theme';
 import { InputField, Button, SelectField } from '../components';
 import type { SelectFieldOption } from '../components';
-import { RecurrenceType } from '../types';
+import { RecurrenceType, recurrenceDisplayLabels } from '../types';
 import { useData } from '../context/DataContext';
 import { parseGermanDate } from '../utils/petHelpers';
 
@@ -112,7 +112,7 @@ export function AddReminderScreen({ navigation }: AddReminderScreenProps) {
         <SelectField
           label="Wiederholung"
           value={recurrence}
-          options={recurrenceOptions.map<SelectFieldOption>(opt => ({ value: opt, label: opt }))}
+          options={recurrenceOptions.map<SelectFieldOption>(opt => ({ value: opt, label: recurrenceDisplayLabels[opt] }))}
           onSelect={v => setRecurrence(v as RecurrenceType)}
         />
 

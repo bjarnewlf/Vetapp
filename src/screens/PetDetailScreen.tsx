@@ -18,7 +18,10 @@ interface PetDetailScreenProps {
 type DetailTab = 'vaccinations' | 'documents' | 'vet';
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString('de-DE', {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('de-DE', {
     day: 'numeric', month: 'short', year: 'numeric',
   });
 }

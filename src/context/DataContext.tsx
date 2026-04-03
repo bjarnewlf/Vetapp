@@ -112,35 +112,40 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }
 
     setLoading(true);
-    const [petsRes, remindersRes, vacsRes, treatRes, docsRes, vetRes] = await Promise.all([
-      supabase.from('pets').select('*').order('created_at', { ascending: false }),
-      supabase.from('reminders').select('*').order('date', { ascending: true }),
-      supabase.from('vaccinations').select('*').order('given_date', { ascending: false }),
-      supabase.from('treatments').select('*').order('date', { ascending: false }),
-      supabase.from('documents').select('*').order('created_at', { ascending: false }),
-      supabase.from('vet_contacts').select('*').limit(1),
-    ]);
+    try {
+      const [petsRes, remindersRes, vacsRes, treatRes, docsRes, vetRes] = await Promise.all([
+        supabase.from('pets').select('*').order('created_at', { ascending: false }),
+        supabase.from('reminders').select('*').order('date', { ascending: true }),
+        supabase.from('vaccinations').select('*').order('given_date', { ascending: false }),
+        supabase.from('treatments').select('*').order('date', { ascending: false }),
+        supabase.from('documents').select('*').order('created_at', { ascending: false }),
+        supabase.from('vet_contacts').select('*').limit(1),
+      ]);
 
-    if (petsRes.data) setPets(petsRes.data.map(mapPet));
-    if (remindersRes.data) setReminders(remindersRes.data.map(mapReminder));
-    if (vacsRes.data) setVaccinations(vacsRes.data.map(mapVaccination));
-    if (docsRes.data) setDocuments(docsRes.data.map((row: any) => ({
-      id: row.id, petId: row.pet_id, name: row.name,
-      fileUrl: row.file_url, storagePath: row.file_url,
-      fileType: row.file_type, fileSize: row.file_size, createdAt: row.created_at,
-    })));
-    if (treatRes.data) setTreatments(treatRes.data.map((row: any) => ({
-      id: row.id, petId: row.pet_id, name: row.name,
-      date: row.date, notes: row.notes, createdAt: row.created_at,
-    })));
-    if (vetRes.data && vetRes.data.length > 0) {
-      const v = vetRes.data[0];
-      setVetContact({
-        id: v.id, name: v.name, clinic: v.clinic || '',
-        phone: v.phone || '', email: v.email || '', address: v.address || '',
-      });
+      if (petsRes.data) setPets(petsRes.data.map(mapPet));
+      if (remindersRes.data) setReminders(remindersRes.data.map(mapReminder));
+      if (vacsRes.data) setVaccinations(vacsRes.data.map(mapVaccination));
+      if (docsRes.data) setDocuments(docsRes.data.map((row: any) => ({
+        id: row.id, petId: row.pet_id, name: row.name,
+        fileUrl: row.file_url, storagePath: row.file_url,
+        fileType: row.file_type, fileSize: row.file_size, createdAt: row.created_at,
+      })));
+      if (treatRes.data) setTreatments(treatRes.data.map((row: any) => ({
+        id: row.id, petId: row.pet_id, name: row.name,
+        date: row.date, notes: row.notes, createdAt: row.created_at,
+      })));
+      if (vetRes.data && vetRes.data.length > 0) {
+        const v = vetRes.data[0];
+        setVetContact({
+          id: v.id, name: v.name, clinic: v.clinic || '',
+          phone: v.phone || '', email: v.email || '', address: v.address || '',
+        });
+      }
+    } catch (e) {
+      console.error('Daten konnten nicht geladen werden:', e);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [user]);
 
   useEffect(() => {
@@ -328,7 +333,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const deleteDocument = async (id: string) => {
     const doc = documents.find(d => d.id === id);
     if (doc?.storagePath) {
-      await deleteFile(doc.storagePath);
+      try {
+        await deleteFile(doc.storagePath);
+      } catch (e) {
+        console.warn('Storage-Datei konnte nicht gelöscht werden:', e);
+      }
     }
     const { error } = await supabase.from('documents').delete().eq('id', id);
     if (!error) await refresh();

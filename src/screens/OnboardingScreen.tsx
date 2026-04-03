@@ -161,6 +161,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
         <Button
           title={saving ? 'Wird gespeichert...' : 'Tier hinzufügen'}
           onPress={handleSavePet}
+          disabled={saving}
           style={styles.saveButton}
         />
       </View>
