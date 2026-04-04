@@ -1,14 +1,13 @@
 # Offene Aufgaben
 
 ## SOFORT
-- [ ] Gesundheits-UX: Quick Fixes (Tab umbenennen, Sektionen labeln, Button-Bug)
 - [ ] Gesundheits-UX: Datenmodell vereinheitlichen (MedicalEvent)
 - [ ] Gesundheits-UX: DataContext + Screens umbauen
 - [ ] KI-Assistent: Guenstigeres Modell evaluieren (claude-sonnet-4-6 ist teuer)
+- [ ] Edge Function deployen (Security-Fix: debug-Felder entfernt)
 
 ## DIESE WOCHE
 - [ ] D1: Accessibility Basics (Labels, Touch-Targets min. 44px)
-- [ ] D4: Inkonsistente Farben — Theme konsequent nutzen
 - [ ] Ungetrackte Dateien committen (briefings/, docs/, scripts/)
 
 ## BACKLOG
@@ -19,6 +18,10 @@
 - [ ] Demo fuer Kunden vorbereiten (Expo Go / EAS Build / Web)
 
 ## ERLEDIGT
+- [x] Quick Wins: Gesundheits-UX (Tab umbenannt, Add-Buttons, toter Code weg)
+- [x] Quick Wins: Theme-Farben konsistent (10 Screens, neuer overlayLight-Token)
+- [x] Quick Wins: Security — debug-Felder aus Edge Function entfernt
+- [x] Quick Wins: Inkonsistente Farben bereinigt
 - [x] AI-Assistent: Edge Function deployed + funktioniert (JWT-Workaround + Modell-Fix)
 - [x] AI-Assistent: ANTHROPIC_API_KEY als Secret gesetzt
 - [x] AI-Assistent: Komplett-Redesign (Hero-Badge, Feature-Cards, Chat-Bubbles, Input-Bar)
