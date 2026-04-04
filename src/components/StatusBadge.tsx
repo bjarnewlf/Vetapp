@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { colors, borderRadius } from '../theme';
+import { colors, borderRadius, typography } from '../theme';
 
 interface StatusBadgeProps {
   status: 'overdue' | 'upcoming' | 'completed';
@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
   },
   text: {
-    fontSize: 12,
+    ...typography.caption,
     fontWeight: '600',
   },
 });

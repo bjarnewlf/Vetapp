@@ -16,6 +16,9 @@ export function Button({ title, onPress, variant = 'primary', style, disabled }:
       style={[styles.base, styles[variant], style, disabled && styles.disabled]}
       onPress={disabled ? undefined : onPress}
       activeOpacity={0.8}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityState={{ disabled: !!disabled }}
     >
       <Text style={[styles.text, variant === 'outline' && styles.outlineText]}>
         {title}

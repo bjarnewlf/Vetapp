@@ -13,6 +13,7 @@ export function InputField({ label, ...props }: InputFieldProps) {
       <TextInput
         style={styles.input}
         placeholderTextColor={colors.textLight}
+        accessibilityLabel={label}
         {...props}
       />
     </View>
@@ -35,7 +36,7 @@ const styles = StyleSheet.create({
     borderColor: colors.borderLight,
     paddingHorizontal: 14,
     paddingVertical: 12,
-    fontSize: 16,
+    ...typography.body,
     color: colors.text,
   },
 });

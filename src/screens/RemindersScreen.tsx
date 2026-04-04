@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
   reminderDate: { ...typography.bodySmall, color: colors.textSecondary },
   reminderDescription: { ...typography.bodySmall, color: colors.textSecondary, marginTop: 2 },
   checkbox: {
-    width: 28, height: 28, borderRadius: 14, borderWidth: 2,
+    width: 44, height: 44, borderRadius: 22, borderWidth: 2,
     borderColor: colors.border, alignItems: 'center', justifyContent: 'center',
     alignSelf: 'center',
   },

@@ -10,7 +10,14 @@
 - [ ] D-C: Deaktivierte Settings-Items im ProfileScreen
 - [ ] D-D: Inline-Werte bereinigen (Card, StatusBadge)
 - [ ] D-E: Hardcoded Farbe HomeScreen
-- [ ] Ungetrackte Dateien committen (briefings/, docs/, scripts/)
+
+## VOR RELEASE
+- [ ] F-02: togglePro() absichern — IAP implementieren, RLS fuer is_premium einschraenken
+- [ ] F-03: CORS in Edge Function einschraenken (Origin statt Wildcard *)
+- [ ] F-05/F-06: goBack() bei null-Events/Pets in EventDetailScreen + PetDetailScreen
+- [ ] F-07: DataContext.refresh() — DB-Fehler nicht verschlucken
+- [ ] F-08: Pet-Fotos in Supabase Storage hochladen (wie Dokumente)
+- [ ] F-11: notification_id Spalte ins supabase-schema.sql nachpflegen
 
 ## BACKLOG
 - [ ] M7: DataContext refactoren (God-Object, ~350 Zeilen)
@@ -18,8 +25,16 @@
 - [ ] SelectField: Tap-outside zum Schliessen (QA-Finding)
 - [ ] ProfileScreen: Settings-Items "Datenschutz" + "Hilfe" noch ohne Handler
 - [ ] Demo fuer Kunden vorbereiten (Expo Go / EAS Build / Web)
+- [ ] Guenstigeres KI-Modell evaluieren (claude-sonnet-4-6 ist teuer)
+- [ ] Deno std Version aktualisieren (0.168.0 → aktuell)
+- [ ] F-10: signUp Auto-SignIn — klare Fehlermeldung bei Email-Confirmation
+- [ ] F-12: AddReminderScreen — Paywall-Check fuer Recurrence ergaenzen
+- [ ] F-14: getAge() — Zukunftsdaten abfangen
 
 ## ERLEDIGT
+- [x] F-01: .env in Git-History pruefen — nie committet, Entwarnung
+- [x] Ungetrackte Dateien committen (briefings/, docs/, scripts/)
+- [x] .gitignore erweitert (supabase/.temp/, generierte HTML)
 - [x] Edge Function deployen (Security-Fix: debug-Felder entfernt)
 - [x] KI-Chat absichern: Rate Limiting (20/h), Input-Validierung, Prompt-Schutz, Client-Logs bereinigt
 - [x] Quick Wins: Gesundheits-UX (Tab umbenannt, Add-Buttons, toter Code weg)

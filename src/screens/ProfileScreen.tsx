@@ -20,9 +20,9 @@ export function ProfileScreen({ navigation }: { navigation: any }) {
   ];
 
   const settingsItems = [
-    { label: 'Benachrichtigungen', onPress: () => navigation.navigate('ReminderSettings') },
-    { label: 'Datenschutz & Sicherheit', onPress: () => {} },
-    { label: 'Hilfe & Support', onPress: () => {} },
+    { label: 'Benachrichtigungen', onPress: () => navigation.navigate('ReminderSettings'), disabled: false },
+    { label: 'Datenschutz & Sicherheit', onPress: () => Alert.alert('Kommt bald', 'Dieses Feature ist noch in Entwicklung.'), disabled: true },
+    { label: 'Hilfe & Support', onPress: () => Alert.alert('Kommt bald', 'Dieses Feature ist noch in Entwicklung.'), disabled: true },
   ];
 
   return (
@@ -105,9 +105,17 @@ export function ProfileScreen({ navigation }: { navigation: any }) {
               index < settingsItems.length - 1 && styles.settingsItemBorder,
             ]}
             onPress={item.onPress}
+            accessibilityState={{ disabled: item.disabled }}
           >
-            <Text style={styles.settingsItemText}>{item.label}</Text>
-            <Ionicons name="chevron-forward" size={18} color={colors.textLight} />
+            <Text style={[styles.settingsItemText, item.disabled && styles.settingsItemTextDisabled]}>
+              {item.label}
+              {item.disabled && <Text style={styles.settingsItemSoon}>  Kommt bald</Text>}
+            </Text>
+            <Ionicons
+              name="chevron-forward"
+              size={18}
+              color={item.disabled ? colors.borderLight : colors.textLight}
+            />
           </TouchableOpacity>
         ))}
         <TouchableOpacity style={styles.settingsItem} onPress={signOut}>
@@ -255,6 +263,13 @@ const styles = StyleSheet.create({
   settingsItemText: {
     ...typography.body,
     color: colors.text,
+  },
+  settingsItemTextDisabled: {
+    color: colors.textLight,
+  },
+  settingsItemSoon: {
+    ...typography.caption,
+    color: colors.textLight,
   },
   signOutText: {
     ...typography.body,
