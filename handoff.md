@@ -16,6 +16,34 @@
 
 **Agent:** Developer
 **Zeitpunkt:** 2026-04-04
+**Session:** Batch 4 — EmptyState + SkeletonLoader Komponenten
+
+### Erledigt
+
+- **`src/components/EmptyState.tsx`** (neu) — Wiederverwendbare EmptyState-Komponente mit Card-Wrapper, Emoji (48px), Title (h3), Subtitle (bodySmall), optionalem Action-Button (primary, full borderRadius)
+- **`src/components/SkeletonLoader.tsx`** (neu) — `SkeletonBox` (animiert per Animated.loop zwischen colors.border und colors.borderLight), `SkeletonCard` (Kreis 40x40 + 2 Rechtecke), `SkeletonListItem` (Kreis 32x32 + 2 Lines). Technik: outer View mit overflow:hidden + absoluteFill Animated.View loest DimensionValue-Inkompatibilitaet mit Animated.View style
+- **`src/components/index.ts`** — EmptyState, SkeletonBox, SkeletonCard, SkeletonListItem exportiert
+- **`src/screens/HomeScreen.tsx`** — Empty-State "Noch keine Haustiere" durch EmptyState-Komponente ersetzt
+- **`src/screens/RemindersScreen.tsx`** — Empty-State durch EmptyState-Komponente ersetzt
+- **`src/screens/PetDetailScreen.tsx`** — Empty-State fuer "Noch keine Impfungen" durch EmptyState-Komponente ersetzt. Header-Bereich NICHT angefasst (paralleler Developer fuer Hero-Banner)
+- **`src/screens/AIAssistantScreen.tsx`** — ActivityIndicator im subscriptionLoading-Block durch 3x SkeletonCard ersetzt
+
+### TypeScript-Status
+0 Fehler
+
+### Offen / Was der Naechste wissen muss
+- PetDetailScreen hat noch einen Text-basierten Empty-State fuer "Noch keine Behandlungen erfasst" (Zeile ~265) — dieser wurde bewusst NICHT als EmptyState-Komponente ersetzt, da der Auftrag nur Impfungen nannte. Falls gewuenscht: analog zur Impfungs-EmptyState implementieren
+- Reminders-Empty-State: Der style `empty`, `emptyText`, `emptySubtext` in RemindersScreen kann jetzt entfernt werden (ungenutzte Styles) — kein TypeScript-Fehler, aber Cleanup moeglich
+
+### Naechster Schritt
+- Weitere Batches gemaess Briefing umsetzen
+
+---
+
+## Vorherige Uebergabe
+
+**Agent:** Developer
+**Zeitpunkt:** 2026-04-04
 **Session:** F-008 — Pet-Fotos in Supabase Storage
 
 ### Erledigt

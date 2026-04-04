@@ -27,4 +27,9 @@ export const colors = {
   overlayLight: 'rgba(255, 255, 255, 0.2)',
   premiumGradientStart: '#1B6B5A',
   premiumGradientEnd: '#145244',
+  primaryMid: '#2D8A73',
+  primaryGradientEnd: '#3AA08A',
+  primaryBorder: '#B8DDD4',
+  warningBorder: '#E8D080',
+  errorBorder: '#F0B0B0',
 } as const;

@@ -53,4 +53,16 @@ export const typography = StyleSheet.create({
     fontWeight: '700',
     lineHeight: 30,
   },
+  display: {
+    fontSize: 38,
+    fontWeight: '800',
+    lineHeight: 44,
+    letterSpacing: -0.5,
+  },
+  displaySmall: {
+    fontSize: 28,
+    fontWeight: '800',
+    lineHeight: 34,
+    letterSpacing: -0.3,
+  },
 });

@@ -12,6 +12,7 @@ import {
   SafeAreaView,
   ActivityIndicator,
 } from 'react-native';
+import { SkeletonCard } from '../components';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors, typography, spacing, borderRadius } from '../theme';
@@ -54,7 +55,11 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
   if (subscriptionLoading) {
     return (
       <View style={styles.loadingScreen}>
-        <ActivityIndicator size="large" color={colors.primary} />
+        <SkeletonCard />
+        <View style={{ height: spacing.md }} />
+        <SkeletonCard />
+        <View style={{ height: spacing.md }} />
+        <SkeletonCard />
       </View>
     );
   }
@@ -252,9 +257,8 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
 
         {/* Disclaimer-Strip */}
         <View style={styles.disclaimerStrip}>
-          <Ionicons name="warning-outline" size={12} color={colors.warning} />
           <Text style={[typography.caption, styles.disclaimerText]}>
-            Kein Ersatz für tierärztlichen Rat. Bei Notfällen sofort Tierarzt kontaktieren.
+            KI-Antworten sind keine tierärztliche Beratung.
           </Text>
         </View>
 
@@ -502,16 +506,15 @@ const styles = StyleSheet.create({
   disclaimerStrip: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.warningLight,
+    backgroundColor: colors.background,
     borderTopWidth: 1,
-    borderTopColor: colors.border,
+    borderTopColor: colors.borderLight,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    gap: spacing.xs,
+    paddingVertical: spacing.xs,
   },
   disclaimerText: {
     flex: 1,
-    color: colors.textSecondary,
+    color: colors.textLight,
   },
 
   // --- Input-Bar ---

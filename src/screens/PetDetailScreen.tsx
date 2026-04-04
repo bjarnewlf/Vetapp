@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert, Linking, ActivityIndicator } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import { colors, typography, spacing, borderRadius } from '../theme';
-import { Card, ErrorBanner } from '../components';
+import { Card, ErrorBanner, EmptyState } from '../components';
 import { usePets } from '../context/PetContext';
 import { useMedical } from '../context/MedicalContext';
 import { useVetContact } from '../context/VetContactContext';
@@ -128,13 +129,23 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
   if (!pet) {
     return (
       <ScrollView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-            <Ionicons name="arrow-back" size={24} color={colors.text} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Tier-Details</Text>
-          <View style={styles.editButton} />
-        </View>
+        <LinearGradient
+          colors={['#2A9E82', '#1B6B5A', '#145244']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0.6, y: 1 }}
+          style={styles.heroContainer}
+        >
+          <Ionicons name="paw" size={72} color="rgba(255,255,255,0.22)" style={styles.heroBackdropIcon} />
+          <View style={styles.heroNavRow}>
+            <TouchableOpacity style={styles.heroNavBtn} onPress={() => navigation.goBack()}>
+              <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+            </TouchableOpacity>
+            <View style={styles.heroNavBtn} />
+          </View>
+          <View style={styles.heroTextBlock}>
+            <Text style={styles.heroName}>Tier-Details</Text>
+          </View>
+        </LinearGradient>
         <Card style={styles.infoCard}>
           <Text style={styles.notFoundText}>Tier nicht gefunden.</Text>
           <Text style={styles.notFoundSub}>Das Tier wurde möglicherweise gelöscht.</Text>
@@ -159,33 +170,35 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="arrow-back" size={24} color={colors.text} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>{pet.name}</Text>
-        <TouchableOpacity onPress={() => navigation.navigate('AddPet', { pet })} style={styles.editButton}>
-          <Ionicons name="create-outline" size={22} color={colors.primary} />
-        </TouchableOpacity>
-      </View>
+      {/* Hero Banner */}
+      <LinearGradient
+        colors={['#2A9E82', '#1B6B5A', '#145244']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0.6, y: 1 }}
+        style={styles.heroContainer}
+      >
+        {pet.photo ? (
+          <Image source={{ uri: pet.photo }} style={styles.heroBackdropImage} />
+        ) : (
+          <Ionicons name="paw" size={72} color="rgba(255,255,255,0.22)" style={styles.heroBackdropIcon} />
+        )}
+        <View style={styles.heroNavRow}>
+          <TouchableOpacity style={styles.heroNavBtn} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.heroNavBtn} onPress={() => navigation.navigate('AddPet', { pet })}>
+            <Ionicons name="create-outline" size={22} color="#FFFFFF" />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.heroTextBlock}>
+          <Text style={styles.heroName}>{pet.name}</Text>
+          <Text style={styles.heroMeta}>{pet.breed ? `${pet.breed} · ` : ''}{getAge(pet.birthDate)}</Text>
+        </View>
+      </LinearGradient>
 
       {/* Pet Information */}
       <Card style={styles.infoCard}>
         <Text style={styles.sectionLabel}>TIER-INFORMATIONEN</Text>
-        <View style={styles.petHeader}>
-          {pet.photo ? (
-            <Image source={{ uri: pet.photo }} style={styles.avatarImage} />
-          ) : (
-            <View style={styles.avatar}>
-              <Ionicons name="paw" size={32} color={colors.primary} />
-            </View>
-          )}
-          <View>
-            <Text style={styles.petName}>{pet.name}</Text>
-            <Text style={styles.petBreed}>{pet.breed}</Text>
-          </View>
-        </View>
         <View style={styles.infoRows}>
           <View style={styles.infoRow}>
             <Text style={styles.infoLabel}>Tierart</Text>
@@ -319,7 +332,13 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
             </View>
           ))}
           {vaccinations.length === 0 && (
-            <Text style={styles.emptyText}>Noch keine Impfungen erfasst</Text>
+            <EmptyState
+              emoji="💉"
+              title="Noch keine Impfungen"
+              subtitle="Trage die erste Impfung ein."
+              actionLabel="Impfung eintragen"
+              onAction={() => navigation.navigate('AddEvent', { petId: pet.id, defaultType: 'vaccination' })}
+            />
           )}
 
           {/* Reminders */}
@@ -437,26 +456,57 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  header: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingTop: 60, paddingHorizontal: spacing.md, paddingBottom: spacing.md,
+
+  // Hero Banner
+  heroContainer: {
+    height: 200,
+    justifyContent: 'flex-end',
+    paddingHorizontal: spacing.md,
+    paddingBottom: 20,
+    position: 'relative',
+    overflow: 'hidden',
   },
-  backButton: { marginRight: spacing.md },
-  headerTitle: { ...typography.h2, color: colors.text, flex: 1 },
-  editButton: { marginLeft: spacing.md },
+  heroBackdropImage: {
+    ...StyleSheet.absoluteFillObject,
+    opacity: 0.35,
+    resizeMode: 'cover',
+  },
+  heroBackdropIcon: {
+    position: 'absolute',
+    alignSelf: 'center',
+    top: '30%',
+  },
+  heroNavRow: {
+    position: 'absolute',
+    top: 52,
+    left: 16,
+    right: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  heroNavBtn: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(0,0,0,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroTextBlock: {},
+  heroName: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: -0.5,
+  },
+  heroMeta: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.78)',
+    marginTop: 4,
+  },
+
   infoCard: { marginHorizontal: spacing.md, marginBottom: spacing.md },
   sectionLabel: { ...typography.sectionHeader, color: colors.textSecondary, marginBottom: spacing.md },
-  petHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.md },
-  avatarImage: {
-    width: 64, height: 64, borderRadius: 32, marginRight: spacing.md,
-  },
-  avatar: {
-    width: 64, height: 64, borderRadius: 32,
-    backgroundColor: colors.primaryLight, alignItems: 'center', justifyContent: 'center',
-    marginRight: spacing.md,
-  },
-  petName: { ...typography.h2, color: colors.text },
-  petBreed: { ...typography.bodySmall, color: colors.primary },
   infoRows: { gap: spacing.sm },
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
   infoLabel: { ...typography.bodySmall, color: colors.primary },

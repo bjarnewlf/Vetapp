@@ -1,8 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import { colors, typography, spacing, borderRadius } from '../theme';
-import { Card, ErrorBanner } from '../components';
+import { Card, ErrorBanner, EmptyState } from '../components';
 import { usePets } from '../context/PetContext';
 import { useMedical } from '../context/MedicalContext';
 import { useAuth } from '../context/AuthContext';
@@ -22,7 +23,12 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.header}>
+      <LinearGradient
+        colors={['#1B6B5A', '#2D8A73', '#3AA08A']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.header}
+      >
         <View style={styles.headerTopRow}>
           <View style={styles.headerTextGroup}>
             <Text style={styles.greeting}>Hallo{userName ? `, ${userName}` : ''}! 👋</Text>
@@ -36,7 +42,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
             <Ionicons name="person-circle-outline" size={30} color={colors.textOnPrimary} />
           </TouchableOpacity>
         </View>
-      </View>
+      </LinearGradient>
 
       <View style={styles.body}>
         {petsError && <ErrorBanner onRetry={refreshPets} />}
@@ -98,12 +104,13 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
         </View>
 
         {pets.length === 0 ? (
-          <Card style={styles.emptyCard}>
-            <Text style={styles.emptyText}>Noch keine Haustiere</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('AddPet')}>
-              <Text style={styles.emptyLink}>Erstes Tier hinzufügen</Text>
-            </TouchableOpacity>
-          </Card>
+          <EmptyState
+            emoji="🐾"
+            title="Noch keine Haustiere"
+            subtitle="Füge dein erstes Tier hinzu und behalte die Gesundheit im Blick."
+            actionLabel="Tier hinzufügen"
+            onAction={() => navigation.navigate('AddPet')}
+          />
         ) : (
           <View style={styles.petsGrid}>
             {pets.map(pet => (
@@ -155,20 +162,26 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
           </View>
         </Card>
 
-        <TouchableOpacity
-          style={styles.aiCard}
-          onPress={() => navigation.navigate('AI')}
-          activeOpacity={0.8}
-        >
-          <View style={styles.aiCardRow}>
-            <View style={styles.aiCardIcon}>
-              <Ionicons name="sparkles" size={22} color={colors.primary} />
+        <TouchableOpacity onPress={() => navigation.navigate('AI')} activeOpacity={0.8}>
+          <View style={styles.aiCardNew}>
+            <View style={styles.aiTopRow}>
+              <View style={styles.aiIconContainer}>
+                <Ionicons name="sparkles" size={22} color="#FFFFFF" />
+              </View>
+              <View style={styles.aiTextContainer}>
+                <Text style={styles.aiTitle}>KI-Gesundheitsassistent</Text>
+                <Text style={styles.aiSubtitle}>Deine Tiere kennt die KI bereits.</Text>
+              </View>
             </View>
-            <View style={styles.aiCardContent}>
-              <Text style={styles.aiCardTitle}>KI-Gesundheitsassistent</Text>
-              <Text style={styles.aiCardSub}>Fragen zur Tiergesundheit? Frag die KI.</Text>
+            <View style={styles.aiCtaRow}>
+              <View style={styles.aiProBadge}>
+                <Text style={styles.aiProBadgeText}>PRO</Text>
+              </View>
+              <View style={styles.aiCtaAction}>
+                <Text style={styles.aiCtaText}>Frage stellen</Text>
+                <Ionicons name="arrow-forward-outline" size={18} color="#1B6B5A" />
+              </View>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={colors.textLight} />
           </View>
         </TouchableOpacity>
       </View>
@@ -179,7 +192,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   header: {
-    backgroundColor: colors.primary, paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.lg,
     paddingTop: 60, paddingBottom: spacing.lg,
     borderBottomLeftRadius: borderRadius.xl, borderBottomRightRadius: borderRadius.xl,
   },
@@ -253,17 +266,66 @@ const styles = StyleSheet.create({
   statItem: { alignItems: 'center' },
   statNumber: { ...typography.stat },
   statLabel: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
-  aiCard: {
-    backgroundColor: colors.surface, borderRadius: borderRadius.lg, padding: spacing.md,
-    marginBottom: spacing.lg, shadowColor: colors.cardShadow, shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1, shadowRadius: 8, elevation: 2,
+  aiCardNew: {
+    backgroundColor: '#E8F5F1',
+    borderWidth: 1.5,
+    borderColor: '#B8DDD4',
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    marginBottom: spacing.md,
   },
-  aiCardRow: { flexDirection: 'row', alignItems: 'center' },
-  aiCardIcon: {
-    width: 44, height: 44, borderRadius: 22, backgroundColor: colors.primaryLight,
-    alignItems: 'center', justifyContent: 'center', marginRight: spacing.md,
+  aiTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.smd,
   },
-  aiCardContent: { flex: 1 },
-  aiCardTitle: { ...typography.h3, color: colors.text },
-  aiCardSub: { ...typography.bodySmall, color: colors.textSecondary },
+  aiIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: borderRadius.md,
+    backgroundColor: '#1B6B5A',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.smd,
+  },
+  aiTextContainer: {
+    flex: 1,
+  },
+  aiTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#145244',
+  },
+  aiSubtitle: {
+    fontSize: 13,
+    color: '#1B6B5A',
+    marginTop: 2,
+  },
+  aiCtaRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  aiProBadge: {
+    backgroundColor: '#1B6B5A',
+    borderRadius: 999,
+    paddingVertical: 3,
+    paddingHorizontal: 8,
+  },
+  aiProBadgeText: {
+    fontSize: 9,
+    fontWeight: '800',
+    letterSpacing: 1,
+    color: '#FFFFFF',
+  },
+  aiCtaAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  aiCtaText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#145244',
+    marginRight: 4,
+  },
 });

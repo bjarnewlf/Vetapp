@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
-import { Button, StatusBadge, ErrorBanner } from '../components';
+import { Button, StatusBadge, ErrorBanner, EmptyState } from '../components';
 import { useMedical } from '../context/MedicalContext';
 import { Reminder } from '../types';
 import { useOverdueSettings } from '../hooks/useOverdueSettings';
@@ -96,11 +96,13 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
           </View>
         )}
         {activeReminders.length === 0 ? (
-          <View style={styles.empty}>
-            <Ionicons name="notifications-outline" size={48} color={colors.textLight} />
-            <Text style={styles.emptyText}>Keine Erinnerungen</Text>
-            <Text style={styles.emptySubtext}>Erstelle deine erste Erinnerung!</Text>
-          </View>
+          <EmptyState
+            emoji="🔔"
+            title="Keine Erinnerungen"
+            subtitle="Richte Erinnerungen für Impfungen oder Tierarzttermine ein."
+            actionLabel="Erinnerung erstellen"
+            onAction={() => navigation.navigate('AddReminder')}
+          />
         ) : (
           <FlatList
             data={activeReminders}
