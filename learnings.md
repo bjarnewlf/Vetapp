@@ -29,6 +29,15 @@
 - Vault: Tiefe vor Breite — breit aber stellenweise flach
 - Nur dokumentieren was wirklich laeuft — keine Fiktion in Prompts
 - Theme-Zustaendigkeit: Designer entscheidet WAS, Developer setzt um WO
+- Angebot-Abgleich vor Phase-Abschluss — sonst gehen Features (PDF-Export, Tierarztfinder) fast vergessen
+- Design-Recherche mit visuellen Mockups (HTML) ist ueberzeugender als Text — Claas konnte sich Aenderungen erst nach Sicht vorstellen
+- Parallele Developer-Delegation fuer Design-Batches funktioniert gut — 4 Developer gleichzeitig, alle TypeScript clean
+- QA nach jedem grossen Batch laufen lassen — Runde 5 fand 3 Findings die sonst unentdeckt geblieben waeren
+- Storage-Policies nicht vergessen — Feature laeuft ohne Policy im Dashboard nicht
+- expo-linear-gradient fuer Gradients in React Native — CSS background-gradient geht nicht, braucht eigenes Package
+- Card-Varianten als Props formalisieren statt inline-backgroundColor — sauberer und konsistenter
+- EmptyState-Komponente lohnt sich — einmal bauen, ueberall einsetzen, sofort professionellerer Look
+- KI-Assistent mit Tool Use: Variante B (Confirm First) bevorzugen — Notifications nur auf dem Client planbar
 
 ## 2026-04-03
 - Nicht selbst machen, delegieren

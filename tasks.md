@@ -6,27 +6,20 @@
 
 ---
 
-## JETZT — in dieser Session abschliessen
+## JETZT — Handy-Test
 
-### Prio 1: Commit + Storage-Policy
-- [ ] **Alle Team-Aenderungen committen** — 18 geaenderte Dateien, TypeScript clean
-- [ ] **Storage-Policy fuer Pet-Fotos** — SQL im Supabase-Editor ausfuehren (ohne das funktioniert Foto-Upload nicht)
-
-### Prio 2: Handy-Test
-- [ ] App auf echtem Geraet starten (Expo Go)
+- [ ] App auf echtem Geraet testen (Expo Go laeuft auf localhost:8081)
 - [ ] Alle Flows durchklicken: Onboarding → Tier anlegen (mit Foto!) → Event → Erinnerung → Dokument → KI-Chat
 - [ ] Bugs sammeln und fixen
-
-### Prio 3: Aufraumen
-- [ ] Alte Tabellen `vaccinations`/`treatments` droppen (erst nach erfolgreichem Handy-Test)
-- [ ] QA-Runde ueber alle Aenderungen laufen lassen
+- [ ] Alte Tabellen `vaccinations`/`treatments` droppen (nach erfolgreichem Test)
 
 ---
 
 ## VOR PHASE-2-ABSCHLUSS
 
 - [ ] Bugs aus Handy-Test fixen
-- [ ] Design Quick Wins umsetzen (aus Designer-Recherche — Claas entscheidet welche)
+- [ ] notification_id Migration fuer reminders deployen
+- [ ] Package-Versionen aktualisieren (Expo-Kompatibilitaet)
 - [ ] Dem Kunden vorzeigbaren MVP praesentieren
 - [ ] Phase-2-Zahlung ausloesen (2.160 EUR)
 
@@ -38,6 +31,8 @@
 - [ ] F-003: CORS einschraenken (nur relevant falls Web-Version)
 - [ ] PDF-Export definieren und umsetzen (Scope mit Kunde klaeren)
 - [ ] Tierarztfinder definieren und umsetzen (Scope mit Kunde klaeren)
+- [ ] KI-Assistent mit Dateneingabe (Tool Use) — Konzept liegt vor, ~2-3 Tage Aufwand
+- [ ] Animationen umsetzen (Konzept + Showcase vorhanden)
 - [ ] Bugs aus Kunden-Feedback fixen
 - [ ] Feinschliff, finale MVP-Version, Uebergabe
 - [ ] Phase-3-Zahlung (1.620 EUR)
@@ -49,8 +44,6 @@
 - [ ] Chat-Historie persistent machen
 - [ ] Custom Font (Inter)
 - [ ] Dark Mode (Semantic Color Tokens zuerst)
-- [ ] Micro-Animationen (Card-Press, kein Reanimated)
-- [ ] Skeleton Loading statt ActivityIndicator
 - [ ] Bottom Sheets fuer schnelle Erfassung
 - [ ] SelectField: Tap-outside zum Schliessen
 - [ ] Guenstigeres KI-Modell evaluieren
@@ -69,6 +62,7 @@
 - [x] DB-Migration: medical_events + Daten-Migration
 - [x] DB-Migration: recurrence_check Constraint
 - [x] Edge Function ai-chat deployed (neues medicalHistory-Format)
+- [x] Storage-Policy fuer Pet-Fotos im SQL-Editor
 
 ### Code-Fixes (Agentur)
 - [x] F-014: storagePath Fallback gefixt
@@ -78,24 +72,34 @@
 - [x] F-018: Error-Handling im OnboardingScreen
 - [x] F-020: WelcomeScreen.tsx geloescht (toter Code)
 - [x] F-021: Anrufen-Button nur bei vorhandener Telefonnummer
+- [x] F-023: Onboarding Foto-Upload korrekt an PetContext
+- [x] F-024: Navigate-Param eventType statt defaultType
+- [x] F-025: Tote Styles nach EmptyState-Umstellung entfernt
 
 ### Features (Agentur)
 - [x] F-008: Pet-Fotos in Supabase Storage (Upload-Flow komplett)
 - [x] F-022: ReminderSettings funktionsfaehig (Ueberfaellig-Regeln wirken)
 
-### UI-Fixes (Agentur)
-- [x] AIAssistantScreen: Leerer Screen bei Nicht-Pro gefixt
-- [x] Card.tsx: shadowColor auf Theme-Token
-- [x] PetDetailScreen: Gesundheits-Sektionen visuell getrennt
-- [x] AIAssistantScreen: Inline-Styles in StyleSheet
+### Design-Polish (8 Punkte — alle umgesetzt)
+- [x] Gradient Header im HomeScreen (expo-linear-gradient)
+- [x] Pet-Hero-Banner im PetDetailScreen (grosses Foto/Icon, Gradient)
+- [x] AI-Card Upgrade im HomeScreen (Premium-Look mit Badge + CTA)
+- [x] EmptyState-Komponente (Emoji + Action-Button)
+- [x] SkeletonLoader-Komponente (animierter Shimmer statt Spinner)
+- [x] Card-Varianten formalisiert (default/tinted/warning/error)
+- [x] Display-Typography (38px/28px) + displaySmall
+- [x] KI-Disclaimer dezenter (Icon weg, kuerzerer Text)
+
+### QA (2 Runden)
+- [x] QA-Audit Runde 4: 8 Findings, 0 kritisch — 6 direkt gefixt
+- [x] QA-Audit Runde 5: 3 Findings, 0 kritisch — alle gefixt
 
 ### Analyse & Planung
-- [x] QA-Audit Runde 4 (8 Findings, 0 kritisch)
-- [x] Designer-Analyse fuer Demo-Relevanz
-- [x] Design-Recherche (moderne Trends, HTML-Bericht in Arbeit)
 - [x] Demo-Ready Checklist erstellt
 - [x] Angebot-Abgleich: Scope-Luecken identifiziert
-- [x] Task-Liste auf Phase-2-Abschluss ausgerichtet
+- [x] Design-Recherche mit Visualisierungen (HTML-Bericht)
+- [x] Animations-Showcase (interaktive HTML-Demos)
+- [x] KI-Assistent Tool Use Konzept (technische Architektur)
 
 ---
 Zuletzt aktualisiert: 2026-04-04
