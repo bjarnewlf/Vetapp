@@ -6,58 +6,69 @@
 
 **VetApp** — React Native / Expo, TypeScript strict, Supabase Backend. UI-Sprache Deutsch.
 
-### Was funktioniert (committed + gepusht)
+### Was funktioniert
 
 - Auth (Supabase), Haustier-CRUD inkl. Bearbeiten, Dokumente mit Storage
-- Impfungen + Behandlungen erfassen, Erinnerungen mit Ueberfaellig-Erkennung
+- Gesundheits-Events (MedicalEvent-Modell) — Impfungen, Entwurmungen, Checkups, Freie Eintraege
+- MedicalEvent-Editing — alle Events editierbar
+- Erinnerungen mit Ueberfaellig-Erkennung
 - Tierarzt-Kontakte, Profil-Screen, Paywall-Screen
-- KI-Gesundheitsassistent: Eigener Tab (Position 3, Mitte), Edge Function deployed
-- KI-Chat abgesichert: Rate Limiting (20/h), Input-Validierung, Prompt-Injection-Schutz
-- Accessibility: Button + InputField Labels/Roles, Checkbox 44px, Settings deaktiviert
+- KI-Gesundheitsassistent: Eigener Tab, Edge Function deployed, Rate Limiting, Sicherheitsschutz
+- Error-Banner-Komponente — sichtbares Feedback bei DB-Fehlern
 - Design-System: Theme-Tokens durchgaengig, Accent WCAG-konform (#CC6B3D), Spacing smd:12
-
----
-
-## Uncommittete Aenderungen
-
-Keine. Working tree ist clean, alle Commits gepusht.
 
 ---
 
 ## Offene Punkte
 
-### Sofort
-- Gesundheits-UX: MedicalEvent Datenmodell + DataContext + Screens umbauen
+### Sofort / Naechste Session
+- DB-Migration deployen: `20260404_medical_events_recurrence_check.sql`
+- Migration fuer `notification_id` in `reminders` deployen
+- QA: MedicalEvent-Edit-Funktion manuell testen
 
-### Vor Release
-- F-02: togglePro() absichern (IAP), F-03: CORS einschraenken
-- F-05/F-06: goBack() bei null, F-07: DB-Fehler in refresh()
-- F-08: Pet-Fotos in Storage, F-11: notification_id Schema-Drift
+### Vor Release (Blocking)
+- **F-01:** Git-History auf Credentials pruefen — ggf. Supabase Key rotieren
+- **F-02:** togglePro() absichern — RLS: `is_premium` nur serverseitig schreibbar + IAP
+- **F-03:** CORS einschraenken (aktuell Wildcard, OK fuer native App, nicht fuer Web)
+- Pet-Fotos in Storage (F-08)
+
+### Vor Release (Wichtig)
+- Design-Konzept v2 umsetzen (Designer)
+- accentLight #F5D0B9 designerisch pruefen
 
 ### Phase 2
-- Custom Font (Inter), Dark Mode (nach Semantic Tokens), Micro-Animationen
+- Chat-Historie persistent
+- Custom Font (Inter), Dark Mode (nach Semantic Tokens)
+- Accessibility systematisch (Labels, SafeAreaView)
+- Test-Suite — Claas entscheidet (→ Test-Strategie.md)
 
 ### Backlog
-- M7: DataContext refactoren, Chat-Historie, SelectField tap-outside
-- Guenstigeres KI-Modell, Deno std Update, Demo vorbereiten
+- Guenstigeres KI-Modell evaluieren
+- Deno std updaten (veraltet in Edge Function)
+- EAS Build / Demo vorbereiten
 
 ---
 
 ## Architektur-Hinweise
 
+- 5 Contexts: AuthContext, PetContext, MedicalContext, VetContactContext, SubscriptionContext
+- DataContext existiert nicht mehr — `useData()` nicht verwenden
 - API-Keys nur serverseitig (Edge Function), nie im Client
 - Storage: Pfade speichern, signed URLs on-demand generieren
 - Premium-Gates via SubscriptionContext.isPro + isLoading
-- Supabase CLI: npx supabase (Windows)
+- Supabase CLI: `npx supabase` (Windows)
 - KI-Assistent: Custom Header x-user-token (JWT-Workaround)
-- Accent-Farbe: #CC6B3D (seit 04.04., vorher #E8895C)
+- Accent-Farbe: #CC6B3D (WCAG AA)
 - Theme-Aenderungen: Designer entscheidet WAS, Developer setzt um WO
+- MedicalEvent-Edit: route.params.editMedicalEvent (nicht editEvent)
+- Document.fileUrl ist leer-String — Storage nur ueber storagePath
 
 ---
 
 ## Vault
 
-Agency-Vault in D:\Agency-Vault\ — 55+ vernetzte Notizen. Retro dokumentiert. Zuletzt inventarisiert 04.04.2026.
+Agency-Vault in `D:\Agency-Vault\` — ~85 vernetzte Notizen. Agency.md ist zentraler Hub.
+Zuletzt aktualisiert: 2026-04-04
 
 ---
 Zuletzt aktualisiert: 2026-04-04

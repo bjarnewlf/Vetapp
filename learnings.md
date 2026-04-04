@@ -8,6 +8,8 @@
 - QA parallel zum Cleanup laufen lassen fuehrt zu False Positives — besser sequentiell
 - MedicalEvent: Ein einheitliches Modell ist flexibler als N separate Tabellen
 - Custom-Events duerfen nicht nur Reminder sein — gehoeren auch in die Gesundheitshistorie
+- Error-States in neuen Contexts von Anfang an einbauen — nachtraeglich ist teuer
+- Edge Function bei Datenformat-Aenderungen sofort mitziehen — sonst KI-Assistent kaputt
 - ALLE Dokumente am Ende aktualisieren (tasks, status, handoff, learnings)
 - Learnings ohne Rueckfrage speichern
 - Supabase Edge Functions sind stateless
