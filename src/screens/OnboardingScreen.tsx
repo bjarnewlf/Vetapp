@@ -73,16 +73,21 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
     }
 
     setSaving(true);
-    await addPet({
-      name: name.trim(),
-      type: animalType,
-      breed: breed.trim(),
-      birthDate: isoDate ?? new Date().toISOString().split('T')[0],
-      microchipCode: undefined,
-      photo: photoUri || undefined,
-    });
-    setSaving(false);
-    onComplete();
+    try {
+      await addPet({
+        name: name.trim(),
+        type: animalType,
+        breed: breed.trim(),
+        birthDate: isoDate ?? new Date().toISOString().split('T')[0],
+        microchipCode: undefined,
+        photo: photoUri || undefined,
+      });
+      onComplete();
+    } catch (e: any) {
+      Alert.alert('Fehler', e.message || 'Tier konnte nicht gespeichert werden. Bitte versuche es erneut.');
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (step === 'welcome') {

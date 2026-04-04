@@ -21,9 +21,9 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
     });
   const overdueCount = activeReminders.filter(r => r.status === 'overdue').length;
 
-  const handleToggle = (reminder: Reminder) => {
+  const handleToggle = async (reminder: Reminder) => {
     if (reminder.status !== 'completed') {
-      completeReminder(reminder.id);
+      await completeReminder(reminder.id);
     }
   };
 

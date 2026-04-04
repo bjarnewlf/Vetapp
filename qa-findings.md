@@ -17,6 +17,158 @@ Alle Findings aus Review 2 wurden als Grundlage für Review 3 verwendet. Details
 
 ---
 
+## Review 4: Vollstaendiger Code-Review nach MedicalEvent-Migration — 2026-04-04
+
+**TypeScript-Check:** `npx tsc --noEmit` — 0 Fehler. Sauber.
+
+**Geprueft:** Alle 43 Source-Dateien in `src/` — 17 Screens, 5 Contexts, 2 Services, 3 Utils, Navigation, Theme, Types.
+
+**Migrationscheck:** Kein Verweis auf `useData`, `DataContext`, `DataProvider`, `Vaccination`, `Treatment` in `src/`. Migration vollstaendig.
+
+---
+
+### F-015: CRUD-Fehler in allen Contexts werden nicht an den Caller propagiert — Schwere: Mittel
+
+**Was:** Alle CRUD-Mutations-Methoden in `MedicalContext`, `PetContext` und `VetContactContext` folgen dem Pattern `if (!error) await refresh()`. Bei einem Supabase-Fehler passiert nichts — kein `throw`, kein `setError`. Der Caller erhaelt keine Rueckmeldung.
+
+**Wo:** `src/context/MedicalContext.tsx` Z.136, 149, 154, 174, 219, 228 — `src/context/PetContext.tsx` Z.103, 115, 120, 137, 154 — `src/context/VetContactContext.tsx` Z.70, 80
+
+**Warum:** Screens wie `AddEventScreen.tsx` (Z.120) und `PetDetailScreen.tsx` (Z.104) wrappen Aufrufe in try/catch — der aber niemals anspringt, weil die Methode nie wirft. Konkret: User klickt "Speichern", Supabase gibt RLS-Fehler zurueck, `navigation.goBack()` passiert trotzdem, Eintrag ist nicht gespeichert. Stiller Datenverlust aus User-Sicht.
+
+**Fix:** `if (error) throw new Error(error.message);` in jeder CRUD-Methode ergaenzen. Bestehende try/catch-Bloecke in den Screens funktionieren dann korrekt.
+
+**Entscheidung:** [ ] Fix jetzt / [ ] Fix vor Release / [ ] Accepted Risk
+
+---
+
+### F-016: `RemindersScreen` — `completeReminder()` wird ohne `await` aufgerufen — Schwere: Mittel
+
+**Was:** `handleToggle` in `RemindersScreen.tsx` Z.26 ruft `completeReminder(reminder.id)` ohne `await` auf. Das Promise wird dropped, Fehler werden nicht abgefangen.
+
+**Wo:** `src/screens/RemindersScreen.tsx` Z.24-28
+
+**Warum:** Bei Netzwerkfehler gibt es kein User-Feedback. `EventDetailScreen.tsx` Z.53-57 implementiert den identischen Call korrekt mit `await` und try/catch — das Pattern ist bekannt, wurde hier uebersehen.
+
+**Fix:** `handleToggle` als `async` deklarieren, `await completeReminder(reminder.id)` in try/catch wrappen mit `Alert.alert`.
+
+**Entscheidung:** [ ] Fix jetzt / [ ] Fix vor Release / [ ] Accepted Risk
+
+---
+
+### F-017: `AddEventScreen` — kein Guard fuer leere `selectedPetId` im Config-Schritt — Schwere: Mittel
+
+**Was:** Wenn `AddEventScreen` mit `eventType`-Param (aber ohne `petId`) aufgerufen wird, startet der Screen direkt auf `'config'` (Z.42). In `handleSave` gibt es keine Validierung ob `selectedPetId` befuellt ist. Der Insert laeuft dann mit `pet_id: ''`.
+
+**Wo:** `src/screens/AddEventScreen.tsx` Z.41-44 (`initialStep`), Z.91-100 (`handleSave`)
+
+**Warum:** Ein leeres `petId` verletzt den Foreign-Key-Constraint der DB (oder schreibt ungueltige Daten). Der Fehler wird dann lautlos verschluckt (koppelt an F-015). Aufruf mit nur `eventType` ist z.B. aus `PetDetailScreen.tsx` Z.235 moeglich wenn `pet.id` als `petId` uebergeben wird — dort korrekt. Aber der Screen laesst sich theoretisch auch ohne `petId` oeffnen.
+
+**Fix:** In `handleSave` frueh pruefen: `if (!selectedPetId) { Alert.alert('Fehlende Angabe', 'Bitte waehle zuerst ein Tier aus.'); return; }`
+
+**Entscheidung:** [ ] Fix jetzt / [ ] Fix vor Release / [ ] Accepted Risk
+
+---
+
+### F-018: `OnboardingScreen` — `addPet`-Fehler wird ignoriert, `onComplete()` immer aufgerufen — Schwere: Mittel
+
+**Was:** `handleSavePet` in `OnboardingScreen.tsx` Z.76-85 ruft `await addPet(...)` ohne try/catch auf. `onComplete()` (Z.85) wird immer aufgerufen, unabhaengig vom Erfolg.
+
+**Wo:** `src/screens/OnboardingScreen.tsx` Z.76-85
+
+**Warum:** Wenn `addPet` fehlschlaegt: User wird in den Hauptscreen weitergeleitet, Tier existiert nicht in DB, beim naechsten Refresh `pets.length === 0`, Onboarding startet neu. Potenzielle Endlos-Schleife. Auch kein `setSaving(false)` im Fehlerfall.
+
+**Fix:** try/catch ergaenzen, `onComplete()` nur bei Erfolg aufrufen, `setSaving(false)` in finally.
+
+**Entscheidung:** [ ] Fix jetzt / [ ] Fix vor Release / [ ] Accepted Risk
+
+---
+
+### F-019: `WelcomeScreen` — toter Code, auf Englisch, nicht eingebunden — Schwere: Niedrig
+
+**Was:** `src/screens/WelcomeScreen.tsx` existiert und ist implementiert, wird aber weder in `src/screens/index.ts` exportiert noch in `AppNavigator.tsx` referenziert. Der Screen-Text ist auf Englisch.
+
+**Wo:** `src/screens/WelcomeScreen.tsx`
+
+**Warum:** Toter Code aus einer frueheren Iteration. Keine Sicherheitsrelevanz, aber Unordnung im Codebase.
+
+**Fix:** Datei loeschen oder auf Deutsch uebersetzen und in Navigation einbinden.
+
+**Entscheidung:** [ ] Fix jetzt / [ ] Fix vor Release / [ ] Accepted Risk
+
+---
+
+### F-020: `VetContactScreen` — kein Error-State sichtbar, "Tierarzt anrufen" bei leerer Nummer — Schwere: Niedrig
+
+**Was (a):** `VetContactScreen` liest `error` aus `useVetContact()` nicht aus. Bei Ladefehler zeigt der Screen denselben State wie "noch kein Kontakt angelegt" — der User kann nicht unterscheiden ob ein Fehler vorliegt oder ob er noch nichts eingetragen hat.
+
+**Was (b):** `handleCall` (Z.34-38) ruft `Linking.openURL('tel:' + vet.phone)` ohne Guard auf. `vet.phone` kann ein leerer String sein (gemappt mit `v.phone || ''` in VetContactContext Z.40). Bei leerem String oeffnet sich eine leere Telefon-App. `.catch()` ist vorhanden, also kein Crash.
+
+**Wo:** `src/screens/VetContactScreen.tsx` Z.12-14, Z.34-38, Z.86
+
+**Fix (a):** `error` aus `useVetContact()` lesen und `ErrorBanner` rendern wenn gesetzt.
+**Fix (b):** `{vet.phone && <Button title="Tierarzt anrufen" ... />}` oder Guard in `handleCall`.
+
+**Entscheidung:** [ ] Fix jetzt / [ ] Fix vor Release / [ ] Accepted Risk
+
+---
+
+### F-021: `ReminderSettingsScreen` — Einstellungen werden nie angewendet — Schwere: Niedrig
+
+**Was:** Die OverdueRule-Einstellung wird in AsyncStorage geschrieben (Key `vetapp_overdue_rule`), aber nirgends in der App ausgelesen. Weder `MedicalContext` noch `notifications.ts` lesen diesen Key.
+
+**Wo:** `src/screens/ReminderSettingsScreen.tsx`
+
+**Warum:** Der User kann eine Einstellung konfigurieren, die keine Wirkung hat. Irreführend.
+
+**Fix:** AsyncStorage-Key in der Notification-Logik auswerten, oder Screen mit "Kommt bald"-Hinweis versehen.
+
+**Entscheidung:** [ ] Fix jetzt / [ ] Fix vor Release / [ ] Accepted Risk
+
+---
+
+### F-022: `fileUpload.ts` — Signed URL nach Upload generiert aber verworfen — Schwere: Niedrig
+
+**Was:** `uploadFile` generiert nach jedem Upload eine 1-Jahr-Signed-URL (`createSignedUrl(path, 60*60*24*365)`). In `PetContext.addDocument` wird nur `path` destrukturiert, `url` wird verworfen. Zur Anzeige wird on-demand eine neue 1-Stunde-URL generiert. Der 1-Jahr-URL-Call ist ueberfluessig.
+
+**Wo:** `src/utils/fileUpload.ts` Z.29-38, `src/context/PetContext.tsx` Z.126
+
+**Fix:** `createSignedUrl`-Block in `uploadFile` entfernen. Rueckgabetyp auf `{ path: string }` vereinfachen.
+
+**Entscheidung:** [ ] Fix jetzt / [ ] Fix vor Release / [ ] Accepted Risk
+
+---
+
+### Verifikation der noch offenen Findings aus Reviews 1-3
+
+**F-010** (FREE_LIMITS ungenutzt importiert): In `AddEventScreen.tsx` nicht vorhanden — **ERLEDIGT**.
+
+**F-011** (state-management.md beschreibt DataContext): Nicht neu geprueft — bleibt offen, ausserhalb Code-Review-Scope.
+
+**F-013** (treatments-Filter Titel): Bleibt Accepted Risk.
+
+**F-014** (storagePath-Fallback): Bleibt Accepted Risk.
+
+---
+
+### Zusammenfassung Review 4
+
+| ID | Schwere | Beschreibung |
+|---|---|---|
+| F-015 | Mittel | CRUD-Fehler in Contexts werden nicht propagiert — Silent Failure |
+| F-016 | Mittel | `completeReminder` ohne `await` in RemindersScreen |
+| F-017 | Mittel | Kein Guard fuer leere `petId` im AddEventScreen Config-Schritt |
+| F-018 | Mittel | OnboardingScreen: `addPet`-Fehler verschluckt, `onComplete` immer aufgerufen |
+| F-019 | Niedrig | WelcomeScreen: toter Code, englischer Text |
+| F-020 | Niedrig | VetContactScreen: kein Error-State, Anruf-Button bei leerer Nummer |
+| F-021 | Niedrig | ReminderSettings-Einstellungen werden nie angewendet |
+| F-022 | Niedrig | fileUpload: unnoetige Signed-URL-Generierung nach Upload |
+
+**TypeScript-Check:** Bestanden — 0 Fehler.
+
+**Naechster Schritt:** F-015 bis F-018 sind als Batch fixbar (ca. 15-20 Zeilen gesamt). F-015 ist Wurzel von F-016, F-017, F-018 — mit dem Fix von F-015 wird auch der Kontext der anderen Findings klarer.
+
+---
+
 ## Review 3: Verifikation der Fix-Welle — 2026-04-04
 
 **TypeScript-Check:** `npx tsc --noEmit` — keine Fehler. Sauber.

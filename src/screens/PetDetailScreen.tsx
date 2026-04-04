@@ -351,7 +351,7 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
             ) : (
               <View style={styles.documentList}>
                 {petDocuments.map(doc => (
-                  <TouchableOpacity key={doc.id} style={styles.documentRow} onPress={() => handleOpenDocument(doc.id, doc.storagePath ?? doc.fileUrl)} disabled={openingDocId === doc.id}>
+                  <TouchableOpacity key={doc.id} style={styles.documentRow} onPress={() => handleOpenDocument(doc.id, doc.storagePath ?? '')} disabled={openingDocId === doc.id}>
                     {openingDocId === doc.id ? (
                       <ActivityIndicator size="small" color={colors.primary} />
                     ) : (

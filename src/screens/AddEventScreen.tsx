@@ -90,6 +90,10 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
 
   const handleSave = async () => {
     if (saving) return;
+    if (!selectedPetId) {
+      Alert.alert('Kein Tier ausgewählt', 'Bitte wähle zuerst ein Tier aus.');
+      return;
+    }
     if (!title.trim() || !date.trim()) {
       Alert.alert('Fehlende Angaben', 'Bitte fülle Titel und Datum aus.');
       return;

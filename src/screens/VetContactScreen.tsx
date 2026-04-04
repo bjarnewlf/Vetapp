@@ -83,7 +83,9 @@ export function VetContactScreen({ navigation }: VetContactScreenProps) {
         </View>
       </Card>
 
-      <Button title="Tierarzt anrufen" onPress={handleCall} style={styles.callButton} />
+      {vet.phone && vet.phone.trim() !== '' && (
+        <Button title="Tierarzt anrufen" onPress={handleCall} style={styles.callButton} />
+      )}
 
       <Card style={styles.emergencyCard}>
         <Text style={styles.emergencyTitle}>Notfall?</Text>
