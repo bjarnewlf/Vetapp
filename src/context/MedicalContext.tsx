@@ -184,6 +184,10 @@ export function MedicalProvider({ children }: { children: React.ReactNode }) {
 
   const completeReminder = async (id: string): Promise<boolean> => {
     const reminder = reminders.find(r => r.id === id);
+
+    // Optimistisches Update: Status sofort lokal auf 'completed' setzen
+    setReminders(prev => prev.map(r => r.id === id ? { ...r, status: 'completed' } : r));
+
     if (reminder?.notificationId) {
       await cancelNotification(reminder.notificationId);
     }
@@ -191,7 +195,12 @@ export function MedicalProvider({ children }: { children: React.ReactNode }) {
       .from('reminders')
       .update({ status: 'completed' })
       .eq('id', id);
-    if (error) { setError(error.message); return false; }
+    if (error) {
+      // Rollback bei Fehler
+      setReminders(prev => prev.map(r => r.id === id ? { ...r, status: getStatus(r.date) } : r));
+      setError(error.message);
+      return false;
+    }
 
     if (reminder && reminder.recurrence !== 'Once' && reminder.recurrence !== 'Custom') {
       const nextDate = calculateNextDate(reminder.date, reminder.recurrence);

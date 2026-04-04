@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
@@ -15,6 +15,7 @@ interface RemindersScreenProps {
 export function RemindersScreen({ navigation }: RemindersScreenProps) {
   const { reminders, completeReminder, error: medicalError, refresh: refreshMedical } = useMedical();
   const { rule: overdueRule, loaded: settingsLoaded } = useOverdueSettings();
+  const pendingIds = useRef<Set<string>>(new Set());
 
   // Überfällige Notifications planen sobald Reminders und Settings geladen sind
   useEffect(() => {
@@ -36,9 +37,14 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
     : 0;
 
   const handleToggle = async (reminder: Reminder) => {
-    if (reminder.status !== 'completed') {
+    if (reminder.status === 'completed') return;
+    if (pendingIds.current.has(reminder.id)) return;
+    pendingIds.current.add(reminder.id);
+    try {
       const success = await completeReminder(reminder.id);
       if (!success) Alert.alert('Fehler', 'Speichern fehlgeschlagen. Bitte versuche es erneut.');
+    } finally {
+      pendingIds.current.delete(reminder.id);
     }
   };
 
