@@ -4,27 +4,24 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card } from '../components';
+import { OverdueRule, OVERDUE_RULE_KEY, DEFAULT_OVERDUE_RULE } from '../hooks/useOverdueSettings';
 
 interface ReminderSettingsScreenProps {
   navigation: any;
 }
 
-type OverdueRule = 'never' | 'daily' | 'weekly' | 'custom';
-
 const overdueOptions: { id: OverdueRule; label: string; description: string }[] = [
   { id: 'never', label: 'Nie', description: 'Keine Erinnerung bei überfälligen Events' },
-  { id: 'daily', label: 'Täglich', description: 'Tägliche Erinnerung bis erledigt' },
-  { id: 'weekly', label: 'Wöchentlich', description: 'Wöchentliche Erinnerung bis erledigt' },
-  { id: 'custom', label: 'Alle X Tage', description: 'Eigenes Intervall festlegen' },
+  { id: 'daily', label: 'Täglich', description: 'Tägliche Push-Erinnerung bis erledigt' },
+  { id: 'weekly', label: 'Wöchentlich', description: 'Wöchentliche Push-Erinnerung bis erledigt' },
+  { id: 'custom', label: 'Alle X Tage', description: 'Tägliche Erinnerung (benutzerdefiniertes Intervall folgt)' },
 ];
 
-const STORAGE_KEY = 'vetapp_overdue_rule';
-
 export function ReminderSettingsScreen({ navigation }: ReminderSettingsScreenProps) {
-  const [selectedRule, setSelectedRule] = useState<OverdueRule>('daily');
+  const [selectedRule, setSelectedRule] = useState<OverdueRule>(DEFAULT_OVERDUE_RULE);
 
   useEffect(() => {
-    AsyncStorage.getItem(STORAGE_KEY).then(val => {
+    AsyncStorage.getItem(OVERDUE_RULE_KEY).then(val => {
       if (val && ['never', 'daily', 'weekly', 'custom'].includes(val)) {
         setSelectedRule(val as OverdueRule);
       }
@@ -33,7 +30,7 @@ export function ReminderSettingsScreen({ navigation }: ReminderSettingsScreenPro
 
   const handleSelectRule = (rule: OverdueRule) => {
     setSelectedRule(rule);
-    AsyncStorage.setItem(STORAGE_KEY, rule);
+    AsyncStorage.setItem(OVERDUE_RULE_KEY, rule);
   };
 
   return (

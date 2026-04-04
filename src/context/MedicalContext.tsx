@@ -55,13 +55,13 @@ interface MedicalContextType {
   reminders: Reminder[];
   loading: boolean;
   error: string | null;
-  addMedicalEvent: (event: Omit<MedicalEvent, 'id' | 'createdAt'>) => Promise<void>;
-  updateMedicalEvent: (id: string, updates: Partial<Omit<MedicalEvent, 'id' | 'createdAt'>>) => Promise<void>;
-  deleteMedicalEvent: (id: string) => Promise<void>;
-  addReminder: (reminder: Omit<Reminder, 'id' | 'createdAt' | 'status' | 'notificationId'>) => Promise<void>;
-  completeReminder: (id: string) => Promise<void>;
-  updateReminder: (id: string, data: Partial<Pick<Reminder, 'title' | 'date' | 'description' | 'recurrence'>>) => Promise<void>;
-  deleteReminder: (id: string) => Promise<void>;
+  addMedicalEvent: (event: Omit<MedicalEvent, 'id' | 'createdAt'>) => Promise<boolean>;
+  updateMedicalEvent: (id: string, updates: Partial<Omit<MedicalEvent, 'id' | 'createdAt'>>) => Promise<boolean>;
+  deleteMedicalEvent: (id: string) => Promise<boolean>;
+  addReminder: (reminder: Omit<Reminder, 'id' | 'createdAt' | 'status' | 'notificationId'>) => Promise<boolean>;
+  completeReminder: (id: string) => Promise<boolean>;
+  updateReminder: (id: string, data: Partial<Pick<Reminder, 'title' | 'date' | 'description' | 'recurrence'>>) => Promise<boolean>;
+  deleteReminder: (id: string) => Promise<boolean>;
   refresh: () => Promise<void>;
 }
 
@@ -121,8 +121,8 @@ export function MedicalProvider({ children }: { children: React.ReactNode }) {
     return () => clearInterval(interval);
   }, []);
 
-  const addMedicalEvent = async (event: Omit<MedicalEvent, 'id' | 'createdAt'>) => {
-    if (!user) return;
+  const addMedicalEvent = async (event: Omit<MedicalEvent, 'id' | 'createdAt'>): Promise<boolean> => {
+    if (!user) return false;
     const { error } = await supabase.from('medical_events').insert({
       user_id: user.id,
       pet_id: event.petId,
@@ -133,10 +133,12 @@ export function MedicalProvider({ children }: { children: React.ReactNode }) {
       notes: event.notes || null,
       recurrence_interval: event.recurrenceInterval || null,
     });
-    if (!error) await refresh();
+    if (error) { setError(error.message); return false; }
+    await refresh();
+    return true;
   };
 
-  const updateMedicalEvent = async (id: string, updates: Partial<Omit<MedicalEvent, 'id' | 'createdAt'>>) => {
+  const updateMedicalEvent = async (id: string, updates: Partial<Omit<MedicalEvent, 'id' | 'createdAt'>>): Promise<boolean> => {
     const updateData: Record<string, unknown> = {};
     if (updates.petId !== undefined) updateData.pet_id = updates.petId;
     if (updates.type !== undefined) updateData.type = updates.type;
@@ -146,16 +148,20 @@ export function MedicalProvider({ children }: { children: React.ReactNode }) {
     if (updates.notes !== undefined) updateData.notes = updates.notes;
     if (updates.recurrenceInterval !== undefined) updateData.recurrence_interval = updates.recurrenceInterval;
     const { error } = await supabase.from('medical_events').update(updateData).eq('id', id);
-    if (!error) await refresh();
+    if (error) { setError(error.message); return false; }
+    await refresh();
+    return true;
   };
 
-  const deleteMedicalEvent = async (id: string) => {
+  const deleteMedicalEvent = async (id: string): Promise<boolean> => {
     const { error } = await supabase.from('medical_events').delete().eq('id', id);
-    if (!error) await refresh();
+    if (error) { setError(error.message); return false; }
+    await refresh();
+    return true;
   };
 
-  const addReminder = async (data: Omit<Reminder, 'id' | 'createdAt' | 'status' | 'notificationId'>) => {
-    if (!user) return;
+  const addReminder = async (data: Omit<Reminder, 'id' | 'createdAt' | 'status' | 'notificationId'>): Promise<boolean> => {
+    if (!user) return false;
     const notifId = await scheduleReminderNotification({
       id: '', petId: data.petId, title: data.title, date: data.date,
       description: data.description, recurrence: data.recurrence,
@@ -171,10 +177,12 @@ export function MedicalProvider({ children }: { children: React.ReactNode }) {
       status: getStatus(data.date),
       notification_id: notifId || null,
     });
-    if (!error) await refresh();
+    if (error) { setError(error.message); return false; }
+    await refresh();
+    return true;
   };
 
-  const completeReminder = async (id: string) => {
+  const completeReminder = async (id: string): Promise<boolean> => {
     const reminder = reminders.find(r => r.id === id);
     if (reminder?.notificationId) {
       await cancelNotification(reminder.notificationId);
@@ -183,7 +191,7 @@ export function MedicalProvider({ children }: { children: React.ReactNode }) {
       .from('reminders')
       .update({ status: 'completed' })
       .eq('id', id);
-    if (error) return;
+    if (error) { setError(error.message); return false; }
 
     if (reminder && reminder.recurrence !== 'Once' && reminder.recurrence !== 'Custom') {
       const nextDate = calculateNextDate(reminder.date, reminder.recurrence);
@@ -204,9 +212,10 @@ export function MedicalProvider({ children }: { children: React.ReactNode }) {
       }
     }
     await refresh();
+    return true;
   };
 
-  const updateReminder = async (id: string, data: Partial<Pick<Reminder, 'title' | 'date' | 'description' | 'recurrence'>>) => {
+  const updateReminder = async (id: string, data: Partial<Pick<Reminder, 'title' | 'date' | 'description' | 'recurrence'>>): Promise<boolean> => {
     const updateData: Record<string, unknown> = {};
     if (data.title !== undefined) updateData.title = data.title;
     if (data.date !== undefined) {
@@ -216,16 +225,20 @@ export function MedicalProvider({ children }: { children: React.ReactNode }) {
     if (data.description !== undefined) updateData.description = data.description;
     if (data.recurrence !== undefined) updateData.recurrence = data.recurrence;
     const { error } = await supabase.from('reminders').update(updateData).eq('id', id);
-    if (!error) await refresh();
+    if (error) { setError(error.message); return false; }
+    await refresh();
+    return true;
   };
 
-  const deleteReminder = async (id: string) => {
+  const deleteReminder = async (id: string): Promise<boolean> => {
     const reminder = reminders.find(r => r.id === id);
     if (reminder?.notificationId) {
       await cancelNotification(reminder.notificationId);
     }
     const { error } = await supabase.from('reminders').delete().eq('id', id);
-    if (!error) await refresh();
+    if (error) { setError(error.message); return false; }
+    await refresh();
+    return true;
   };
 
   return (

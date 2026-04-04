@@ -2,6 +2,60 @@ import { supabase } from '../lib/supabase';
 
 const BUCKET = 'pet-documents';
 
+/**
+ * Lädt ein Pet-Profilfoto in Supabase Storage hoch.
+ * Pfad: pet-photos/{userId}/{petId}.jpg
+ * Gibt den Storage-Pfad zurück (wird in photo_url der DB gespeichert).
+ */
+export async function uploadPetPhoto(
+  userId: string,
+  petId: string,
+  fileUri: string,
+): Promise<{ path: string }> {
+  const path = `pet-photos/${userId}/${petId}.jpg`;
+
+  const response = await fetch(fileUri);
+  const blob = await response.blob();
+
+  const { error } = await supabase.storage
+    .from(BUCKET)
+    .upload(path, blob, {
+      contentType: 'image/jpeg',
+      upsert: true, // Überschreiben erlaubt (Foto ersetzen)
+    });
+
+  if (error) throw new Error(`Foto-Upload fehlgeschlagen: ${error.message}`);
+
+  return { path };
+}
+
+/**
+ * Generiert eine signed URL für ein Pet-Foto (1 Stunde gültig).
+ */
+export async function getPetPhotoUrl(storagePath: string): Promise<string> {
+  const { data, error } = await supabase.storage
+    .from(BUCKET)
+    .createSignedUrl(storagePath, 3600);
+
+  if (error || !data?.signedUrl) {
+    throw new Error('Foto-URL konnte nicht erstellt werden.');
+  }
+  return data.signedUrl;
+}
+
+/**
+ * Löscht ein Pet-Foto aus Supabase Storage.
+ */
+export async function deletePetPhoto(storagePath: string): Promise<void> {
+  const { error } = await supabase.storage
+    .from(BUCKET)
+    .remove([storagePath]);
+
+  if (error) {
+    console.warn('Foto-Löschung fehlgeschlagen:', error.message);
+  }
+}
+
 export async function uploadFile(
   userId: string,
   petId: string,

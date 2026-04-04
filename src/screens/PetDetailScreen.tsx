@@ -53,18 +53,16 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
     if (!result.canceled && result.assets[0]) {
       const file = result.assets[0];
       setUploading(true);
-      try {
-        await addDocument({
-          petId,
-          name: file.name,
-          fileUrl: file.uri,
-          fileType: file.mimeType,
-          fileSize: file.size,
-        });
-      } catch (e: any) {
-        Alert.alert('Upload fehlgeschlagen', e.message || 'Bitte versuche es erneut.');
-      } finally {
-        setUploading(false);
+      const success = await addDocument({
+        petId,
+        name: file.name,
+        fileUrl: file.uri,
+        fileType: file.mimeType,
+        fileSize: file.size,
+      });
+      setUploading(false);
+      if (!success) {
+        Alert.alert('Fehler', 'Upload fehlgeschlagen. Bitte versuche es erneut.');
       }
     }
   };
@@ -94,21 +92,36 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
   const handleDeleteDocument = (docId: string, docName: string) => {
     Alert.alert('Dokument löschen', `"${docName}" wirklich löschen?`, [
       { text: 'Abbrechen', style: 'cancel' },
-      { text: 'Löschen', style: 'destructive', onPress: () => deleteDocument(docId) },
+      {
+        text: 'Löschen', style: 'destructive', onPress: async () => {
+          const success = await deleteDocument(docId);
+          if (!success) Alert.alert('Fehler', 'Löschen fehlgeschlagen. Bitte versuche es erneut.');
+        },
+      },
     ]);
   };
 
   const handleDeleteVaccination = (id: string, name: string) => {
     Alert.alert('Impfung löschen', `"${name}" wirklich löschen?`, [
       { text: 'Abbrechen', style: 'cancel' },
-      { text: 'Löschen', style: 'destructive', onPress: () => deleteMedicalEvent(id) },
+      {
+        text: 'Löschen', style: 'destructive', onPress: async () => {
+          const success = await deleteMedicalEvent(id);
+          if (!success) Alert.alert('Fehler', 'Löschen fehlgeschlagen. Bitte versuche es erneut.');
+        },
+      },
     ]);
   };
 
   const handleDeleteTreatment = (id: string, name: string) => {
     Alert.alert('Behandlung löschen', `"${name}" wirklich löschen?`, [
       { text: 'Abbrechen', style: 'cancel' },
-      { text: 'Löschen', style: 'destructive', onPress: () => deleteMedicalEvent(id) },
+      {
+        text: 'Löschen', style: 'destructive', onPress: async () => {
+          const success = await deleteMedicalEvent(id);
+          if (!success) Alert.alert('Fehler', 'Löschen fehlgeschlagen. Bitte versuche es erneut.');
+        },
+      },
     ]);
   };
 
@@ -263,6 +276,7 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
           ))}
 
           {/* Vaccinations */}
+          <View style={styles.sectionDivider} />
           <View style={styles.subSectionHeader}>
             <Text style={styles.subSectionTitle}>Impfungen</Text>
             <TouchableOpacity onPress={() => navigation.navigate('AddEvent', { petId: pet.id })}>
@@ -480,6 +494,11 @@ const styles = StyleSheet.create({
   vaccinationName: { ...typography.h3, color: colors.text },
   vaccinationRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   vaccinationDate: { ...typography.bodySmall, color: colors.textSecondary },
+  sectionDivider: {
+    marginTop: spacing.lg,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
   remindersSection: { marginTop: spacing.md },
   emptyReminders: { alignItems: 'center', gap: 4 },
   addReminderLink: { ...typography.bodySmall, color: colors.primary, textDecorationLine: 'underline' },

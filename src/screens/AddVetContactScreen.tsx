@@ -32,19 +32,19 @@ export function AddVetContactScreen({ navigation, route }: AddVetContactScreenPr
     }
 
     setSaving(true);
-    try {
-      await saveVetContact({
-        name: name.trim(),
-        clinic: clinic.trim(),
-        phone: phone.trim(),
-        email: email.trim(),
-        address: address.trim(),
-      });
+    const success = await saveVetContact({
+      name: name.trim(),
+      clinic: clinic.trim(),
+      phone: phone.trim(),
+      email: email.trim(),
+      address: address.trim(),
+    });
+    setSaving(false);
+
+    if (success) {
       navigation.goBack();
-    } catch (e: any) {
-      Alert.alert('Fehler', e.message || 'Bitte versuche es erneut.');
-    } finally {
-      setSaving(false);
+    } else {
+      Alert.alert('Fehler', 'Speichern fehlgeschlagen. Bitte versuche es erneut.');
     }
   };
 

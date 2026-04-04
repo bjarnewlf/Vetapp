@@ -53,14 +53,14 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
 
   if (subscriptionLoading) {
     return (
-      <View style={{ flex: 1, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={styles.loadingScreen}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   if (!isPro) {
-    return <View style={{ flex: 1, backgroundColor: colors.surface }} />;
+    return <View style={styles.loadingScreen} />;
   }
 
   const quickActions: string[] = [
@@ -245,7 +245,7 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
             renderItem={renderMessage}
             inverted
             contentContainerStyle={styles.listContent}
-            ItemSeparatorComponent={() => <View style={{ height: spacing.md }} />}
+            ItemSeparatorComponent={() => <View style={styles.messageSeparator} />}
             keyboardShouldPersistTaps="handled"
           />
         )}
@@ -556,5 +556,18 @@ const styles = StyleSheet.create({
   },
   sendButtonDisabled: {
     backgroundColor: colors.border,
+  },
+
+  // --- Loading / Non-Pro ---
+  loadingScreen: {
+    flex: 1,
+    backgroundColor: colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  // --- Chat Separator ---
+  messageSeparator: {
+    height: spacing.md,
   },
 });

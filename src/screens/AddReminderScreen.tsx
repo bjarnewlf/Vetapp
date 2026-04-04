@@ -46,19 +46,19 @@ export function AddReminderScreen({ navigation }: AddReminderScreenProps) {
     }
 
     setSaving(true);
-    try {
-      await addReminder({
-        petId: petId || undefined,
-        title: title.trim(),
-        date: isoDate,
-        description: description.trim() || undefined,
-        recurrence,
-      });
+    const success = await addReminder({
+      petId: petId || undefined,
+      title: title.trim(),
+      date: isoDate,
+      description: description.trim() || undefined,
+      recurrence,
+    });
+    setSaving(false);
+
+    if (success) {
       navigation.goBack();
-    } catch (e: any) {
-      Alert.alert('Fehler', e.message || 'Bitte versuche es erneut.');
-    } finally {
-      setSaving(false);
+    } else {
+      Alert.alert('Fehler', 'Speichern fehlgeschlagen. Bitte versuche es erneut.');
     }
   };
 

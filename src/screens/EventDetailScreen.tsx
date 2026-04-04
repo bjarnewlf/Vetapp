@@ -50,13 +50,12 @@ export function EventDetailScreen({ navigation, route }: EventDetailScreenProps)
   const handleComplete = async () => {
     if (saving) return;
     setSaving(true);
-    try {
-      await completeReminder(event.id);
+    const success = await completeReminder(event.id);
+    setSaving(false);
+    if (success) {
       navigation.goBack();
-    } catch (e: any) {
-      Alert.alert('Fehler', e.message || 'Bitte versuche es erneut.');
-    } finally {
-      setSaving(false);
+    } else {
+      Alert.alert('Fehler', 'Speichern fehlgeschlagen. Bitte versuche es erneut.');
     }
   };
 
@@ -76,15 +75,14 @@ export function EventDetailScreen({ navigation, route }: EventDetailScreenProps)
       return;
     }
     setSaving(true);
-    try {
-      await updateReminder(event.id, { date: isoDate });
+    const success = await updateReminder(event.id, { date: isoDate });
+    setSaving(false);
+    if (success) {
       setShowReschedule(false);
       setNewDate('');
       Alert.alert('Verschoben', `Event wurde auf ${newDate} verschoben.`);
-    } catch (e: any) {
-      Alert.alert('Fehler', e.message || 'Bitte versuche es erneut.');
-    } finally {
-      setSaving(false);
+    } else {
+      Alert.alert('Fehler', 'Speichern fehlgeschlagen. Bitte versuche es erneut.');
     }
   };
 

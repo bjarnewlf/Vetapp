@@ -38,7 +38,10 @@ export function AddPetScreen({ navigation, route }: AddPetScreenProps) {
   const [breed, setBreed] = useState(editPet?.breed ?? '');
   const [birthDate, setBirthDate] = useState(editPet ? toGermanDate(editPet.birthDate) : '');
   const [microchip, setMicrochip] = useState(editPet?.microchipCode ?? '');
-  const [photoUri, setPhotoUri] = useState<string | null>(editPet?.photo ?? null);
+  // Vorschau-URI: signed URL (bestehendes Foto) oder lokale URI (neu ausgewählt)
+  const [photoPreviewUri, setPhotoPreviewUri] = useState<string | null>(editPet?.photo ?? null);
+  // Neu ausgewählte lokale URI — wird beim Speichern hochgeladen
+  const [newPhotoUri, setNewPhotoUri] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const pickImage = async () => {
@@ -49,7 +52,8 @@ export function AddPetScreen({ navigation, route }: AddPetScreenProps) {
       quality: 0.7,
     });
     if (!result.canceled && result.assets[0]) {
-      setPhotoUri(result.assets[0].uri);
+      setPhotoPreviewUri(result.assets[0].uri);
+      setNewPhotoUri(result.assets[0].uri);
     }
   };
 
@@ -81,31 +85,39 @@ export function AddPetScreen({ navigation, route }: AddPetScreenProps) {
     }
 
     setSaving(true);
-    try {
-      if (isEditMode && editPet) {
-        await updatePet(editPet.id, {
+    let success: boolean;
+
+    // newPhotoUri wird an addPet/updatePet übergeben — der Context übernimmt den Upload
+    if (isEditMode && editPet) {
+      success = await updatePet(
+        editPet.id,
+        {
           name: name.trim(),
           type: animalType,
           breed: breed.trim(),
           birthDate: isoDate ?? editPet.birthDate,
           microchipCode: microchip.trim() || undefined,
-          photo: photoUri || undefined,
-        });
-      } else {
-        await addPet({
+        },
+        newPhotoUri ?? undefined,
+      );
+    } else {
+      success = await addPet(
+        {
           name: name.trim(),
           type: animalType,
           breed: breed.trim(),
           birthDate: isoDate ?? new Date().toISOString().split('T')[0],
           microchipCode: microchip.trim() || undefined,
-          photo: photoUri || undefined,
-        });
-      }
+        },
+        newPhotoUri ?? undefined,
+      );
+    }
+    setSaving(false);
+
+    if (success) {
       navigation.goBack();
-    } catch (e: any) {
-      Alert.alert('Fehler', e.message || 'Bitte versuche es erneut.');
-    } finally {
-      setSaving(false);
+    } else {
+      Alert.alert('Fehler', 'Speichern fehlgeschlagen. Bitte versuche es erneut.');
     }
   };
 
@@ -122,8 +134,8 @@ export function AddPetScreen({ navigation, route }: AddPetScreenProps) {
         {/* Photo Upload */}
         <Text style={styles.label}>Foto</Text>
         <TouchableOpacity style={styles.photoUpload} onPress={pickImage}>
-          {photoUri ? (
-            <Image source={{ uri: photoUri }} style={styles.photoPreview} resizeMode="cover" />
+          {photoPreviewUri ? (
+            <Image source={{ uri: photoPreviewUri }} style={styles.photoPreview} resizeMode="cover" />
           ) : (
             <>
               <Ionicons name="camera-outline" size={32} color={colors.textLight} />

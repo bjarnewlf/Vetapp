@@ -122,86 +122,103 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
     }
 
     setSaving(true);
-    try {
-      // MedicalEvent bearbeiten (aus PetDetailScreen via editMedicalEvent-Param)
-      if (editMedicalEvent?.id) {
-        await updateMedicalEvent(editMedicalEvent.id, {
-          name: title.trim(),
-          date: isoDate,
-          notes: notes.trim() || undefined,
-          recurrenceInterval: recurrence !== 'Once' ? recurrence : undefined,
-        });
+
+    // MedicalEvent bearbeiten (aus PetDetailScreen via editMedicalEvent-Param)
+    if (editMedicalEvent?.id) {
+      const success = await updateMedicalEvent(editMedicalEvent.id, {
+        name: title.trim(),
+        date: isoDate,
+        notes: notes.trim() || undefined,
+        recurrenceInterval: recurrence !== 'Once' ? recurrence : undefined,
+      });
+      setSaving(false);
+      if (success) {
         navigation.goBack();
+      } else {
+        Alert.alert('Fehler', 'Speichern fehlgeschlagen. Bitte versuche es erneut.');
+      }
+      return;
+    }
+
+    // Reminder bearbeiten (aus EventDetailScreen via editEvent-Param)
+    if (editEvent?.id) {
+      const success = await updateReminder(editEvent.id, {
+        title: title.trim(),
+        date: isoDate,
+        description: notes.trim() || undefined,
+        recurrence,
+      });
+      setSaving(false);
+      if (success) {
+        navigation.goBack();
+      } else {
+        Alert.alert('Fehler', 'Speichern fehlgeschlagen. Bitte versuche es erneut.');
+      }
+      return;
+    }
+
+    if (selectedType === 'custom') {
+      // Custom: als MedicalEvent speichern
+      const success = await addMedicalEvent({
+        petId: selectedPetId,
+        type: 'custom',
+        name: title.trim(),
+        date: isoDate,
+        nextDate,
+        notes: notes.trim() || undefined,
+        recurrenceInterval: recurrence !== 'Once' ? recurrence : undefined,
+      });
+      if (!success) {
+        setSaving(false);
+        Alert.alert('Fehler', 'Speichern fehlgeschlagen. Bitte versuche es erneut.');
         return;
       }
-
-      // Reminder bearbeiten (aus EventDetailScreen via editEvent-Param)
-      if (editEvent?.id) {
-        await updateReminder(editEvent.id, {
-          title: title.trim(),
-          date: isoDate,
-          description: notes.trim() || undefined,
+      // Zusätzlich Erinnerung wenn nächstes Datum berechnet wurde
+      if (nextDate) {
+        await addReminder({
+          petId: selectedPetId,
+          title: `${title.trim()} fällig`,
+          date: nextDate,
+          description: notes.trim() || `Nächste ${title.trim()} für dein Tier`,
           recurrence,
         });
-        navigation.goBack();
+      }
+    } else {
+      // Alle anderen Typen als MedicalEvent speichern
+      const eventType: MedicalEventType =
+        selectedType === 'vaccination' ? 'vaccination'
+        : selectedType === 'deworming' ? 'deworming'
+        : 'checkup';
+
+      const success = await addMedicalEvent({
+        petId: selectedPetId,
+        type: eventType,
+        name: title.trim(),
+        date: isoDate,
+        nextDate,
+        notes: notes.trim() || undefined,
+        recurrenceInterval: recurrence !== 'Once' ? recurrence : undefined,
+      });
+      if (!success) {
+        setSaving(false);
+        Alert.alert('Fehler', 'Speichern fehlgeschlagen. Bitte versuche es erneut.');
         return;
       }
 
-      if (selectedType === 'custom') {
-        // Custom: als MedicalEvent speichern
-        await addMedicalEvent({
+      // Auto-Erinnerung für nächstes Datum erstellen
+      if (nextDate) {
+        await addReminder({
           petId: selectedPetId,
-          type: 'custom',
-          name: title.trim(),
-          date: isoDate,
-          nextDate,
-          notes: notes.trim() || undefined,
-          recurrenceInterval: recurrence !== 'Once' ? recurrence : undefined,
+          title: `${title.trim()} fällig`,
+          date: nextDate,
+          description: notes.trim() || `Nächste ${title.trim()} für dein Tier`,
+          recurrence,
         });
-        // Zusätzlich Erinnerung wenn nächstes Datum berechnet wurde
-        if (nextDate) {
-          await addReminder({
-            petId: selectedPetId,
-            title: `${title.trim()} fällig`,
-            date: nextDate,
-            description: notes.trim() || `Nächste ${title.trim()} für dein Tier`,
-            recurrence,
-          });
-        }
-      } else {
-        // Alle anderen Typen als MedicalEvent speichern
-        const eventType: MedicalEventType =
-          selectedType === 'vaccination' ? 'vaccination'
-          : selectedType === 'deworming' ? 'deworming'
-          : 'checkup';
-
-        await addMedicalEvent({
-          petId: selectedPetId,
-          type: eventType,
-          name: title.trim(),
-          date: isoDate,
-          nextDate,
-          notes: notes.trim() || undefined,
-          recurrenceInterval: recurrence !== 'Once' ? recurrence : undefined,
-        });
-
-        // Auto-Erinnerung für nächstes Datum erstellen
-        if (nextDate) {
-          await addReminder({
-            petId: selectedPetId,
-            title: `${title.trim()} fällig`,
-            date: nextDate,
-            description: notes.trim() || `Nächste ${title.trim()} für dein Tier`,
-            recurrence,
-          });
-        }
       }
-      navigation.goBack();
-    } catch (e: any) {
-      Alert.alert('Fehler', e.message || 'Bitte versuche es erneut.');
-    } finally {
-      setSaving(false);
     }
+
+    setSaving(false);
+    navigation.goBack();
   };
 
   const getStepTitle = () => {

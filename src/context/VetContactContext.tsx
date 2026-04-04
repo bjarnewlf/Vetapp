@@ -7,7 +7,7 @@ interface VetContactContextType {
   vetContact: VetContact | null;
   loading: boolean;
   error: string | null;
-  saveVetContact: (data: Omit<VetContact, 'id'>) => Promise<void>;
+  saveVetContact: (data: Omit<VetContact, 'id'>) => Promise<boolean>;
   refresh: () => Promise<void>;
 }
 
@@ -57,8 +57,8 @@ export function VetContactProvider({ children }: { children: React.ReactNode }) 
     refresh();
   }, [refresh]);
 
-  const saveVetContact = async (data: Omit<VetContact, 'id'>) => {
-    if (!user) return;
+  const saveVetContact = async (data: Omit<VetContact, 'id'>): Promise<boolean> => {
+    if (!user) return false;
     if (vetContact) {
       const { error } = await supabase.from('vet_contacts').update({
         name: data.name,
@@ -67,7 +67,7 @@ export function VetContactProvider({ children }: { children: React.ReactNode }) 
         email: data.email || null,
         address: data.address || null,
       }).eq('id', vetContact.id);
-      if (!error) await refresh();
+      if (error) { setError(error.message); return false; }
     } else {
       const { error } = await supabase.from('vet_contacts').insert({
         user_id: user.id,
@@ -77,8 +77,10 @@ export function VetContactProvider({ children }: { children: React.ReactNode }) 
         email: data.email || null,
         address: data.address || null,
       });
-      if (!error) await refresh();
+      if (error) { setError(error.message); return false; }
     }
+    await refresh();
+    return true;
   };
 
   return (

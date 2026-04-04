@@ -4,7 +4,10 @@ export interface Pet {
   type: AnimalType;
   breed: string;
   birthDate: string;
+  /** Signed URL zum Anzeigen — on-demand generiert aus photoStoragePath */
   photo?: string;
+  /** Pfad im Supabase Storage Bucket (pet-documents), z.B. pet-photos/{userId}/{petId}.jpg */
+  photoStoragePath?: string;
   microchipCode?: string;
   createdAt: string;
 }

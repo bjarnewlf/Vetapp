@@ -1,10 +1,12 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Button, StatusBadge, ErrorBanner } from '../components';
 import { useMedical } from '../context/MedicalContext';
 import { Reminder } from '../types';
+import { useOverdueSettings } from '../hooks/useOverdueSettings';
+import { scheduleOverdueNotifications } from '../services/notifications';
 
 interface RemindersScreenProps {
   navigation: any;
@@ -12,6 +14,14 @@ interface RemindersScreenProps {
 
 export function RemindersScreen({ navigation }: RemindersScreenProps) {
   const { reminders, completeReminder, error: medicalError, refresh: refreshMedical } = useMedical();
+  const { rule: overdueRule, loaded: settingsLoaded } = useOverdueSettings();
+
+  // Überfällige Notifications planen sobald Reminders und Settings geladen sind
+  useEffect(() => {
+    if (!settingsLoaded) return;
+    scheduleOverdueNotifications(reminders, overdueRule);
+  }, [reminders, overdueRule, settingsLoaded]);
+
   const activeReminders = reminders
     .filter(r => r.status !== 'completed')
     .sort((a, b) => {
@@ -19,11 +29,16 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
       if (a.status !== 'overdue' && b.status === 'overdue') return 1;
       return new Date(a.date).getTime() - new Date(b.date).getTime();
     });
-  const overdueCount = activeReminders.filter(r => r.status === 'overdue').length;
+
+  // Bei Regel 'never' werden überfällige Erinnerungen nicht speziell hervorgehoben
+  const overdueCount = overdueRule !== 'never'
+    ? activeReminders.filter(r => r.status === 'overdue').length
+    : 0;
 
   const handleToggle = async (reminder: Reminder) => {
     if (reminder.status !== 'completed') {
-      await completeReminder(reminder.id);
+      const success = await completeReminder(reminder.id);
+      if (!success) Alert.alert('Fehler', 'Speichern fehlgeschlagen. Bitte versuche es erneut.');
     }
   };
 
