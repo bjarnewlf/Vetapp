@@ -12,6 +12,11 @@
 - [ ] F-08: Pet-Fotos in Supabase Storage hochladen (wie Dokumente)
 - [ ] F-11: notification_id Spalte ins supabase-schema.sql nachpflegen
 
+## PHASE 2
+- [ ] Custom Font (Inter) einfuehren — frueh in Phase 2, bevor Screen-Bestand waechst
+- [ ] Dark Mode — erst Semantic Color Tokens, dann Dark-Varianten
+- [ ] Micro-Animationen — maximal ein einzelner Effekt (Card-Press), kein Reanimated fuers MVP
+
 ## BACKLOG
 - [ ] M7: DataContext refactoren (God-Object, ~350 Zeilen)
 - [ ] Chat-Historie persistent machen (nach MVP)
@@ -24,6 +29,8 @@
 - [ ] F-14: getAge() — Zukunftsdaten abfangen
 
 ## ERLEDIGT
+- [x] Orange-Kontrast: accent #E8895C → #CC6B3D (WCAG-konform)
+- [x] Spacing-Token smd: 12 eingefuehrt
 - [x] D-A: Accessibility — Button + InputField (Labels, Roles, States)
 - [x] D-B: Touch-Target Checkbox RemindersScreen (28px → 44px)
 - [x] D-C: Deaktivierte Settings-Items im ProfileScreen ("Kommt bald" Alert)

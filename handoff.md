@@ -9,50 +9,43 @@
 
 **Agent:** Brian (Sidekick)
 **Zeitpunkt:** 2026-04-04
-**Session:** Vault-Inventur + Hygiene + Design-Tasks
+**Session:** Vault-Inventur, Design-Sprint, Team-Retro, Design-Entscheidungen
 
 ### Erledigt
-- **Vault-Inventur** — Komplettes Team (Developer, Designer, QA) hat Codebase analysiert
-  - 15 neue Notizen im Agency-Vault erstellt
-  - 2 neue Ordner (QA/, Konzepte/)
-  - 10 bestehende Notizen mit Backlinks ergaenzt
-- **Commit: Hygiene** — 17 Dateien (Briefings, Docs, Scripts, Agency-Infrastruktur, .gitignore)
-- **Commit: Design-Tasks D-A bis D-E** — 7 Dateien, QA-geprueft, TypeScript 0 Fehler
-  - D-A: Button + InputField Accessibility (Labels, Roles, States)
-  - D-B: Reminder-Checkbox 28px → 44px
-  - D-C: Settings-Items visuell deaktiviert + "Kommt bald" Alert
-  - D-D: Card + StatusBadge Inline-Werte → Theme-Tokens
-  - D-E: War bereits gefixt
-- **QA-Findings** — 15 Findings aus Vollanalyse, 3 kritische bewertet:
-  - F-01: .env nie committet → Entwarnung
-  - F-02: togglePro() → tasks.md (Vor Release)
-  - F-03: CORS Wildcard → tasks.md (Vor Release)
-- **tasks.md aktualisiert** — Neue Kategorie "Vor Release" mit 6 QA-Findings, D-A bis D-E erledigt
-- **ProfileScreen Settings-Items** — aus Backlog entfernt (durch D-C erledigt)
+- **Vault-Inventur** — 15 neue Notizen, 2 neue Ordner, 10 Backlinks ergaenzt
+- **Design-Tasks D-A bis D-E** — Alle 5 erledigt, QA-geprueft
+- **Team-Retrospektive** — 6 Agents, HTML-Briefing erstellt
+- **Design-Entscheidungen** — 5 offene Fragen geklaert:
+  - Orange-Kontrast: #E8895C → #CC6B3D (WCAG-konform, umgesetzt)
+  - Spacing-Token: smd: 12 eingefuehrt (umgesetzt)
+  - Custom Font (Inter): Spaeter, fruehe Phase 2
+  - Micro-Animationen: MVP ohne
+  - Dark Mode: Nach MVP, erst Semantic Tokens
+- **QA-Findings bewertet** — F-01 Entwarnung, F-02/F-03 in Vor-Release, Rest priorisiert
+- **Alle Dokumente aktualisiert** — tasks.md, status.md, handoff.md, learnings.md, claas-todos.md
 
 ### Offen / Nicht fertig
-- Aenderungen dieser Session noch nicht gepusht
+- 7+ Commits lokal, noch nicht gepusht
+- Claas-Todos: 5 Entscheidungen + 3 Aktionen offen (Architektur, Agentur, Push)
 
 ### Naechster Schritt
-1. Optional: git push
+1. Claas: Restliche TODOs in claas-todos.md abarbeiten (M7 Prio, Test-Strategie, Scheduled Agents)
 2. Gesundheits-UX Datenmodell (MedicalEvent) — groesserer Umbau, eigene Session
-3. "Vor Release" Fixes (F-02 bis F-11) — mittlerer Aufwand
+3. "Vor Release" Fixes (F-02 bis F-11)
 
 ### Wichtig fuer den Naechsten
-- Vault in D:\Agency-Vault\ ist jetzt umfassend befuellt (55+ Notizen)
-- QA-Findings F-01 bis F-15 dokumentiert in Vault unter QA/QA-Findings 2026-04-04.md
-- Design-Tasks D-A bis D-E sind alle abgeschlossen
-- KI-Assistent nutzt Custom Header `x-user-token` — nicht aendern
-- Rate Limiting nutzt ai_usage Tabelle — fail-open bei DB-Fehler
+- Accent-Farbe ist jetzt #CC6B3D (nicht mehr #E8895C)
+- Neuer Spacing-Token spacing.smd: 12 verfuegbar
+- accentLight (#F5D0B9) passt noch, aber designerisch pruefenswert
+- KI-Assistent nutzt Custom Header x-user-token — nicht aendern
+- Vault hat 55+ Notizen inkl. neue Entscheidung zu Design-Fragen
 
 ---
 
 ## Vorherige Uebergaben
 
-### Brian (Sidekick) — 2026-04-04 (frueherer Eintrag)
-- KI-Chat abgesichert (Rate Limiting, Validierung, Prompt-Schutz)
-- Edge Function deployed
-- Migration ai_usage angewendet
+### Brian — 2026-04-04 (frueher)
+- KI-Chat abgesichert, Edge Function deployed, Migration ai_usage
 
 ### Agency Admin — 2026-04-04 ~09:00
-- Uebergabeprotokoll-System eingefuehrt (handoff.md, Agent-Rules aktualisiert)
+- Uebergabeprotokoll-System eingefuehrt
