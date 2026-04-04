@@ -337,7 +337,7 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
               title="Noch keine Impfungen"
               subtitle="Trage die erste Impfung ein."
               actionLabel="Impfung eintragen"
-              onAction={() => navigation.navigate('AddEvent', { petId: pet.id, defaultType: 'vaccination' })}
+              onAction={() => navigation.navigate('AddEvent', { petId: pet.id, eventType: 'vaccination' })}
             />
           )}
 

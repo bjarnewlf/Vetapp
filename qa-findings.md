@@ -17,6 +17,121 @@ Alle Findings aus Review 2 wurden als Grundlage für Review 3 verwendet. Details
 
 ---
 
+## Review 5: Vollstaendiger Code-Review nach Feature-Session — 2026-04-04
+
+**TypeScript-Check:** `npx tsc --noEmit` — 0 Fehler. Sauber.
+
+**Geprueft:** fileUpload.ts, PetContext.tsx, AddPetScreen.tsx, OnboardingScreen.tsx, HomeScreen.tsx, PetDetailScreen.tsx, RemindersScreen.tsx, ReminderSettingsScreen.tsx, AddEventScreen.tsx, VetContactScreen.tsx, AIAssistantScreen.tsx, EmptyState.tsx, SkeletonLoader.tsx, Card.tsx, components/index.ts, theme/colors.ts, theme/typography.ts, hooks/useOverdueSettings.ts, services/notifications.ts, types/index.ts
+
+---
+
+### F-023: OnboardingScreen — Foto wird als petData-Feld statt als zweites Argument uebergeben — Schwere: Mittel
+
+**Was:** `OnboardingScreen.tsx` Z.76-83 ruft `addPet({ ..., photo: photoUri || undefined })` auf. Das `photo`-Feld ist im ersten Parameter (`Omit<Pet, 'id' | 'createdAt'>`) zwar typseitig erlaubt, aber `addPet` in `PetContext.tsx` ignoriert `petData.photo` vollstaendig — es wird nirgends ausgewertet. Das zweite Argument `photoUri` (Z.117) wird nicht uebergeben.
+
+**Wo:** `src/screens/OnboardingScreen.tsx` Z.76-83, `src/context/PetContext.tsx` Z.117-154
+
+**Warum:** Wenn ein User beim Onboarding ein Foto auswaehlt, wird es zwar im State gehalten und in der Vorschau angezeigt, aber beim Speichern stillschweigend ignoriert. Das Tier wird ohne Foto angelegt. Kein Crash, kein Fehler — stiller Datenverlust.
+
+**Fix:** Aufruf aendern auf: `addPet({ name, type, breed, birthDate, microchipCode: undefined }, photoUri ?? undefined)` — `photo` aus dem petData-Objekt entfernen, Foto als zweites Argument uebergeben.
+
+**Entscheidung:** [ ] Fix jetzt / [ ] Fix vor Release / [ ] Accepted Risk
+
+---
+
+### F-024: PetDetailScreen — `defaultType`-Param wird in AddEventScreen nicht ausgewertet — Schwere: Niedrig
+
+**Was:** `PetDetailScreen.tsx` Z.340 navigiert zu `AddEvent` mit `{ petId: pet.id, defaultType: 'vaccination' }`. In `AddEventScreen.tsx` wird `route.params?.defaultType` nirgends gelesen. Der Param existiert nur als `route.params?.eventType` (Z.35). Der `defaultType`-Wert ist unbekannt.
+
+**Wo:** `src/screens/PetDetailScreen.tsx` Z.340, `src/screens/AddEventScreen.tsx` Z.35
+
+**Warum:** Der EmptyState-Action-Button "Impfung eintragen" oeffnet `AddEventScreen` mit `defaultType: 'vaccination'`. Da dieser Param nicht ausgewertet wird, landet der User auf dem Select-Pet-Schritt (oder Select-Type-Schritt), statt direkt im Config-Schritt mit vorausgewaehltem Typ. Keine Fehlfunktion, aber schlechte UX — der Button suggeriert einen direkten Einstieg.
+
+**Fix:** Entweder in `PetDetailScreen` `defaultType` durch `eventType` ersetzen (korrekter Param-Name), oder in `AddEventScreen` `defaultType` als Alias fuer `eventType` auslesen.
+
+**Entscheidung:** [ ] Fix jetzt / [ ] Fix vor Release / [ ] Accepted Risk
+
+---
+
+### F-025: HomeScreen — tote Style-Definitionen (`emptyCard`, `emptyText`, `emptyLink`) — Schwere: Niedrig
+
+**Was:** `HomeScreen.tsx` Z.244-246 definiert drei Styles (`emptyCard`, `emptyText`, `emptyLink`), die nach der Umstellung auf die `EmptyState`-Komponente (Z.107-113) nicht mehr referenziert werden.
+
+**Wo:** `src/screens/HomeScreen.tsx` Z.244-246
+
+**Warum:** Toter Code. Kein funktionaler Schaden, aber Unordnung. TypeScript meldet das nicht (StyleSheet-Properties werden nicht auf Nutzung geprueft).
+
+**Fix:** Die drei Style-Definitionen loeschen.
+
+**Entscheidung:** [ ] Fix jetzt / [ ] Fix vor Release / [ ] Accepted Risk
+
+---
+
+### F-026: SkeletonLoader — `useNativeDriver: false` notwendig aber bewusst gesetzt, Anmerkung zur Performance — Schwere: Niedrig
+
+**Was:** `SkeletonLoader.tsx` Z.21 und Z.26 setzen `useNativeDriver: false` fuer die Hintergrundfarben-Animation. Das ist korrekt, da `backgroundColor` nicht vom Native Driver unterstuetzt wird. Auf Low-End-Geraeten lauft die Animation auf dem JS-Thread und koennte bei gleichzeitig vielen Skeleton-Karten (z.B. 10+) zu Frame-Drops fuehren.
+
+**Wo:** `src/components/SkeletonLoader.tsx` Z.21, Z.26
+
+**Warum:** Nicht ein Bug, sondern eine Performance-Einschraenkung der RN-Animationsarchitektur. Relevant wenn SkeletonListItem in langen Listen eingesetzt wird (z.B. 20+ Tiere).
+
+**Fix (optional):** Fuer Performance-kritische Stellen `react-native-reanimated` oder `Animated.interpolateColors` mit nativeDriver erwaegen. Fuer den aktuellen Use Case (kurze Ladelisten) kein Handlungsbedarf.
+
+**Entscheidung:** [ ] Fix jetzt / [ ] Fix vor Release / [x] Accepted Risk — aktueller Use Case unkritisch
+
+---
+
+### Verifikation der Fixes aus Review 4
+
+#### F-015: CRUD-boolean-Returns
+**Status: GEFIXT und korrekt.**
+Alle drei Contexts (`PetContext`, `MedicalContext`, `VetContactContext`) geben `boolean` zurueck. `AddPetScreen.tsx` Z.88-121: `success` wird geprueft, `goBack()` nur bei `true`. `PetDetailScreen.tsx`: `handleDeleteDocument`, `handleDeleteVaccination`, `handleDeleteTreatment` pruefen alle korrekt auf `!success` und zeigen Alert.
+
+#### F-016: Dropped Promise in RemindersScreen
+**Status: GEFIXT.**
+`RemindersScreen.tsx` Z.38-43: `handleToggle` ist `async`, `await completeReminder(reminder.id)` mit anschliessendem Alert bei Fehler. Korrekt.
+
+#### F-017: Guard fuer leere petId in AddEventScreen
+**Status: GEFIXT.**
+`AddEventScreen.tsx` Z.92-95: `if (!selectedPetId) { Alert.alert(...); return; }` ist vorhanden.
+
+#### F-018: OnboardingScreen Error-Handling
+**Status: TEILWEISE GEFIXT.**
+`OnboardingScreen.tsx` Z.86-90: `if (success)` Guard ist vorhanden, `onComplete()` nur bei Erfolg. Alert bei Fehler. Aber: neues Finding F-023 — das Foto wird trotzdem nicht hochgeladen (falscher Param-Pfad).
+
+#### F-019: WelcomeScreen toter Code
+**Status: GEFIXT.** Datei wurde geloescht (nicht mehr vorhanden).
+
+#### F-020: VetContactScreen Anruf-Button
+**Status: GEFIXT.**
+`VetContactScreen.tsx` Z.86: `{vet.phone && vet.phone.trim() !== '' && <Button ... />}` — Guard vorhanden.
+
+#### F-021: ReminderSettings werden nie angewendet
+**Status: GEFIXT.**
+`RemindersScreen.tsx` Z.17: `useOverdueSettings()` wird gelesen. Z.20-23: `useEffect` plant `scheduleOverdueNotifications(reminders, overdueRule)` sobald Settings geladen sind. `notifications.ts` wertet `rule` korrekt aus.
+
+#### F-022: Unnoetige Signed URL in uploadFile
+**Status: OFFEN.**
+`fileUpload.ts` Z.83-92: `createSignedUrl`-Block ist noch vorhanden. `PetContext.addDocument` Z.214 destrukturiert weiterhin nur `{ path }`.
+
+---
+
+### Zusammenfassung Review 5
+
+| ID | Schwere | Beschreibung | Status |
+|---|---|---|---|
+| F-023 | Mittel | OnboardingScreen: Foto-URI geht an falschen Parameter, wird ignoriert | NEU — Fix empfohlen |
+| F-024 | Niedrig | PetDetailScreen: `defaultType`-Param unbekannt in AddEventScreen | NEU — Fix empfohlen |
+| F-025 | Niedrig | HomeScreen: tote Styles nach EmptyState-Umstellung | NEU |
+| F-026 | Niedrig | SkeletonLoader: `useNativeDriver: false` — JS-Thread-Animation, Accepted | NEU — Accepted Risk |
+| F-022 | Niedrig | fileUpload: unnoetige Signed-URL-Generierung (aus Review 4, noch offen) | OFFEN |
+
+**TypeScript-Check:** Bestanden — 0 Fehler.
+
+**Naechster Schritt:** F-023 ist der einzige Mittel-Fund — ein 2-Zeilen-Fix im OnboardingScreen. Alle anderen Findings sind Niedrig oder Accepted Risk. Code ist bereit fuer Handy-Test.
+
+---
+
 ## Review 4: Vollstaendiger Code-Review nach MedicalEvent-Migration — 2026-04-04
 
 **TypeScript-Check:** `npx tsc --noEmit` — 0 Fehler. Sauber.

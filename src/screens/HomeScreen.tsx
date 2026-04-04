@@ -241,9 +241,6 @@ const styles = StyleSheet.create({
   },
   sectionTitle: { ...typography.h2, color: colors.text },
   addLink: { ...typography.label, color: colors.primary },
-  emptyCard: { alignItems: 'center', marginBottom: spacing.lg },
-  emptyText: { ...typography.body, color: colors.textLight, marginBottom: 4 },
-  emptyLink: { ...typography.label, color: colors.primary },
   petsGrid: { flexDirection: 'row', gap: spacing.md, marginBottom: spacing.lg, flexWrap: 'wrap' },
   petCard: {
     flex: 1, minWidth: 140, backgroundColor: colors.surface, borderRadius: borderRadius.lg,

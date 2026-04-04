@@ -79,8 +79,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
       breed: breed.trim(),
       birthDate: isoDate ?? new Date().toISOString().split('T')[0],
       microchipCode: undefined,
-      photo: photoUri || undefined,
-    });
+    }, photoUri ?? undefined);
     setSaving(false);
 
     if (success) {
