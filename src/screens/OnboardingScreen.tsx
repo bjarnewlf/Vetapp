@@ -8,7 +8,7 @@ import { colors, typography, spacing, borderRadius } from '../theme';
 import { InputField, Button, SelectField } from '../components';
 import type { SelectFieldOption } from '../components';
 import { AnimalType } from '../types';
-import { useData } from '../context/DataContext';
+import { usePets } from '../context/PetContext';
 import { useAuth } from '../context/AuthContext';
 import { parseGermanDate } from '../utils/petHelpers';
 
@@ -30,7 +30,7 @@ interface OnboardingScreenProps {
 
 export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
   const { user } = useAuth();
-  const { addPet } = useData();
+  const { addPet } = usePets();
   const [step, setStep] = useState<'welcome' | 'addPet'>('welcome');
   const [name, setName] = useState('');
   const [animalType, setAnimalType] = useState<AnimalType | ''>('');

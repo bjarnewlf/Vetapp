@@ -5,43 +5,53 @@
 
 ---
 
+## Erinnerungen von Claas (Wissensmanager)
+
+- **Duplikat loeschen:** `D:\Agency-Vault\Learnings\Alle Dokumente nach Arbeit aktualisieren.md` — Claas manuell loeschen
+- **Entscheidung ausstehend:** Test-Strategie fuer VetApp — Option A (Unit-Tests), B (Integration-Tests) oder C (nichts) → `D:\Agency-Vault\Konzepte\Test-Strategie.md`
+- **Inbox-Auftrag:** Developer soll kritische QA-Findings F-01 und F-02 fixen → `D:\Agency-Vault\Inbox\Auftrag Developer — Kritische QA-Findings fixen.md`
+
+---
+
 ## Aktuelle Uebergabe
 
-**Agent:** Brian (Sidekick)
-**Zeitpunkt:** 2026-04-04 (Session-Ende)
-**Session:** Vault-Inventur, Design-Sprint, Team-Retro, Design-Entscheidungen, Infrastruktur-Update
+**Agent:** Developer
+**Zeitpunkt:** 2026-04-04
+**Session:** QA-Vor-Release-Fixes F-03, F-05, F-06, F-07, F-007, F-009
 
 ### Erledigt
-- **Vault-Inventur** — Komplettes Team hat Codebase analysiert, 15 neue Notizen, 2 neue Ordner (QA/, Konzepte/), 10 Backlinks ergaenzt
-- **Design-Tasks D-A bis D-E** — Alle 5 erledigt, QA-geprueft, committet
-- **Team-Retrospektive** — 6 Agents, HTML-Briefing, im Vault dokumentiert
-- **Design-Entscheidungen** — 5 offene Fragen geklaert + umgesetzt:
-  - Orange-Kontrast: #E8895C → #CC6B3D (WCAG-konform)
-  - Spacing-Token: smd: 12 eingefuehrt
-  - Custom Font (Inter): Phase 2
-  - Micro-Animationen: MVP ohne
-  - Dark Mode: Nach MVP
-- **QA-Findings bewertet** — 15 Findings, 3 Kritische, alle priorisiert
-- **Infrastruktur-Update nach Retro** — QA Schreibzugriff, Scheduled Agents ehrlich, Theme-Zustaendigkeit, Session-Ende-Pflicht, learnings.md als Index
-- **Alle Commits gepusht** — 10 Commits remote
+
+- **F-03 — `supabase/functions/ai-chat/index.ts`**: CORS-Wildcard (`*`) dokumentiert. Kommentar erklaert warum native Apps keinen Origin senden, und dass der Wildcard vor einem Web-Release eingeschraenkt werden muss.
+
+- **F-05/F-06 — `src/screens/EventDetailScreen.tsx` + `src/screens/PetDetailScreen.tsx`**: Null-Checks ersetzt durch echte Fallback-UI mit "Eintrag nicht gefunden"-Text und Zurueck-Knopf. Kein stiller `return null` mehr.
+
+- **F-07 — `src/components/ErrorBanner.tsx`** (neu): Wiederverwendbare Fehler-Banner-Komponente. Zeigt rote Box mit Text und Retry via `onRetry`-Callback. In `src/components/index.ts` exportiert. Eingebaut in:
+  - `HomeScreen.tsx` — zeigt petsError und medicalError
+  - `RemindersScreen.tsx` — zeigt medicalError
+  - `PetDetailScreen.tsx` — zeigt medicalError im Gesundheits-Tab
+
+- **F-007 — `src/context/PetContext.tsx`**: `mapDocument` korrigiert. `storagePath` bekommt den DB-Wert (`row.file_url`), `fileUrl` wird als leerer String gesetzt (kein echter URL-Wert aus DB). Storage-Zugriff laeuft ausschliesslich ueber `storagePath` + signed URL in `PetDetailScreen.getSignedUrl()`.
+
+- **F-009 — `src/screens/AddEventScreen.tsx` + `src/screens/PetDetailScreen.tsx`**: MedicalEvents sind jetzt editierbar. PetDetailScreen hat Edit-Icon-Buttons neben jedem MedicalEvent (Impfungen + Behandlungen). Navigation zu AddEventScreen mit `editMedicalEvent`-Param. AddEventScreen erkennt `editMedicalEvent`, fuellt Felder vor und ruft `updateMedicalEvent()` beim Speichern auf.
+
+- **TypeScript-Check** — `npx tsc --noEmit` ohne Fehler.
 
 ### Offen / Nicht fertig
-- claas-todos.md: 5 Entscheidungen + 2 Aktionen offen
+- DB-Migration `20260404_medical_events_recurrence_check.sql` muss noch gegen Supabase deployed werden
+- Alte Supabase-Tabellen `vaccinations` und `treatments` koennen in der DB gedroppt werden
+- Migration fuer `notification_id` in `reminders` (DB-Migration fehlt noch)
+- CORS vor Web-Release einschraenken (Kommentar im Code vorhanden)
 
 ### Naechster Schritt
-1. Claas: Restliche TODOs abarbeiten (M7, Tests, Scheduled Agents, Design-Konzept v2)
-2. Gesundheits-UX Datenmodell (MedicalEvent) — groesserer Umbau, eigene Session
-3. "Vor Release" Fixes (F-02 bis F-11) — 6 Stueck
+1. DB-Migration deployen: `20260404_medical_events_recurrence_check.sql`
+2. Manuelle QA der neuen Edit-Funktion fuer MedicalEvents
+3. CORS einschraenken falls Web-Client kommt
 
 ### Wichtig fuer den Naechsten
-- Accent-Farbe ist jetzt #CC6B3D (nicht mehr #E8895C)
-- Neuer Spacing-Token spacing.smd: 12 verfuegbar
-- accentLight (#F5D0B9) designerisch pruefenswert (passt noch, aber knapp)
-- KI-Assistent nutzt Custom Header x-user-token — nicht aendern
-- Rate Limiting via ai_usage Tabelle — fail-open bei DB-Fehler
-- QA schreibt Findings jetzt in qa-findings.md (nicht mehr ueber Brian)
-- Theme-Aenderungen: Designer entscheidet WAS, Developer setzt um WO
-- Vault hat 55+ Notizen, Retro dokumentiert in Chronik/2026-04-04 Team-Retrospektive.md
+- `DataContext.tsx` existiert nicht mehr — nirgendwo `useData()` oder `DataProvider` importieren
+- Alle drei Contexts (`usePets`, `useMedical`, `useVetContact`) exponieren `error: string | null` und `refresh()`
+- `Document.fileUrl` ist jetzt immer leer-String — Storage-Zugriff nur ueber `storagePath`
+- MedicalEvent-Edit-Navigation laeuft ueber route.params.editMedicalEvent (nicht editEvent)
 
 ---
 

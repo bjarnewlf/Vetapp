@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
-import { Button, StatusBadge } from '../components';
-import { useData } from '../context/DataContext';
+import { Button, StatusBadge, ErrorBanner } from '../components';
+import { useMedical } from '../context/MedicalContext';
 import { Reminder } from '../types';
 
 interface RemindersScreenProps {
@@ -11,7 +11,7 @@ interface RemindersScreenProps {
 }
 
 export function RemindersScreen({ navigation }: RemindersScreenProps) {
-  const { reminders, completeReminder } = useData();
+  const { reminders, completeReminder, error: medicalError, refresh: refreshMedical } = useMedical();
   const activeReminders = reminders
     .filter(r => r.status !== 'completed')
     .sort((a, b) => {
@@ -67,6 +67,7 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Erinnerungen</Text>
+      {medicalError && <ErrorBanner onRetry={refreshMedical} />}
       <View style={styles.content}>
         <Button
           title="+ Erinnerung hinzufügen"

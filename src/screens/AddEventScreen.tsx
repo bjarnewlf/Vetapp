@@ -6,10 +6,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { InputField, Button, Card, SelectField } from '../components';
 import type { SelectFieldOption } from '../components';
-import { useData } from '../context/DataContext';
+import { usePets } from '../context/PetContext';
+import { useMedical } from '../context/MedicalContext';
 import { parseGermanDate } from '../utils/petHelpers';
-import { useSubscription, FREE_LIMITS } from '../context/SubscriptionContext';
-import { RecurrenceType, recurrenceDisplayLabels } from '../types';
+import { useSubscription } from '../context/SubscriptionContext';
+import { RecurrenceType, MedicalEventType, recurrenceDisplayLabels } from '../types';
 
 interface AddEventScreenProps {
   navigation: any;
@@ -29,11 +30,13 @@ const recurrenceOptions: RecurrenceType[] = ['Once', 'Weekly', 'Monthly', 'Yearl
 
 export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
   const { isPro } = useSubscription();
-  const { pets, addReminder, addVaccination, addTreatment, updateReminder } = useData();
+  const { pets } = usePets();
+  const { addMedicalEvent, addReminder, updateReminder, updateMedicalEvent } = useMedical();
   const preselectedPetId = route.params?.petId;
   const preselectedEventType = route.params?.eventType;
   const editEvent = route.params?.editEvent;
-  const isEditMode = !!editEvent;
+  const editMedicalEvent = route.params?.editMedicalEvent;
+  const isEditMode = !!editEvent || !!editMedicalEvent;
 
   const initialStep = (): Step => {
     if (isEditMode || preselectedEventType) return 'config';
@@ -41,10 +44,12 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
     return 'select-pet';
   };
 
+
   const [step, setStep] = useState<Step>(initialStep);
   const [selectedPetId, setSelectedPetId] = useState(preselectedPetId || '');
-  const [selectedType, setSelectedType] = useState(editEvent?.type || preselectedEventType || '');
+  const [selectedType, setSelectedType] = useState(editMedicalEvent?.type || editEvent?.type || preselectedEventType || '');
   const [title, setTitle] = useState(() => {
+    if (editMedicalEvent?.name) return editMedicalEvent.name;
     if (editEvent?.title) return editEvent.title;
     if (preselectedEventType) {
       const type = eventTypes.find(t => t.id === preselectedEventType);
@@ -53,14 +58,15 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
     return '';
   });
   const [date, setDate] = useState(() => {
-    if (editEvent?.date) {
-      const d = new Date(editEvent.date);
+    const dateStr = editMedicalEvent?.date || editEvent?.date;
+    if (dateStr) {
+      const d = new Date(dateStr);
       return `${d.getDate().toString().padStart(2, '0')}.${(d.getMonth() + 1).toString().padStart(2, '0')}.${d.getFullYear()}`;
     }
     return '';
   });
-  const [notes, setNotes] = useState(editEvent?.description || '');
-  const [recurrence, setRecurrence] = useState<RecurrenceType>(editEvent?.recurrence || 'Once');
+  const [notes, setNotes] = useState(editMedicalEvent?.notes || editEvent?.description || '');
+  const [recurrence, setRecurrence] = useState<RecurrenceType>(editMedicalEvent?.recurrenceInterval || editEvent?.recurrence || 'Once');
   const [saving, setSaving] = useState(false);
 
   const selectedPet = pets.find(p => p.id === selectedPetId);
@@ -113,8 +119,20 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
 
     setSaving(true);
     try {
-      // Edit mode: update existing reminder
-      if (isEditMode && editEvent?.id) {
+      // MedicalEvent bearbeiten (aus PetDetailScreen via editMedicalEvent-Param)
+      if (editMedicalEvent?.id) {
+        await updateMedicalEvent(editMedicalEvent.id, {
+          name: title.trim(),
+          date: isoDate,
+          notes: notes.trim() || undefined,
+          recurrenceInterval: recurrence !== 'Once' ? recurrence : undefined,
+        });
+        navigation.goBack();
+        return;
+      }
+
+      // Reminder bearbeiten (aus EventDetailScreen via editEvent-Param)
+      if (editEvent?.id) {
         await updateReminder(editEvent.id, {
           title: title.trim(),
           date: isoDate,
@@ -125,52 +143,54 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
         return;
       }
 
-      if (selectedType === 'vaccination') {
-        // Save as vaccination record + create reminder for next date
-        await addVaccination({
+      if (selectedType === 'custom') {
+        // Custom: als MedicalEvent speichern
+        await addMedicalEvent({
           petId: selectedPetId,
-          name: title.trim(),
-          givenDate: isoDate,
-          nextDate,
-          recurrenceInterval: recurrence !== 'Once' ? recurrence : undefined,
-        });
-        // Auto-create reminder for next vaccination date
-        if (nextDate) {
-          await addReminder({
-            petId: selectedPetId,
-            title: `${title.trim()} fällig`,
-            date: nextDate,
-            description: `Nächste ${title.trim()} für dein Tier`,
-            recurrence,
-          });
-        }
-      } else if (selectedType === 'deworming' || selectedType === 'checkup') {
-        // Save as treatment record
-        await addTreatment({
-          petId: selectedPetId,
+          type: 'custom',
           name: title.trim(),
           date: isoDate,
+          nextDate,
           notes: notes.trim() || undefined,
+          recurrenceInterval: recurrence !== 'Once' ? recurrence : undefined,
         });
-        // Create reminder for next occurrence if recurring
+        // Zusätzlich Erinnerung wenn nächstes Datum berechnet wurde
         if (nextDate) {
           await addReminder({
             petId: selectedPetId,
             title: `${title.trim()} fällig`,
             date: nextDate,
-            description: notes.trim() || undefined,
+            description: notes.trim() || `Nächste ${title.trim()} für dein Tier`,
             recurrence,
           });
         }
       } else {
-        // Custom: save as reminder
-        await addReminder({
-          petId: selectedPetId || undefined,
-          title: title.trim(),
+        // Alle anderen Typen als MedicalEvent speichern
+        const eventType: MedicalEventType =
+          selectedType === 'vaccination' ? 'vaccination'
+          : selectedType === 'deworming' ? 'deworming'
+          : 'checkup';
+
+        await addMedicalEvent({
+          petId: selectedPetId,
+          type: eventType,
+          name: title.trim(),
           date: isoDate,
-          description: notes.trim() || undefined,
-          recurrence,
+          nextDate,
+          notes: notes.trim() || undefined,
+          recurrenceInterval: recurrence !== 'Once' ? recurrence : undefined,
         });
+
+        // Auto-Erinnerung für nächstes Datum erstellen
+        if (nextDate) {
+          await addReminder({
+            petId: selectedPetId,
+            title: `${title.trim()} fällig`,
+            date: nextDate,
+            description: notes.trim() || `Nächste ${title.trim()} für dein Tier`,
+            recurrence,
+          });
+        }
       }
       navigation.goBack();
     } catch (e: any) {
@@ -181,6 +201,7 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
   };
 
   const getStepTitle = () => {
+    if (editMedicalEvent) return 'Eintrag bearbeiten';
     switch (step) {
       case 'select-pet': return 'Tier wählen';
       case 'select-type': return 'Eventtyp wählen';

@@ -7,7 +7,8 @@ import { colors, typography, spacing } from '../theme';
 import { InputField, Button, SelectField } from '../components';
 import type { SelectFieldOption } from '../components';
 import { RecurrenceType, recurrenceDisplayLabels } from '../types';
-import { useData } from '../context/DataContext';
+import { usePets } from '../context/PetContext';
+import { useMedical } from '../context/MedicalContext';
 import { parseGermanDate } from '../utils/petHelpers';
 
 const recurrenceOptions: RecurrenceType[] = ['Once', 'Weekly', 'Monthly', 'Yearly', 'Custom'];
@@ -17,7 +18,8 @@ interface AddReminderScreenProps {
 }
 
 export function AddReminderScreen({ navigation }: AddReminderScreenProps) {
-  const { addReminder, pets } = useData();
+  const { pets } = usePets();
+  const { addReminder } = useMedical();
   const [petId, setPetId] = useState('');
   const [title, setTitle] = useState('');
   const [date, setDate] = useState('');

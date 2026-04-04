@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Button } from '../components';
-import { useData } from '../context/DataContext';
+import { usePets } from '../context/PetContext';
 import { Pet } from '../types';
 import { getAge } from '../utils/petHelpers';
 
@@ -12,7 +12,7 @@ interface MyPetsScreenProps {
 }
 
 export function MyPetsScreen({ navigation }: MyPetsScreenProps) {
-  const { pets } = useData();
+  const { pets } = usePets();
 
   const renderPet = ({ item }: { item: Pet }) => (
     <TouchableOpacity

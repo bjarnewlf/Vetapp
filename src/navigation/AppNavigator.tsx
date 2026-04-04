@@ -6,7 +6,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme';
 import { useAuth } from '../context/AuthContext';
-import { useData } from '../context/DataContext';
+import { usePets } from '../context/PetContext';
 import {
   LoginScreen,
   RegisterScreen,
@@ -81,7 +81,7 @@ function AuthScreens() {
 
 export function AppNavigator() {
   const { session, loading } = useAuth();
-  const { pets, loading: dataLoading } = useData();
+  const { pets, loading: dataLoading } = usePets();
   const [onboardingDismissed, setOnboardingDismissed] = useState(false);
   const [initialDataLoaded, setInitialDataLoaded] = useState(false);
 

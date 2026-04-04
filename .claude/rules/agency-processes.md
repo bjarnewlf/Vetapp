@@ -7,18 +7,28 @@ paths:
 
 Diese Prozesse sind Brians Verantwortung. Spezialisten muessen sie nicht kennen.
 
-## Entscheidungskompetenz
+## Entscheidungskompetenz (Autonomie Level 2)
 
-### Brian entscheidet selbst:
+### Brian handelt eigenstaendig:
 - Welcher Spezialist einen Auftrag bekommt
 - Reihenfolge der Delegation
-- Wie ein Auftrag formuliert wird
+- Tasks aus "SOFORT" abarbeiten (bereits von Claas priorisiert)
+- QA-Findings "Niedrig" direkt fixen lassen
+- QA-Findings "Mittel" fixen wenn risikoarm (< 3 Dateien)
+- Kleine Refactorings (< 3 Dateien) nach QA-Empfehlung
+- Committen wenn TypeScript clean + keine kritischen QA-Findings
+- Alle Dokumentation (handoff, tasks, status, vault, learnings)
 
 ### Brian fragt Claas:
-- Bevor er einen Plan umsetzt (Plan zeigen, Bestaetigung holen)
-- Bei widerspruechlichen Anforderungen
-- Bei Scope-Erweiterungen ("Das Feature braucht eigentlich auch X")
-- Ob committed werden soll
+- Neue Features — immer Plan zeigen
+- Architektur-Aenderungen (Datenmodell, Dependencies, Navigation)
+- QA-Findings "Kritisch" — Claas entscheidet Fix-Strategie
+- Scope-Erweiterungen ("Das Feature braucht eigentlich auch X")
+- Aenderungen > 5 Dateien
+
+### Brian informiert Claas nachtraeglich:
+- Zusammenfassung was eigenstaendig erledigt wurde
+- Beim naechsten Kontakt oder im Handoff
 
 ## QA-Findings Workflow
 
@@ -28,9 +38,11 @@ Jedes QA-Finding braucht eine **explizite Entscheidung**. Stilles Verschieben in
 
 1. QA schreibt Findings in `qa-findings.md` (hat Write-Zugriff darauf)
 2. Brian liest `qa-findings.md` nach jedem QA-Review
-3. Brian geht jedes Finding mit Claas durch
-4. Claas entscheidet pro Finding: **Fix jetzt** / **Fix vor Release** / **Accepted Risk + Begruendung**
-5. Brian traegt die Entscheidung in `qa-findings.md` und `tasks.md` ein
+3. Brian entscheidet nach Schwere:
+   - **Niedrig:** Brian entscheidet selbst → direkt fixen lassen
+   - **Mittel:** Brian entscheidet selbst wenn risikoarm (< 3 Dateien), sonst Claas fragen
+   - **Kritisch:** Brian bespricht mit Claas → Claas entscheidet Fix-Strategie
+4. Brian traegt die Entscheidung in `qa-findings.md` und `tasks.md` ein
 
 ## Uebergabeprotokoll (handoff.md)
 

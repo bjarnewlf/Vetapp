@@ -34,6 +34,7 @@ create table public.reminders (
   description text,
   recurrence text default 'Once',
   status text default 'upcoming',
+  notification_id text,  -- Expo Push Notification ID fuer Stornierung (F-11)
   created_at timestamptz default now()
 );
 
@@ -72,6 +73,21 @@ create table public.vet_contacts (
   created_at timestamptz default now()
 );
 
+-- Medical Events table (vereinheitlichtes Gesundheits-Datenmodell)
+-- Loest vaccinations + treatments ab. Typen: vaccination | deworming | checkup | custom
+create table public.medical_events (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users on delete cascade not null,
+  pet_id uuid references public.pets on delete cascade not null,
+  type text not null check (type in ('vaccination', 'deworming', 'checkup', 'custom')),
+  name text not null,
+  date date not null,
+  next_date date,
+  notes text,
+  recurrence_interval text,
+  created_at timestamptz default now()
+);
+
 -- Documents table (Pro feature)
 create table public.documents (
   id uuid default gen_random_uuid() primary key,
@@ -90,6 +106,7 @@ alter table public.pets enable row level security;
 alter table public.reminders enable row level security;
 alter table public.vaccinations enable row level security;
 alter table public.treatments enable row level security;
+alter table public.medical_events enable row level security;
 alter table public.vet_contacts enable row level security;
 alter table public.documents enable row level security;
 
@@ -117,6 +134,11 @@ create policy "Users can view own treatments" on public.treatments for select us
 create policy "Users can insert own treatments" on public.treatments for insert with check (auth.uid() = user_id);
 create policy "Users can update own treatments" on public.treatments for update using (auth.uid() = user_id);
 create policy "Users can delete own treatments" on public.treatments for delete using (auth.uid() = user_id);
+
+create policy "Users can view own medical events" on public.medical_events for select using (auth.uid() = user_id);
+create policy "Users can insert own medical events" on public.medical_events for insert with check (auth.uid() = user_id);
+create policy "Users can update own medical events" on public.medical_events for update using (auth.uid() = user_id);
+create policy "Users can delete own medical events" on public.medical_events for delete using (auth.uid() = user_id);
 
 create policy "Users can view own documents" on public.documents for select using (auth.uid() = user_id);
 create policy "Users can insert own documents" on public.documents for insert with check (auth.uid() = user_id);

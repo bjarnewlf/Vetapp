@@ -4,3 +4,4 @@ export { StatusBadge } from './StatusBadge';
 export { InputField } from './InputField';
 export { SelectField } from './SelectField';
 export type { SelectFieldOption } from './SelectField';
+export { ErrorBanner } from './ErrorBanner';

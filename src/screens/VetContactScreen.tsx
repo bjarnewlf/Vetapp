@@ -3,14 +3,14 @@ import { View, Text, StyleSheet, Linking, Alert, TouchableOpacity } from 'react-
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card, Button } from '../components';
-import { useData } from '../context/DataContext';
+import { useVetContact } from '../context/VetContactContext';
 
 interface VetContactScreenProps {
   navigation?: any;
 }
 
 export function VetContactScreen({ navigation }: VetContactScreenProps) {
-  const { vetContact: vet } = useData();
+  const { vetContact: vet } = useVetContact();
 
   if (!vet) {
     return (

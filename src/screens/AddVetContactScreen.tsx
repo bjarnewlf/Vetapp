@@ -5,7 +5,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { InputField, Button } from '../components';
-import { useData } from '../context/DataContext';
+import { useVetContact } from '../context/VetContactContext';
 
 interface AddVetContactScreenProps {
   navigation: any;
@@ -13,7 +13,7 @@ interface AddVetContactScreenProps {
 }
 
 export function AddVetContactScreen({ navigation, route }: AddVetContactScreenProps) {
-  const { vetContact, saveVetContact } = useData();
+  const { vetContact, saveVetContact } = useVetContact();
   const isEditing = !!vetContact && !route?.params?.forceNew;
   const existing = isEditing ? vetContact : null;
 

@@ -26,24 +26,20 @@ export interface Reminder {
 export type RecurrenceType = 'Once' | 'Weekly' | 'Monthly' | 'Yearly' | 'Custom';
 export type ReminderStatus = 'upcoming' | 'overdue' | 'completed';
 
-export interface Vaccination {
+export type MedicalEventType = 'vaccination' | 'deworming' | 'checkup' | 'custom';
+
+export interface MedicalEvent {
   id: string;
   petId: string;
+  type: MedicalEventType;
   name: string;
-  givenDate: string;
+  date: string;
   nextDate?: string;
+  notes?: string;
   recurrenceInterval?: RecurrenceType;
   createdAt: string;
 }
 
-export interface Treatment {
-  id: string;
-  petId: string;
-  name: string;
-  date: string;
-  notes?: string;
-  createdAt: string;
-}
 
 export interface VetContact {
   id: string;

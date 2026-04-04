@@ -1,4 +1,4 @@
-import { Pet, Reminder, Vaccination, Treatment, VetContact, UserProfile } from '../types';
+import { Pet, Reminder, MedicalEvent, VetContact, UserProfile } from '../types';
 
 export const mockPets: Pet[] = [
   {
@@ -46,19 +46,18 @@ export const mockReminders: Reminder[] = [
   },
 ];
 
-export const mockVaccinations: Vaccination[] = [
+export const mockMedicalEvents: MedicalEvent[] = [
   {
     id: '1',
     petId: '2',
+    type: 'vaccination',
     name: 'FVRCP',
-    givenDate: '2024-02-20',
+    date: '2024-02-20',
     nextDate: '2027-02-20',
     recurrenceInterval: 'Yearly',
     createdAt: '2024-02-20',
   },
 ];
-
-export const mockTreatments: Treatment[] = [];
 
 export const mockVetContact: VetContact = {
   id: '1',

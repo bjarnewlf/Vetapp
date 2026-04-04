@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput } from 'reac
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card, Button, StatusBadge } from '../components';
-import { useData } from '../context/DataContext';
+import { usePets } from '../context/PetContext';
+import { useMedical } from '../context/MedicalContext';
 import { parseGermanDate } from '../utils/petHelpers';
 import { recurrenceDisplayLabels, animalTypeDisplayLabels } from '../types';
 
@@ -20,13 +21,29 @@ function formatDate(dateStr: string): string {
 
 export function EventDetailScreen({ navigation, route }: EventDetailScreenProps) {
   const { eventId } = route.params;
-  const { reminders, pets, completeReminder, updateReminder } = useData();
+  const { pets } = usePets();
+  const { reminders, completeReminder, updateReminder } = useMedical();
   const event = reminders.find(r => r.id === eventId);
   const [showReschedule, setShowReschedule] = useState(false);
   const [newDate, setNewDate] = useState('');
   const [saving, setSaving] = useState(false);
 
-  if (!event) return null;
+  if (!event) {
+    return (
+      <View style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Event-Details</Text>
+        </View>
+        <Card style={styles.card}>
+          <Text style={styles.notFoundText}>Eintrag nicht gefunden.</Text>
+          <Text style={styles.notFoundSub}>Der Eintrag wurde möglicherweise gelöscht.</Text>
+        </Card>
+      </View>
+    );
+  }
 
   const pet = pets.find(p => p.id === event.petId);
 
@@ -238,5 +255,14 @@ const styles = StyleSheet.create({
     borderColor: colors.borderLight,
     paddingHorizontal: 14,
     paddingVertical: 12,
+  },
+  notFoundText: {
+    ...typography.h3,
+    color: colors.text,
+    marginBottom: spacing.sm,
+  },
+  notFoundSub: {
+    ...typography.bodySmall,
+    color: colors.textSecondary,
   },
 });

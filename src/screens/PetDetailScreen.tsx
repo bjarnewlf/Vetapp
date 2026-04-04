@@ -3,8 +3,10 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert, Lin
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import { colors, typography, spacing, borderRadius } from '../theme';
-import { Card } from '../components';
-import { useData } from '../context/DataContext';
+import { Card, ErrorBanner } from '../components';
+import { usePets } from '../context/PetContext';
+import { useMedical } from '../context/MedicalContext';
+import { useVetContact } from '../context/VetContactContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { animalTypeDisplayLabels, recurrenceDisplayLabels } from '../types';
 import { getAge } from '../utils/petHelpers';
@@ -29,14 +31,16 @@ function formatDate(dateStr: string): string {
 export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
   const { petId } = route.params;
   const { isPro } = useSubscription();
-  const { pets, vaccinations: allVaccinations, treatments: allTreatments, reminders: allReminders, documents: allDocuments, vetContact, addDocument, deleteDocument, deleteVaccination, deleteTreatment } = useData();
+  const { pets, documents: allDocuments, addDocument, deleteDocument } = usePets();
+  const { medicalEvents: allMedicalEvents, reminders: allReminders, deleteMedicalEvent, loading: medicalLoading, error: medicalError, refresh: refreshMedical } = useMedical();
+  const { vetContact } = useVetContact();
   const [activeTab, setActiveTab] = useState<DetailTab>('vaccinations');
   const [uploading, setUploading] = useState(false);
   const [openingDocId, setOpeningDocId] = useState<string | null>(null);
 
   const pet = pets.find(p => p.id === petId);
-  const vaccinations = allVaccinations.filter(v => v.petId === petId);
-  const treatments = allTreatments.filter(t => t.petId === petId);
+  const vaccinations = allMedicalEvents.filter(e => e.petId === petId && e.type === 'vaccination');
+  const treatments = allMedicalEvents.filter(e => e.petId === petId && e.type !== 'vaccination');
   const reminders = allReminders.filter(r => r.petId === petId);
   const petDocuments = allDocuments.filter(d => d.petId === petId);
   const vet = vetContact;
@@ -97,18 +101,34 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
   const handleDeleteVaccination = (id: string, name: string) => {
     Alert.alert('Impfung löschen', `"${name}" wirklich löschen?`, [
       { text: 'Abbrechen', style: 'cancel' },
-      { text: 'Löschen', style: 'destructive', onPress: () => deleteVaccination(id) },
+      { text: 'Löschen', style: 'destructive', onPress: () => deleteMedicalEvent(id) },
     ]);
   };
 
   const handleDeleteTreatment = (id: string, name: string) => {
     Alert.alert('Behandlung löschen', `"${name}" wirklich löschen?`, [
       { text: 'Abbrechen', style: 'cancel' },
-      { text: 'Löschen', style: 'destructive', onPress: () => deleteTreatment(id) },
+      { text: 'Löschen', style: 'destructive', onPress: () => deleteMedicalEvent(id) },
     ]);
   };
 
-  if (!pet) return null;
+  if (!pet) {
+    return (
+      <ScrollView style={styles.container}>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+            <Ionicons name="arrow-back" size={24} color={colors.text} />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Tier-Details</Text>
+          <View style={styles.editButton} />
+        </View>
+        <Card style={styles.infoCard}>
+          <Text style={styles.notFoundText}>Tier nicht gefunden.</Text>
+          <Text style={styles.notFoundSub}>Das Tier wurde möglicherweise gelöscht.</Text>
+        </Card>
+      </ScrollView>
+    );
+  }
 
   const tabs: { id: DetailTab; label: string; icon: keyof typeof Ionicons.glyphMap; pro?: boolean }[] = [
     { id: 'vaccinations', label: 'Gesundheit', icon: 'bandage-outline' },
@@ -201,9 +221,17 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
       {/* Tab Content: Impfungen */}
       {activeTab === 'vaccinations' && (
         <View style={styles.tabContent}>
+          {medicalError && <ErrorBanner onRetry={refreshMedical} />}
+          {medicalLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={colors.primary} />
+              <Text style={styles.loadingText}>Lade Gesundheitsdaten...</Text>
+            </View>
+          ) : (
+          <>
           {/* Recent Treatments */}
           <View style={styles.subSectionHeader}>
-            <Text style={styles.subSectionTitle}>Letzte Behandlungen</Text>
+            <Text style={styles.subSectionTitle}>Weitere Gesundheitseinträge</Text>
             <TouchableOpacity onPress={() => navigation.navigate('AddEvent', { petId: pet.id, eventType: 'checkup' })}>
               <Ionicons name="add" size={22} color={colors.text} />
             </TouchableOpacity>
@@ -223,9 +251,14 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
                   <Text style={styles.vaccinationDate}>{treatment.notes}</Text>
                 )}
               </View>
-              <TouchableOpacity onPress={() => handleDeleteTreatment(treatment.id, treatment.name)}>
-                <Ionicons name="trash-outline" size={18} color={colors.error} />
-              </TouchableOpacity>
+              <View style={styles.cardActions}>
+                <TouchableOpacity onPress={() => navigation.navigate('AddEvent', { petId: pet.id, editMedicalEvent: treatment })}>
+                  <Ionicons name="create-outline" size={18} color={colors.primary} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleDeleteTreatment(treatment.id, treatment.name)}>
+                  <Ionicons name="trash-outline" size={18} color={colors.error} />
+                </TouchableOpacity>
+              </View>
             </View>
           ))}
 
@@ -242,7 +275,7 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
                 <Text style={styles.vaccinationName}>{vax.name}</Text>
                 <View style={styles.vaccinationRow}>
                   <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
-                  <Text style={styles.vaccinationDate}>Verabreicht: {formatDate(vax.givenDate)}</Text>
+                  <Text style={styles.vaccinationDate}>Verabreicht: {formatDate(vax.date)}</Text>
                 </View>
                 {vax.nextDate && (
                   <View style={styles.vaccinationRow}>
@@ -261,9 +294,14 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
                   </View>
                 )}
               </View>
-              <TouchableOpacity onPress={() => handleDeleteVaccination(vax.id, vax.name)}>
-                <Ionicons name="trash-outline" size={18} color={colors.error} />
-              </TouchableOpacity>
+              <View style={styles.cardActions}>
+                <TouchableOpacity onPress={() => navigation.navigate('AddEvent', { petId: pet.id, editMedicalEvent: vax })}>
+                  <Ionicons name="create-outline" size={18} color={colors.primary} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => handleDeleteVaccination(vax.id, vax.name)}>
+                  <Ionicons name="trash-outline" size={18} color={colors.error} />
+                </TouchableOpacity>
+              </View>
             </View>
           ))}
           {vaccinations.length === 0 && (
@@ -298,6 +336,8 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
               ))
             )}
           </Card>
+          </>
+          )}
         </View>
       )}
 
@@ -435,6 +475,7 @@ const styles = StyleSheet.create({
     padding: spacing.md, marginTop: spacing.sm, gap: 6,
   },
   vaccinationCardRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 0 },
+  cardActions: { flexDirection: 'column', gap: spacing.sm, alignItems: 'center', paddingLeft: spacing.sm },
   vaccinationCardContent: { flex: 1, gap: 6 },
   vaccinationName: { ...typography.h3, color: colors.text },
   vaccinationRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
@@ -463,6 +504,19 @@ const styles = StyleSheet.create({
     borderRadius: borderRadius.md,
   },
   uploadText: { ...typography.label, color: colors.primary },
+
+  // Loading
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.xxl,
+    gap: spacing.sm,
+  },
+  loadingText: { ...typography.bodySmall, color: colors.textSecondary },
+
+  // Not Found
+  notFoundText: { ...typography.h3, color: colors.text, marginBottom: spacing.sm },
+  notFoundSub: { ...typography.bodySmall, color: colors.textSecondary },
 
   // Vet Tab
   vetName: { ...typography.h3, color: colors.text },

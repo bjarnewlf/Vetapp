@@ -8,7 +8,7 @@ import { colors, typography, spacing, borderRadius } from '../theme';
 import { InputField, Button, SelectField } from '../components';
 import type { SelectFieldOption } from '../components';
 import { AnimalType, animalTypeDisplayLabels } from '../types';
-import { useData } from '../context/DataContext';
+import { usePets } from '../context/PetContext';
 import { useSubscription, FREE_LIMITS } from '../context/SubscriptionContext';
 import { parseGermanDate } from '../utils/petHelpers';
 import type { Pet } from '../types';
@@ -31,7 +31,7 @@ export function AddPetScreen({ navigation, route }: AddPetScreenProps) {
   const editPet: Pet | undefined = route?.params?.pet;
   const isEditMode = !!editPet;
 
-  const { addPet, updatePet, pets } = useData();
+  const { addPet, updatePet, pets } = usePets();
   const { isPro } = useSubscription();
   const [name, setName] = useState(editPet?.name ?? '');
   const [animalType, setAnimalType] = useState<AnimalType | ''>(editPet?.type ?? '');

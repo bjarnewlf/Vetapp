@@ -4,6 +4,10 @@
 > Wissensmanager pflegt beides: Vault-Notiz + Einzeiler hier.
 
 ## 2026-04-04
+- God-Object-Refactoring: Erst Fassade, dann schrittweise migrieren, dann Fassade loeschen
+- QA parallel zum Cleanup laufen lassen fuehrt zu False Positives — besser sequentiell
+- MedicalEvent: Ein einheitliches Modell ist flexibler als N separate Tabellen
+- Custom-Events duerfen nicht nur Reminder sein — gehoeren auch in die Gesundheitshistorie
 - ALLE Dokumente am Ende aktualisieren (tasks, status, handoff, learnings)
 - Learnings ohne Rueckfrage speichern
 - Supabase Edge Functions sind stateless

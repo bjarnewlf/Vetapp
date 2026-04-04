@@ -2,8 +2,9 @@ import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
-import { Card } from '../components';
-import { useData } from '../context/DataContext';
+import { Card, ErrorBanner } from '../components';
+import { usePets } from '../context/PetContext';
+import { useMedical } from '../context/MedicalContext';
 import { useAuth } from '../context/AuthContext';
 import { animalTypeDisplayLabels } from '../types';
 
@@ -12,7 +13,8 @@ interface HomeScreenProps {
 }
 
 export function HomeScreen({ navigation }: HomeScreenProps) {
-  const { pets, reminders, vaccinations, treatments } = useData();
+  const { pets, error: petsError, refresh: refreshPets } = usePets();
+  const { medicalEvents, reminders, error: medicalError, refresh: refreshMedical } = useMedical();
   const { user } = useAuth();
   const userName = user?.user_metadata?.name;
   const overdueReminders = reminders.filter(r => r.status === 'overdue');
@@ -37,6 +39,8 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
       </View>
 
       <View style={styles.body}>
+        {petsError && <ErrorBanner onRetry={refreshPets} />}
+        {medicalError && <ErrorBanner onRetry={refreshMedical} />}
         {overdueReminders.length > 0 && (
           <Card style={styles.overdueCard}>
             <View style={styles.overdueHeader}>
@@ -135,11 +139,11 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
               <Text style={styles.statLabel}>Tiere</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={[styles.statNumber, { color: colors.primary }]}>{vaccinations.length}</Text>
+              <Text style={[styles.statNumber, { color: colors.primary }]}>{medicalEvents.filter(e => e.type === 'vaccination').length}</Text>
               <Text style={styles.statLabel}>Impfungen</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={[styles.statNumber, { color: colors.primary }]}>{treatments.length}</Text>
+              <Text style={[styles.statNumber, { color: colors.primary }]}>{medicalEvents.filter(e => e.type !== 'vaccination').length}</Text>
               <Text style={styles.statLabel}>Behandlungen</Text>
             </View>
             <View style={styles.statItem}>

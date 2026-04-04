@@ -1,0 +1,244 @@
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { MedicalEvent, MedicalEventType, Reminder, RecurrenceType } from '../types';
+import { supabase } from '../lib/supabase';
+import { useAuth } from './AuthContext';
+import { scheduleReminderNotification, cancelNotification } from '../services/notifications';
+
+function getStatus(dateStr: string): 'upcoming' | 'overdue' {
+  const eventDate = new Date(dateStr);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return eventDate < today ? 'overdue' : 'upcoming';
+}
+
+function calculateNextDate(currentDate: string, recurrence: RecurrenceType): string | null {
+  if (recurrence === 'Once' || recurrence === 'Custom') return null;
+  const date = new Date(currentDate);
+  switch (recurrence) {
+    case 'Weekly': date.setDate(date.getDate() + 7); break;
+    case 'Monthly': date.setMonth(date.getMonth() + 1); break;
+    case 'Yearly': date.setFullYear(date.getFullYear() + 1); break;
+  }
+  return date.toISOString().split('T')[0];
+}
+
+function mapMedicalEvent(row: any): MedicalEvent {
+  return {
+    id: row.id,
+    petId: row.pet_id,
+    type: row.type as MedicalEventType,
+    name: row.name,
+    date: row.date,
+    nextDate: row.next_date || undefined,
+    notes: row.notes || undefined,
+    recurrenceInterval: row.recurrence_interval || undefined,
+    createdAt: row.created_at,
+  };
+}
+
+function mapReminder(row: any): Reminder {
+  return {
+    id: row.id,
+    petId: row.pet_id,
+    title: row.title,
+    date: row.date,
+    description: row.description,
+    recurrence: row.recurrence || 'Once',
+    status: row.status === 'completed' ? 'completed' : getStatus(row.date),
+    notificationId: row.notification_id || undefined,
+    createdAt: row.created_at,
+  };
+}
+
+interface MedicalContextType {
+  medicalEvents: MedicalEvent[];
+  reminders: Reminder[];
+  loading: boolean;
+  error: string | null;
+  addMedicalEvent: (event: Omit<MedicalEvent, 'id' | 'createdAt'>) => Promise<void>;
+  updateMedicalEvent: (id: string, updates: Partial<Omit<MedicalEvent, 'id' | 'createdAt'>>) => Promise<void>;
+  deleteMedicalEvent: (id: string) => Promise<void>;
+  addReminder: (reminder: Omit<Reminder, 'id' | 'createdAt' | 'status' | 'notificationId'>) => Promise<void>;
+  completeReminder: (id: string) => Promise<void>;
+  updateReminder: (id: string, data: Partial<Pick<Reminder, 'title' | 'date' | 'description' | 'recurrence'>>) => Promise<void>;
+  deleteReminder: (id: string) => Promise<void>;
+  refresh: () => Promise<void>;
+}
+
+const MedicalContext = createContext<MedicalContextType>({} as MedicalContextType);
+
+export function MedicalProvider({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  const [medicalEvents, setMedicalEvents] = useState<MedicalEvent[]>([]);
+  const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const refresh = useCallback(async () => {
+    if (!user) {
+      setMedicalEvents([]);
+      setReminders([]);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      const [medicalRes, remindersRes] = await Promise.all([
+        supabase.from('medical_events').select('*').order('date', { ascending: false }),
+        supabase.from('reminders').select('*').order('date', { ascending: true }),
+      ]);
+
+      if (medicalRes.error) throw medicalRes.error;
+      if (remindersRes.error) throw remindersRes.error;
+
+      if (medicalRes.data) setMedicalEvents(medicalRes.data.map(mapMedicalEvent));
+      if (remindersRes.data) setReminders(remindersRes.data.map(mapReminder));
+    } catch (e: any) {
+      const message = e?.message || 'Medizinische Daten konnten nicht geladen werden.';
+      console.error('Medizinische Daten konnten nicht geladen werden:', e);
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    refresh();
+  }, [refresh]);
+
+  // Overdue-Status jede Minute neu berechnen (falls App über Nacht offen bleibt)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setReminders(prev => prev.map(r => {
+        if (r.status === 'completed') return r;
+        const newStatus = getStatus(r.date);
+        if (newStatus !== r.status) return { ...r, status: newStatus };
+        return r;
+      }));
+    }, 60000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const addMedicalEvent = async (event: Omit<MedicalEvent, 'id' | 'createdAt'>) => {
+    if (!user) return;
+    const { error } = await supabase.from('medical_events').insert({
+      user_id: user.id,
+      pet_id: event.petId,
+      type: event.type,
+      name: event.name,
+      date: event.date,
+      next_date: event.nextDate || null,
+      notes: event.notes || null,
+      recurrence_interval: event.recurrenceInterval || null,
+    });
+    if (!error) await refresh();
+  };
+
+  const updateMedicalEvent = async (id: string, updates: Partial<Omit<MedicalEvent, 'id' | 'createdAt'>>) => {
+    const updateData: Record<string, unknown> = {};
+    if (updates.petId !== undefined) updateData.pet_id = updates.petId;
+    if (updates.type !== undefined) updateData.type = updates.type;
+    if (updates.name !== undefined) updateData.name = updates.name;
+    if (updates.date !== undefined) updateData.date = updates.date;
+    if (updates.nextDate !== undefined) updateData.next_date = updates.nextDate;
+    if (updates.notes !== undefined) updateData.notes = updates.notes;
+    if (updates.recurrenceInterval !== undefined) updateData.recurrence_interval = updates.recurrenceInterval;
+    const { error } = await supabase.from('medical_events').update(updateData).eq('id', id);
+    if (!error) await refresh();
+  };
+
+  const deleteMedicalEvent = async (id: string) => {
+    const { error } = await supabase.from('medical_events').delete().eq('id', id);
+    if (!error) await refresh();
+  };
+
+  const addReminder = async (data: Omit<Reminder, 'id' | 'createdAt' | 'status' | 'notificationId'>) => {
+    if (!user) return;
+    const notifId = await scheduleReminderNotification({
+      id: '', petId: data.petId, title: data.title, date: data.date,
+      description: data.description, recurrence: data.recurrence,
+      status: 'upcoming', createdAt: '',
+    });
+    const { error } = await supabase.from('reminders').insert({
+      user_id: user.id,
+      pet_id: data.petId || null,
+      title: data.title,
+      date: data.date,
+      description: data.description || null,
+      recurrence: data.recurrence,
+      status: getStatus(data.date),
+      notification_id: notifId || null,
+    });
+    if (!error) await refresh();
+  };
+
+  const completeReminder = async (id: string) => {
+    const reminder = reminders.find(r => r.id === id);
+    if (reminder?.notificationId) {
+      await cancelNotification(reminder.notificationId);
+    }
+    const { error } = await supabase
+      .from('reminders')
+      .update({ status: 'completed' })
+      .eq('id', id);
+    if (error) return;
+
+    if (reminder && reminder.recurrence !== 'Once' && reminder.recurrence !== 'Custom') {
+      const nextDate = calculateNextDate(reminder.date, reminder.recurrence);
+      if (nextDate && user) {
+        const nextNotifId = await scheduleReminderNotification({
+          ...reminder, date: nextDate, status: 'upcoming',
+        });
+        await supabase.from('reminders').insert({
+          user_id: user.id,
+          pet_id: reminder.petId || null,
+          title: reminder.title,
+          date: nextDate,
+          description: reminder.description || null,
+          recurrence: reminder.recurrence,
+          status: getStatus(nextDate),
+          notification_id: nextNotifId || null,
+        });
+      }
+    }
+    await refresh();
+  };
+
+  const updateReminder = async (id: string, data: Partial<Pick<Reminder, 'title' | 'date' | 'description' | 'recurrence'>>) => {
+    const updateData: Record<string, unknown> = {};
+    if (data.title !== undefined) updateData.title = data.title;
+    if (data.date !== undefined) {
+      updateData.date = data.date;
+      updateData.status = getStatus(data.date);
+    }
+    if (data.description !== undefined) updateData.description = data.description;
+    if (data.recurrence !== undefined) updateData.recurrence = data.recurrence;
+    const { error } = await supabase.from('reminders').update(updateData).eq('id', id);
+    if (!error) await refresh();
+  };
+
+  const deleteReminder = async (id: string) => {
+    const reminder = reminders.find(r => r.id === id);
+    if (reminder?.notificationId) {
+      await cancelNotification(reminder.notificationId);
+    }
+    const { error } = await supabase.from('reminders').delete().eq('id', id);
+    if (!error) await refresh();
+  };
+
+  return (
+    <MedicalContext.Provider value={{
+      medicalEvents, reminders, loading, error,
+      addMedicalEvent, updateMedicalEvent, deleteMedicalEvent,
+      addReminder, completeReminder, updateReminder, deleteReminder, refresh,
+    }}>
+      {children}
+    </MedicalContext.Provider>
+  );
+}
+
+export function useMedical() {
+  return useContext(MedicalContext);
+}

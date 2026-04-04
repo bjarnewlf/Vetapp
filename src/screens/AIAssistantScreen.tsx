@@ -16,7 +16,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { sendChatMessage, buildPetContext, ChatMessage } from '../services/aiService';
-import { useData } from '../context/DataContext';
+import { usePets } from '../context/PetContext';
+import { useMedical } from '../context/MedicalContext';
 import { useSubscription } from '../context/SubscriptionContext';
 
 interface AIAssistantScreenProps {
@@ -31,7 +32,8 @@ interface LocalMessage extends ChatMessage {
 
 export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
   const { isPro, loading: subscriptionLoading } = useSubscription();
-  const { pets, vaccinations, treatments } = useData();
+  const { pets } = usePets();
+  const { medicalEvents } = useMedical();
 
   const [messages, setMessages] = useState<LocalMessage[]>([]);
   const [input, setInput] = useState('');
@@ -81,7 +83,7 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
     setLoading(true);
 
     try {
-      const petContext = buildPetContext(pets, vaccinations, treatments);
+      const petContext = buildPetContext(pets, medicalEvents);
       const history: ChatMessage[] = [...messages, userMsg].map(({ role, content }) => ({ role, content }));
       const response = await sendChatMessage(history, petContext);
       const aiMsg: LocalMessage = { id: String(Date.now() + 1), role: 'assistant', content: response };

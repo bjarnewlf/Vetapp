@@ -1,6 +1,12 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
+// CORS-Hinweis: React Native Apps senden keinen Origin-Header, daher sind CORS-Headers
+// für den mobilen App-Betrieb nicht erforderlich. Der Wildcard-Origin (*) ist hier nur
+// für den Supabase Dashboard-Zugriff / lokales Web-Testing relevant.
+// TODO vor Production-Release: Origin auf die Produktions-Domain einschränken
+// (z.B. 'https://vetapp.example.com'), sobald ein Web-Client existiert.
+// Für rein-native Deployments kann der CORS-Block vollständig entfernt werden.
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-user-token',
@@ -12,13 +18,18 @@ interface ChatMessage {
   content: string;
 }
 
+interface MedicalHistoryEntry {
+  type: string;
+  name: string;
+  date: string;
+}
+
 interface PetContext {
   name: string;
   type: string;
   breed: string;
   age: string;
-  vaccinations: string[];
-  treatments: string[];
+  medicalHistory: MedicalHistoryEntry[];
 }
 
 // Sanitize-Hilfsfunktion: trim, Newlines entfernen, auf maxLen kuerzen
@@ -42,16 +53,14 @@ function buildSystemPrompt(pets: PetContext[]): string {
         const breed = sanitizeString(pet.breed, 100);
         const age = sanitizeString(pet.age, 100);
 
-        const vaccs =
-          pet.vaccinations.length > 0
-            ? pet.vaccinations.map((v) => sanitizeString(v, 200)).join(', ')
-            : 'Keine Impfungen eingetragen';
-        const treats =
-          pet.treatments.length > 0
-            ? pet.treatments.map((t) => sanitizeString(t, 200)).join(', ')
-            : 'Keine Behandlungen eingetragen';
+        const history =
+          pet.medicalHistory.length > 0
+            ? pet.medicalHistory
+                .map((e) => `${sanitizeString(e.type, 50)}: ${sanitizeString(e.name, 200)} (${sanitizeString(e.date, 30)})`)
+                .join(', ')
+            : 'Keine Eintraege vorhanden';
 
-        return `- ${name} (${type}, ${breed}, ${age})\n  Impfungen: ${vaccs}\n  Behandlungen: ${treats}`;
+        return `- ${name} (${type}, ${breed}, ${age})\n  Medizinische Historie: ${history}`;
       })
       .join('\n');
   }
@@ -205,33 +214,22 @@ serve(async (req: Request) => {
       }
     }
 
-    // vaccinations: max 20 Eintraege, je max 200 Zeichen
-    if (!Array.isArray(pet.vaccinations) || pet.vaccinations.length > 20) {
+    // medicalHistory: max 40 Eintraege
+    if (!Array.isArray(pet.medicalHistory) || pet.medicalHistory.length > 40) {
       return new Response(
-        JSON.stringify({ error: 'Ungueltige Tier-Daten: Zu viele Impfeintraege (max. 20).' }),
+        JSON.stringify({ error: 'Ungueltige Tier-Daten: Zu viele Eintraege in der med. Historie (max. 40).' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-    for (const v of pet.vaccinations) {
-      if (typeof v !== 'string' || v.length > 200) {
+    for (const entry of pet.medicalHistory) {
+      if (
+        typeof entry !== 'object' || entry === null ||
+        typeof entry.type !== 'string' || entry.type.length > 50 ||
+        typeof entry.name !== 'string' || entry.name.length > 200 ||
+        typeof entry.date !== 'string' || entry.date.length > 30
+      ) {
         return new Response(
-          JSON.stringify({ error: 'Ungueltige Tier-Daten: Impfeintrag zu lang (max. 200 Zeichen).' }),
-          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-    }
-
-    // treatments: max 20 Eintraege, je max 200 Zeichen
-    if (!Array.isArray(pet.treatments) || pet.treatments.length > 20) {
-      return new Response(
-        JSON.stringify({ error: 'Ungueltige Tier-Daten: Zu viele Behandlungseintraege (max. 20).' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-    for (const t of pet.treatments) {
-      if (typeof t !== 'string' || t.length > 200) {
-        return new Response(
-          JSON.stringify({ error: 'Ungueltige Tier-Daten: Behandlungseintrag zu lang (max. 200 Zeichen).' }),
+          JSON.stringify({ error: 'Ungueltige Tier-Daten: Med.-Eintrag hat ungueltiges Format.' }),
           { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
         );
       }

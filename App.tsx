@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { AuthProvider } from './src/context/AuthContext';
-import { DataProvider } from './src/context/DataContext';
+import { PetProvider } from './src/context/PetContext';
+import { MedicalProvider } from './src/context/MedicalContext';
+import { VetContactProvider } from './src/context/VetContactContext';
 import { SubscriptionProvider } from './src/context/SubscriptionContext';
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { setupNotificationHandler, requestNotificationPermissions } from './src/services/notifications';
@@ -15,12 +17,16 @@ export default function App() {
 
   return (
     <AuthProvider>
-      <DataProvider>
-        <SubscriptionProvider>
-          <StatusBar style="light" />
-          <AppNavigator />
-        </SubscriptionProvider>
-      </DataProvider>
+      <PetProvider>
+        <MedicalProvider>
+          <VetContactProvider>
+            <SubscriptionProvider>
+              <StatusBar style="light" />
+              <AppNavigator />
+            </SubscriptionProvider>
+          </VetContactProvider>
+        </MedicalProvider>
+      </PetProvider>
     </AuthProvider>
   );
 }
