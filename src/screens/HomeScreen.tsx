@@ -1,13 +1,14 @@
-import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, typography, spacing, borderRadius } from '../theme';
-import { Card, ErrorBanner, EmptyState } from '../components';
+import { Card, ErrorBanner, EmptyState, AnimatedPressable } from '../components';
 import { usePets } from '../context/PetContext';
 import { useMedical } from '../context/MedicalContext';
 import { useAuth } from '../context/AuthContext';
 import { animalTypeDisplayLabels } from '../types';
+import { useFadeIn } from '../hooks/useFadeIn';
 
 interface HomeScreenProps {
   navigation: any;
@@ -20,6 +21,18 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
   const userName = user?.user_metadata?.name;
   const overdueReminders = reminders.filter(r => r.status === 'overdue');
   const nextReminder = reminders.find(r => r.status === 'upcoming');
+
+  const fadeIn = useFadeIn(300);
+
+  const pulseScale = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    if (overdueReminders.length > 0) {
+      Animated.sequence([
+        Animated.timing(pulseScale, { toValue: 1.03, duration: 200, useNativeDriver: true }),
+        Animated.spring(pulseScale, { toValue: 1, useNativeDriver: true, speed: 14, bounciness: 10 }),
+      ]).start();
+    }
+  }, [overdueReminders.length]);
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -44,10 +57,12 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
         </View>
       </LinearGradient>
 
+      <Animated.View style={{ opacity: fadeIn, flex: 1 }}>
       <View style={styles.body}>
         {petsError && <ErrorBanner onRetry={refreshPets} />}
         {medicalError && <ErrorBanner onRetry={refreshMedical} />}
         {overdueReminders.length > 0 && (
+          <Animated.View style={{ transform: [{ scale: pulseScale }] }}>
           <Card style={styles.overdueCard}>
             <View style={styles.overdueHeader}>
               <Ionicons name="alert-circle" size={22} color={colors.error} />
@@ -72,6 +87,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
               <Text style={styles.overdueMore}>+{overdueReminders.length - 3} weitere</Text>
             )}
           </Card>
+          </Animated.View>
         )}
 
         {nextReminder && (
@@ -114,11 +130,10 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
         ) : (
           <View style={styles.petsGrid}>
             {pets.map(pet => (
-              <TouchableOpacity
+              <AnimatedPressable
                 key={pet.id}
                 style={styles.petCard}
                 onPress={() => navigation.navigate('PetDetail', { petId: pet.id })}
-                activeOpacity={0.8}
               >
                 {pet.photo ? (
                   <Image source={{ uri: pet.photo }} style={styles.petImage} />
@@ -133,7 +148,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
                 )}
                 <Text style={styles.petName}>{pet.name}</Text>
                 <Text style={styles.petType}>{animalTypeDisplayLabels[pet.type]}</Text>
-              </TouchableOpacity>
+              </AnimatedPressable>
             ))}
           </View>
         )}
@@ -162,8 +177,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
           </View>
         </Card>
 
-        <TouchableOpacity onPress={() => navigation.navigate('AI')} activeOpacity={0.8}>
-          <View style={styles.aiCardNew}>
+        <AnimatedPressable onPress={() => navigation.navigate('AI')} style={styles.aiCardNew}>
             <View style={styles.aiTopRow}>
               <View style={styles.aiIconContainer}>
                 <Ionicons name="sparkles" size={22} color="#FFFFFF" />
@@ -182,9 +196,9 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
                 <Ionicons name="arrow-forward-outline" size={18} color="#1B6B5A" />
               </View>
             </View>
-          </View>
-        </TouchableOpacity>
+        </AnimatedPressable>
       </View>
+      </Animated.View>
     </ScrollView>
   );
 }

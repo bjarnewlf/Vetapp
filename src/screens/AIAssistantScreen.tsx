@@ -11,7 +11,9 @@ import {
   ScrollView,
   SafeAreaView,
   ActivityIndicator,
+  Animated,
 } from 'react-native';
+import { useFadeIn } from '../hooks/useFadeIn';
 import { SkeletonCard } from '../components';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
@@ -40,6 +42,8 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const flatListRef = useRef<FlatList>(null);
+
+  const fadeIn = useFadeIn(300);
 
   const paywallShown = useRef(false);
   useFocusEffect(
@@ -174,6 +178,7 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
         keyboardVerticalOffset={0}
       >
+      <Animated.View style={{ opacity: fadeIn, flex: 1 }}>
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.headerSpacer} />
@@ -287,6 +292,7 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
             )}
           </TouchableOpacity>
         </View>
+      </Animated.View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert, Linking, ActivityIndicator } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert, Linking, ActivityIndicator, Animated } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
@@ -38,6 +38,36 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
   const [activeTab, setActiveTab] = useState<DetailTab>('vaccinations');
   const [uploading, setUploading] = useState(false);
   const [openingDocId, setOpeningDocId] = useState<string | null>(null);
+  const [tabBarWidth, setTabBarWidth] = useState(0);
+
+  const fadeOpacity = useRef(new Animated.Value(0)).current;
+  const tabIndicatorPosition = useRef(new Animated.Value(0)).current;
+
+  const tabCount = 3;
+
+  useEffect(() => {
+    Animated.timing(fadeOpacity, {
+      toValue: 1,
+      duration: 300,
+      useNativeDriver: true,
+    }).start();
+  }, []);
+
+  const tabs: { id: DetailTab; label: string; icon: keyof typeof Ionicons.glyphMap; pro?: boolean }[] = [
+    { id: 'vaccinations', label: 'Gesundheit', icon: 'bandage-outline' },
+    { id: 'documents', label: 'Dokumente', icon: 'document-outline', pro: true },
+    { id: 'vet', label: 'Tierarzt', icon: 'medkit-outline' },
+  ];
+
+  useEffect(() => {
+    const tabIndex = tabs.findIndex(t => t.id === activeTab);
+    Animated.spring(tabIndicatorPosition, {
+      toValue: tabIndex,
+      useNativeDriver: true,
+      speed: 20,
+      bounciness: 8,
+    }).start();
+  }, [activeTab]);
 
   const pet = pets.find(p => p.id === petId);
   const vaccinations = allMedicalEvents.filter(e => e.petId === petId && e.type === 'vaccination');
@@ -154,12 +184,6 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
     );
   }
 
-  const tabs: { id: DetailTab; label: string; icon: keyof typeof Ionicons.glyphMap; pro?: boolean }[] = [
-    { id: 'vaccinations', label: 'Gesundheit', icon: 'bandage-outline' },
-    { id: 'documents', label: 'Dokumente', icon: 'document-outline', pro: true },
-    { id: 'vet', label: 'Tierarzt', icon: 'medkit-outline' },
-  ];
-
   const handleTabPress = (tab: DetailTab, isPro: boolean, isProFeature?: boolean) => {
     if (isProFeature && !isPro) {
       navigation.navigate('Paywall', { feature: 'documents' });
@@ -196,6 +220,9 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
         </View>
       </LinearGradient>
 
+      {/* Content mit Fade-In (alles unterhalb des Hero-Banners) */}
+      <Animated.View style={{ opacity: fadeOpacity }}>
+
       {/* Pet Information */}
       <Card style={styles.infoCard}>
         <Text style={styles.sectionLabel}>TIER-INFORMATIONEN</Text>
@@ -222,11 +249,29 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
       </Card>
 
       {/* Tab Navigation */}
-      <View style={styles.tabBar}>
+      <View
+        style={styles.tabBar}
+        onLayout={e => setTabBarWidth(e.nativeEvent.layout.width - 8)}
+      >
+        {/* Animierter Hintergrund-Indikator */}
+        <Animated.View
+          style={[
+            styles.tabIndicator,
+            {
+              width: tabBarWidth / tabCount,
+              transform: [{
+                translateX: tabIndicatorPosition.interpolate({
+                  inputRange: [0, 1, 2],
+                  outputRange: [0, tabBarWidth / tabCount, (tabBarWidth / tabCount) * 2],
+                }),
+              }],
+            },
+          ]}
+        />
         {tabs.map(tab => (
           <TouchableOpacity
             key={tab.id}
-            style={[styles.tab, activeTab === tab.id && styles.tabActive]}
+            style={styles.tab}
             onPress={() => handleTabPress(tab.id, isPro, tab.pro)}
           >
             <Ionicons
@@ -450,6 +495,7 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
       )}
 
       <View style={{ height: 40 }} />
+      </Animated.View>
     </ScrollView>
   );
 }
@@ -517,12 +563,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row', marginHorizontal: spacing.md,
     backgroundColor: colors.surface, borderRadius: borderRadius.md,
     padding: 4, marginBottom: spacing.md,
+    position: 'relative',
+  },
+  tabIndicator: {
+    position: 'absolute',
+    top: 4,
+    left: 4,
+    bottom: 4,
+    backgroundColor: colors.primaryLight,
+    borderRadius: borderRadius.sm,
   },
   tab: {
     flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
     gap: 4, paddingVertical: 10, borderRadius: borderRadius.sm,
+    zIndex: 1,
   },
-  tabActive: { backgroundColor: colors.primaryLight },
   tabLabel: { ...typography.caption, color: colors.textSecondary, fontWeight: '500' },
   tabLabelActive: { color: colors.primary, fontWeight: '600' },
 

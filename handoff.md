@@ -14,8 +14,42 @@
 
 ## Aktuelle Uebergabe
 
-**Agent:** Brian (Sidekick)
+**Agent:** Developer
 **Zeitpunkt:** 2026-04-04
+**Session:** Animations Tier 1 — Reusable Components + HomeScreen + AIAssistantScreen
+
+### Erledigt
+
+**Neue Dateien:**
+- `src/hooks/useFadeIn.ts` — Fade-In Hook (duration, delay konfigurierbar, useNativeDriver)
+- `src/components/AnimatedPressable.tsx` — Scale-Feedback Pressable via spring-Animation
+
+**Geaenderte Dateien:**
+- `src/components/index.ts` — AnimatedPressable hinzugefuegt
+- `src/screens/HomeScreen.tsx` — Fade-In Wrapper (body), Overdue-Banner Pulse (einmalig bei Mount), Pet-Cards + AI-Card auf AnimatedPressable umgestellt
+- `src/screens/AIAssistantScreen.tsx` — Fade-In Wrapper (Pro-Content)
+
+**TypeScript:** 1 vorbestehender Fehler in PetDetailScreen.tsx (styles.tabIndicator — StyleSheet >50 Keys, nicht von dieser Session eingefuehrt, Datei war explizit nicht anzufassen per Auftrag)
+
+### Offen / Nicht fertig
+- Handy-Test steht aus (Expo laeuft auf localhost:8081)
+- notification_id Migration fuer reminders
+- Alte Tabellen vaccinations/treatments droppen (nach Test)
+- Package-Versionen aktualisieren (Expo-Kompatibilitaet)
+- DatePicker statt Textfeld (nice-to-have)
+
+### Wichtig fuer den Naechsten
+- `useFadeIn` direkt aus `../hooks/useFadeIn` importieren (kein Re-Export in index.ts)
+- `AnimatedPressable` aus `../components` importieren
+- `AnimatedPressable` erwartet `style?: ViewStyle` — kein StyleSheet.flatten noetig
+- Alle Animationen mit `useNativeDriver: true` — opacity und transform OK, backgroundColor nicht
+- PetDetailScreen.tsx: vorbestehender TS-Fehler (tabIndicator, StyleSheet mit vielen Keys) — unveraendert
+
+---
+
+## Vorherige Uebergabe (2026-04-04 mittags)
+
+**Agent:** Brian (Sidekick)
 **Session:** Phase-2-Sprint — QA, Features, Design-Polish
 
 ### Erledigt (Mammut-Session)
