@@ -1,0 +1,308 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dev-Agentur Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0f0f1a;
+      color: #e0e0e8;
+      padding: 24px;
+      line-height: 1.5;
+    }
+    h1 { font-size: 28px; color: #fff; margin-bottom: 4px; }
+    .subtitle { color: #888; font-size: 14px; margin-bottom: 32px; }
+    .grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+    .card {
+      background: #1a1a2e;
+      border: 1px solid #2a2a3e;
+      border-radius: 12px;
+      padding: 20px;
+      transition: border-color 0.2s;
+    }
+    .card:hover { border-color: #4a4a6e; }
+    .card h2 {
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #888;
+      margin-bottom: 16px;
+    }
+    .card.span-2 { grid-column: span 2; }
+    .agent {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid #2a2a3e;
+    }
+    .agent:last-child { border-bottom: none; }
+    .agent-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .agent-name { font-weight: 600; color: #fff; min-width: 100px; }
+    .agent-role { color: #aaa; font-size: 13px; }
+    .agent-model {
+      margin-left: auto;
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #2a2a3e;
+      color: #aaa;
+    }
+    .agent-scope {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: #1e3a2e;
+      color: #6fcf97;
+    }
+    .agent-scope.project { background: #3a2e1e; color: #f2c94c; }
+    .task-group { margin-bottom: 16px; }
+    .task-group:last-child { margin-bottom: 0; }
+    .task-group h3 {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    .task-group h3.sofort { background: #3e1a1a; color: #f27474; }
+    .task-group h3.woche { background: #3e2e1a; color: #f2c94c; }
+    .task-group h3.backlog { background: #1a2e3e; color: #74b4f2; }
+    .task-group h3.erledigt { background: #1e3a2e; color: #6fcf97; }
+    .task { font-size: 13px; padding: 4px 0; color: #ccc; }
+    .task::before {
+      content: '';
+      display: inline-block;
+      width: 8px; height: 8px;
+      border: 1.5px solid #555;
+      border-radius: 2px;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    .task.done { color: #666; text-decoration: line-through; }
+    .task.done::before { background: #6fcf97; border-color: #6fcf97; }
+    .commit {
+      font-size: 13px;
+      padding: 6px 0;
+      border-bottom: 1px solid #2a2a3e;
+      display: flex;
+      gap: 10px;
+    }
+    .commit:last-child { border-bottom: none; }
+    .commit-hash {
+      font-family: 'Consolas', 'Fira Code', monospace;
+      color: #7b68ee;
+      font-size: 12px;
+      flex-shrink: 0;
+    }
+    .commit-msg { color: #ccc; }
+    .git-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-right: 8px;
+    }
+    .git-branch { background: #1e3a2e; color: #6fcf97; }
+    .git-changes { background: #3e2e1a; color: #f2c94c; }
+    .trigger {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #2a2a3e;
+    }
+    .trigger:last-child { border-bottom: none; }
+    .trigger-name { font-weight: 600; color: #fff; }
+    .trigger-time { color: #aaa; font-size: 13px; }
+    .trigger-status {
+      font-size: 11px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      background: #1e3a2e;
+      color: #6fcf97;
+    }
+    .learning {
+      padding: 10px 0;
+      border-bottom: 1px solid #2a2a3e;
+    }
+    .learning:last-child { border-bottom: none; }
+    .learning-title { font-weight: 600; color: #fff; font-size: 14px; }
+    .learning-date { color: #888; font-size: 12px; }
+    .learning-text { color: #aaa; font-size: 13px; margin-top: 4px; }
+    .footer {
+      text-align: center;
+      color: #444;
+      font-size: 12px;
+      margin-top: 32px;
+      padding-top: 16px;
+      border-top: 1px solid #2a2a3e;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Dev-Agentur Dashboard</h1>
+  <p class="subtitle">VetApp â€” generiert 03.04.2026 um 19:28 Uhr</p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>Agenten</h2>
+      <div class="agent">
+        <div class="agent-dot" style="background: #f97316;"></div>
+        <span class="agent-name">designer</span>
+        <span class="agent-role">UI/UX Designer</span>
+        <span class="agent-scope project">Projekt</span>
+        <span class="agent-model">sonnet</span>
+      </div>      <div class="agent">
+        <div class="agent-dot" style="background: #22c55e;"></div>
+        <span class="agent-name">developer</span>
+        <span class="agent-role">Senior Developer</span>
+        <span class="agent-scope project">Projekt</span>
+        <span class="agent-model">sonnet</span>
+      </div>      <div class="agent">
+        <div class="agent-dot" style="background: #ef4444;"></div>
+        <span class="agent-name">qa</span>
+        <span class="agent-role">QA Engineer</span>
+        <span class="agent-scope project">Projekt</span>
+        <span class="agent-model">sonnet</span>
+      </div>      <div class="agent">
+        <div class="agent-dot" style="background: #a855f6;"></div>
+        <span class="agent-name">sidekick</span>
+        <span class="agent-role">Brian</span>
+        <span class="agent-scope project">Projekt</span>
+        <span class="agent-model">opus</span>
+      </div>      <div class="agent">
+        <div class="agent-dot" style="background: #06b6d4;"></div>
+        <span class="agent-name">agency-admin</span>
+        <span class="agent-role">Agency Admin (CTO)</span>
+        <span class="agent-scope ">Global</span>
+        <span class="agent-model">opus</span>
+      </div>      <div class="agent">
+        <div class="agent-dot" style="background: #22c55e;"></div>
+        <span class="agent-name">db-expert</span>
+        <span class="agent-role">Supabase/PostgreSQL-Datenbanke...</span>
+        <span class="agent-scope ">Global</span>
+        <span class="agent-model">opus</span>
+      </div>      <div class="agent">
+        <div class="agent-dot" style="background: #eab308;"></div>
+        <span class="agent-name">dokumentar</span>
+        <span class="agent-role">Dokumentations-Automation</span>
+        <span class="agent-scope ">Global</span>
+        <span class="agent-model">sonnet</span>
+      </div>
+    </div>
+
+    <div class="card span-2">
+      <h2>Aufgaben</h2>
+      <div class="task-group"><h3 class="sofort">SOFORT</h3>
+        <div class="task">AI-Assistent deployen: `supabase functions deploy ai-chat` + `ANTHROPIC_API_KEY` als Secret setzen</div>
+        <div class="task">Gesundheits-UX: Quick Fixes (Tab umbenennen, Sektionen labeln, Button-Bug)</div>
+        <div class="task">Gesundheits-UX: Datenmodell vereinheitlichen (MedicalEvent)</div>
+        <div class="task">Gesundheits-UX: DataContext + Screens umbauen</div>
+      <div class="task-group"><h3 class="woche">DIESE WOCHE</h3>
+        <div class="task">D1: Accessibility Basics (Labels, Touch-Targets min. 44px)</div>
+        <div class="task">D4: Inkonsistente Farben — Theme konsequent nutzen</div>
+        <div class="task">ProfileScreen: "Kommt bald" Text aktualisieren (AI-Feature existiert jetzt)</div>
+        <div class="task">Ungetrackte Dateien committen (briefings/, docs/, scripts/)</div>
+      <div class="task-group"><h3 class="backlog">BACKLOG</h3>
+        <div class="task">M7: DataContext refactoren (God-Object, ~350 Zeilen)</div>
+        <div class="task">Chat-Historie persistent machen (nach MVP)</div>
+        <div class="task">SelectField: Tap-outside zum Schliessen (QA-Finding)</div>
+        <div class="task">ProfileScreen: Settings-Items "Datenschutz" + "Hilfe" noch ohne Handler</div>
+      <div class="task-group"><h3 class="erledigt">ERLEDIGT (14)</h3>
+        <div class="task done">Paket 3: AI-Assistent (Claude Haiku, Premium-only, Chat-UI + Edge Function)</div>
+        <div class="task done">AI-Assistent: QA-Findings gefixt (Premium-Gate useEffect, Input-Validierung)</div>
+        <div class="task done">K1: Supabase-Credentials in .env auslagern</div>
+        <div class="task done" style="color:#555">...und 11 weitere</div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="grid grid-2">
+    <div class="card">
+      <h2>Git</h2>
+      <div style="margin-bottom: 12px;">
+        <span class="git-badge git-branch">master</span>
+        <span class="git-badge git-changes">7 geaendert / 9 untracked</span>
+      </div>
+      <div class="commit">
+        <span class="commit-hash">2f798f7</span>
+        <span class="commit-msg">docs: changelog 2026-04-03 Session 2</span>
+      </div>      <div class="commit">
+        <span class="commit-hash">a51b238</span>
+        <span class="commit-msg">feat: KI-Gesundheitsassistent implementiert (Paket 3)</span>
+      </div>      <div class="commit">
+        <span class="commit-hash">a7b55b0</span>
+        <span class="commit-msg">fix: QA-Findings ÔÇö Error-Handling, formatDate, deutsche Labels, disabled-Button</span>
+      </div>      <div class="commit">
+        <span class="commit-hash">69e7eaa</span>
+        <span class="commit-msg">feat: Ueberfaellig-Regeln aktivieren (Paket 2)</span>
+      </div>      <div class="commit">
+        <span class="commit-hash">c92c429</span>
+        <span class="commit-msg">chore: Agentur-Infrastruktur verbessern ÔÇö Skills, Rules, QA-Haertung</span>
+      </div>      <div class="commit">
+        <span class="commit-hash">e31087f</span>
+        <span class="commit-msg">docs: Changelog fuer Session vom 03.04.2026</span>
+      </div>      <div class="commit">
+        <span class="commit-hash">b0d7cad</span>
+        <span class="commit-msg">feat: Storage-URLs refactoren, Loading-States + Submit-Schutz</span>
+      </div>      <div class="commit">
+        <span class="commit-hash">29653f5</span>
+        <span class="commit-msg">feat: Haustier bearbeiten ÔÇö Edit-Modus fuer AddPetScreen</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Automationen</h2>
+      <div class="trigger">
+        <div>
+          <div class="trigger-name">Dokumentar-Morgens</div>
+          <div class="trigger-time">Naechster Lauf: 04.04.2026 08:00:00</div>
+        </div>
+        <span class="trigger-status">Bereit</span>
+      </div>      <div class="trigger">
+        <div>
+          <div class="trigger-name">Dokumentar-Abends</div>
+          <div class="trigger-time">Naechster Lauf: 04.04.2026 18:00:00</div>
+        </div>
+        <span class="trigger-status">Bereit</span>
+      </div>
+
+      <h2 style="margin-top: 24px;">Learnings</h2>
+      <div class="learning">
+        <div class="learning-date">2026-04-03</div>
+        <div class="learning-title">Nicht selbst machen, delegieren</div>
+        <div class="learning-text">Auch "kleine" technische Aufgaben wie SQL vorbereiten gehoeren an den Spezialisten, nicht an Brian. Mein Job ist plan...</div>
+      </div>      <div class="learning">
+        <div class="learning-date">2026-04-03</div>
+        <div class="learning-title">Team auch fuer Teilschritte nutzen</div>
+        <div class="learning-text">Nicht alles in einen grossen Auftrag packen. Wenn ich fuer die Planung etwas brauche (z.B. ein Schema-Entwurf, eine M...</div>
+      </div>      <div class="learning">
+        <div class="learning-date">2026-04-03</div>
+        <div class="learning-title">Learnings automatisch festhalten</div>
+        <div class="learning-text">Wenn in einer Session eine Erkenntnis entsteht die ueber die aktuelle Aufgabe hinaus relevant ist, sofort in learning...</div>
+      </div>      <div class="learning">
+        <div class="learning-date">2026-04-03</div>
+        <div class="learning-title">tasks.md automatisch aktualisieren</div>
+        <div class="learning-text">Bei jedem Commit die tasks.md mitpflegen — erledigte Tasks abhaken, neue ergaenzen. Nicht erst wenn Claas daran erinn...</div>
+      </div>
+    </div>
+  </div>
+
+  <p class="footer">Dev-Agentur von Claas â€” 03.04.2026 um 19:28 Uhr</p>
+
+</body>
+</html>

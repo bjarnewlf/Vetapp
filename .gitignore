@@ -52,3 +52,9 @@ docs/.claude-backup/
 
 # Credentials
 Login.txt
+
+# Supabase temp files
+supabase/.temp/
+
+# Generated HTML previews
+docs/*.html

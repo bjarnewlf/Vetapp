@@ -15,6 +15,7 @@ Dieses Dokument regelt die Zusammenarbeit aller Agents in Claas' Dev-Agentur.
 | **Developer** | Logik, Features, Bugfixes, Datenmodell, API-Anbindung, Navigation | Visuelle Entscheidungen, Testing |
 | **Designer** | Farben, Typografie, Spacing, Layout, UX-Flows, Accessibility, Animationen | Business-Logik, Datenmodell |
 | **QA** | Code-Review, Bug-Hunting, TypeScript-Checks, Security, Datenvalidierung | Code ändern, Design-Entscheidungen |
+| **Wissensmanager** | Agency-Vault pflegen, Learnings/Entscheidungen dokumentieren, Wissen vernetzen | Code, Planung, Tagesgeschaeft |
 
 ### Routing-Regeln für Brian
 
@@ -24,6 +25,9 @@ Dieses Dokument regelt die Zusammenarbeit aller Agents in Claas' Dev-Agentur.
 - **Bug im Design** → Designer
 - **Refactoring** → Developer, dann QA
 - **Code-Review / Qualitätscheck** → QA
+- **Learning / Entscheidung festhalten** → Wissensmanager
+- **Wissen nachschlagen / Kontext fehlt** → Brian liest im Vault, bei Bedarf Wissensmanager fuer Tiefe
+- **Session-Ende** → Wissensmanager (Chronik + Learnings sichern)
 - **Unklar** → Brian fragt Claas nach
 
 ## Auftragsformat
@@ -145,3 +149,36 @@ Damit Zwischenschritte nicht verloren gehen, fuehrt die Agentur ein Uebergabepro
 2. Naechster Agent startet → vorherige Uebergabe rutscht nach "Vorherige Uebergaben"
 3. Commit wird gemacht → `handoff.md` wird mitcommittet
 4. Dokumentar laeuft → alte Eintraege werden aufgeraeumt
+
+## Agency-Vault (Obsidian)
+
+Das zentrale Langzeitgedaechtnis der Agentur. Ein Obsidian-Vault mit vernetzten Markdown-Notizen.
+
+**Pfad:** `D:\Agency-Vault\`
+
+### Struktur
+
+| Ordner | Inhalt |
+|---|---|
+| `Projekte/` | Projekt-Hub-Notizen (z.B. VetApp.md) — zentraler Einstiegspunkt |
+| `Learnings/` | Erkenntnisse als vernetzte Notizen |
+| `Entscheidungen/` | Architektur- und Prozess-Entscheidungen mit Kontext |
+| `Features/` | Feature-Dokumentation |
+| `Technik/` | Technologie-Wissen (Supabase, React Native, etc.) |
+| `Architektur/` | Patterns und Konventionen |
+| `Agentur/` | Agent-Profile, Workflows |
+| `Chronik/` | Session- und Sprint-Zusammenfassungen |
+| `Inbox/` | Unsortiertes |
+| `_Templates/` | Vorlagen fuer neue Notizen |
+
+### Wer macht was
+
+- **Brian liest** den Vault selbst — `Projekte/VetApp.md` beim Start, weitere Notizen bei Bedarf. Er folgt den `[[Wiki-Links]]` fuer Tiefe
+- **Wissensmanager schreibt** — Nur er legt Notizen an, ergaenzt Links und verdichtet das Netz. Brian delegiert Schreibauftraege an ihn
+- **Alle Agents duerfen lesen** — Jeder Agent kann bei Bedarf im Vault nachschlagen
+
+### Vault = Quelle der Wahrheit
+
+- Der Vault ist das ausfuehrliche Langzeitgedaechtnis
+- `learnings.md` im Projekt ist nur ein Index (Einzeiler pro Learning)
+- Bei Widerspruechen gilt der Vault
