@@ -8,36 +8,38 @@
 ## Aktuelle Uebergabe
 
 **Agent:** Brian (Sidekick)
-**Zeitpunkt:** 2026-04-04 ~01:30
-**Session:** KI-Assistent zum Laufen gebracht + Quick Wins
+**Zeitpunkt:** 2026-04-04
+**Session:** KI-Chat absichern — Rate Limiting, Validierung, Prompt-Schutz
 
 ### Erledigt
-- **KI-Assistent funktioniert** — zwei Bugs gefixt:
-  1. 401 Invalid JWT: Anon Key als Bearer + User-Token in `x-user-token` Custom Header
-  2. 502 Model not found: Modell auf `claude-sonnet-4-6` aktualisiert (alte Haiku-Modelle abgeschaltet)
-- **Dashboard-Setting:** "Verify JWT with legacy secret" auf OFF
-- **Quick Wins** (3 parallele Auftraege, QA-geprueft):
-  1. Gesundheits-UX: Tab "Impfungen" → "Gesundheit", Add-Buttons konsistent, toter Code weg
-  2. Theme-Farben: 10 Screens bereinigt, neuer `overlayLight`-Token, alle hardcodierten Farben ersetzt
-  3. Security: `debug`-Felder aus Edge Function Error-Responses entfernt
-- **Projekt-Uebersicht:** `docs/projekt-uebersicht.html` erstellt
-- Alles committed und gepusht (Commits `387978a`, `af1c04e`, `f091e44`)
+- **Edge Function deployed** — Security-Fix (debug-Felder) ist jetzt live
+- **KI-Chat abgesichert** (Developer + QA-Review + Fixes):
+  - Rate Limiting: max 20 Nachrichten/User/Stunde via Supabase-Tabelle `ai_usage`
+  - PetContext-Validierung: max 10 Pets, Feldlaengen begrenzt (inkl. `age`)
+  - Body-Groesse: max 50KB
+  - Prompt-Injection-Schutz: Sanitizing + Trennzeichen im System-Prompt
+  - Client-Logs: Token-Fragmente entfernt
+  - Rate-Limit-Query ist fail-open (bei DB-Fehler wird durchgelassen)
+- **Migration angewendet** — `ai_usage` Tabelle mit RLS und Index ist live
+- **Edge Function erneut deployed** — alle Security-Aenderungen sind aktiv
+- **tasks.md aktualisiert**
+- **learnings.md aktualisiert** — 3 neue Eintraege (stateless Edge Functions, fail-open, Learnings ohne Rueckfrage)
 
 ### Offen / Nicht fertig
-- **Edge Function deployen** — Security-Fix (debug-Felder) ist committed aber noch nicht deployed. Claas muss ausfuehren: `npx supabase functions deploy ai-chat`
-- **Guenstigeres KI-Modell** — `claude-sonnet-4-6` ist teuer, guenstigere Alternative suchen
 - **Ungetrackte Dateien** — briefings/, docs/, scripts/, agency-backlog.md etc. noch nicht committet
+- **Aenderungen dieser Session** — noch nicht committet
 
 ### Naechster Schritt
-- Edge Function deployen (Security-Fix)
-- Gesundheits-UX Datenmodell (MedicalEvent) — groesserer Umbau
-- Accessibility Basics (Labels, Touch-Targets)
-- Guenstigeres KI-Modell evaluieren
+1. Aenderungen committen (Edge Function, Migration, aiService, tasks, learnings, handoff)
+2. Design-Tasks D-A bis D-E (Accessibility, Touch-Targets, Design-System) — Plan liegt fertig in `briefings/2026-04-04-design-plan.md`
+3. Gesundheits-UX Datenmodell (MedicalEvent) — groesserer Umbau, eigene Session
 
 ### Wichtig fuer den Naechsten
-- KI-Assistent nutzt Custom Header `x-user-token` fuer Auth — nicht den Standard-Authorization-Header
-- Anthropic alte Modelle (claude-3-haiku, claude-3-5-haiku) sind nicht mehr verfuegbar
-- Alle 5 MVP-Pakete sind fertig, es geht jetzt um Polish und Optimierung
+- KI-Assistent nutzt Custom Header `x-user-token` fuer Auth — nicht aendern
+- Rate Limiting nutzt Supabase-Tabelle `ai_usage` — fail-open bei DB-Fehler
+- Anthropic alte Modelle (claude-3-haiku, claude-3-5-haiku) nicht mehr verfuegbar
+- Design-Plan fuer 5 Accessibility-Tasks liegt komplett vor — kann direkt delegiert werden
+- KI-Modell-Kostenoptimierung bewusst zurueckgestellt
 
 ---
 
@@ -45,4 +47,3 @@
 
 ### Agency Admin — 2026-04-04 ~09:00
 - Uebergabeprotokoll-System eingefuehrt (handoff.md, Agent-Rules aktualisiert)
-- System wurde in dieser Session erstmals im Betrieb genutzt

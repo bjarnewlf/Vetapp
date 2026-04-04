@@ -38,9 +38,6 @@ export async function sendChatMessage(
     session = sessionData.session;
   }
 
-  console.log('[aiService] Token:', session.access_token.substring(0, 20) + '...');
-  console.log('[aiService] Expires:', new Date(session.expires_at! * 1000).toISOString());
-
   try {
     const response = await fetch(
       `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/ai-chat`,

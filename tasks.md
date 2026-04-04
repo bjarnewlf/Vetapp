@@ -3,11 +3,13 @@
 ## SOFORT
 - [ ] Gesundheits-UX: Datenmodell vereinheitlichen (MedicalEvent)
 - [ ] Gesundheits-UX: DataContext + Screens umbauen
-- [ ] KI-Assistent: Guenstigeres Modell evaluieren (claude-sonnet-4-6 ist teuer)
-- [ ] Edge Function deployen (Security-Fix: debug-Felder entfernt)
 
 ## DIESE WOCHE
-- [ ] D1: Accessibility Basics (Labels, Touch-Targets min. 44px)
+- [ ] D-A: Accessibility — Button + InputField (Labels, Roles)
+- [ ] D-B: Touch-Target Checkbox RemindersScreen (28px → 44px)
+- [ ] D-C: Deaktivierte Settings-Items im ProfileScreen
+- [ ] D-D: Inline-Werte bereinigen (Card, StatusBadge)
+- [ ] D-E: Hardcoded Farbe HomeScreen
 - [ ] Ungetrackte Dateien committen (briefings/, docs/, scripts/)
 
 ## BACKLOG
@@ -18,6 +20,8 @@
 - [ ] Demo fuer Kunden vorbereiten (Expo Go / EAS Build / Web)
 
 ## ERLEDIGT
+- [x] Edge Function deployen (Security-Fix: debug-Felder entfernt)
+- [x] KI-Chat absichern: Rate Limiting (20/h), Input-Validierung, Prompt-Schutz, Client-Logs bereinigt
 - [x] Quick Wins: Gesundheits-UX (Tab umbenannt, Add-Buttons, toter Code weg)
 - [x] Quick Wins: Theme-Farben konsistent (10 Screens, neuer overlayLight-Token)
 - [x] Quick Wins: Security — debug-Felder aus Edge Function entfernt

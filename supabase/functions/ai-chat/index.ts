@@ -21,6 +21,15 @@ interface PetContext {
   treatments: string[];
 }
 
+// Sanitize-Hilfsfunktion: trim, Newlines entfernen, auf maxLen kuerzen
+function sanitizeString(value: unknown, maxLen: number): string {
+  if (typeof value !== 'string') return '';
+  return value
+    .trim()
+    .replace(/[\n\r]/g, ' ')
+    .substring(0, maxLen);
+}
+
 function buildSystemPrompt(pets: PetContext[]): string {
   let petInfo = '';
   if (pets.length === 0) {
@@ -28,27 +37,35 @@ function buildSystemPrompt(pets: PetContext[]): string {
   } else {
     petInfo = pets
       .map((pet) => {
+        const name = sanitizeString(pet.name, 100);
+        const type = sanitizeString(pet.type, 100);
+        const breed = sanitizeString(pet.breed, 100);
+        const age = sanitizeString(pet.age, 100);
+
         const vaccs =
           pet.vaccinations.length > 0
-            ? pet.vaccinations.join(', ')
+            ? pet.vaccinations.map((v) => sanitizeString(v, 200)).join(', ')
             : 'Keine Impfungen eingetragen';
         const treats =
           pet.treatments.length > 0
-            ? pet.treatments.join(', ')
+            ? pet.treatments.map((t) => sanitizeString(t, 200)).join(', ')
             : 'Keine Behandlungen eingetragen';
-        return `- ${pet.name} (${pet.type}, ${pet.breed}, ${pet.age})\n  Impfungen: ${vaccs}\n  Behandlungen: ${treats}`;
+
+        return `- ${name} (${type}, ${breed}, ${age})\n  Impfungen: ${vaccs}\n  Behandlungen: ${treats}`;
       })
       .join('\n');
   }
 
   return `Du bist ein freundlicher Tiergesundheits-Assistent in der VetApp. Du beantwortest Fragen zur Tiergesundheit auf Deutsch.
 
-WICHTIG: Du bist KEIN Ersatz für einen Tierarzt. Bei ernsten Symptomen empfiehlst du IMMER einen Tierarztbesuch.
+WICHTIG: Du bist KEIN Ersatz fuer einen Tierarzt. Bei ernsten Symptomen empfiehlst du IMMER einen Tierarztbesuch.
 
 Du kennst folgende Tiere des Users:
+--- TIERDATEN (vom System bereitgestellt) ---
 ${petInfo}
+--- ENDE TIERDATEN ---
 
-Antworte kurz und verständlich. Beziehe dich auf die konkreten Tiere wenn relevant.`;
+Antworte kurz und verstaendlich. Beziehe dich auf die konkreten Tiere wenn relevant.`;
 }
 
 serve(async (req: Request) => {
@@ -75,7 +92,6 @@ serve(async (req: Request) => {
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
 
-  // Debug: Env-Vars prüfen
   if (!supabaseUrl || !supabaseAnonKey) {
     return new Response(
       JSON.stringify({ error: 'Server-Konfigurationsfehler.' }),
@@ -95,21 +111,50 @@ serve(async (req: Request) => {
     );
   }
 
+  // Rate Limiting: Max 20 Anfragen pro Stunde pro User
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const { count: usageCount, error: usageError } = await supabase
+    .from('ai_usage')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', user.id)
+    .gte('created_at', oneHourAgo);
+
+  if (usageError) {
+    // Fail-open: Bei DB-Fehler Request durchlassen, nur loggen
+    console.error('[ai-chat] Rate-Limit-Abfrage fehlgeschlagen:', usageError.message);
+  }
+
+  if ((usageCount ?? 0) >= 20) {
+    return new Response(
+      JSON.stringify({ error: 'Du hast das Nachrichten-Limit erreicht (20 pro Stunde). Bitte versuche es spaeter erneut.' }),
+      { status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
   // Request-Body parsen
-  let messages: ChatMessage[];
-  let petContext: PetContext[];
+  let body: unknown;
   try {
-    const body = await req.json();
-    messages = body.messages ?? [];
-    petContext = body.petContext ?? [];
+    body = await req.json();
   } catch {
     return new Response(
-      JSON.stringify({ error: 'Ungültiges Anfrage-Format.' }),
+      JSON.stringify({ error: 'Ungueltiges Anfrage-Format.' }),
       { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 
-  // Input-Validierung
+  // Gesamt-Body-Groesse pruefen (max 50KB)
+  if (JSON.stringify(body).length > 50000) {
+    return new Response(
+      JSON.stringify({ error: 'Anfrage ist zu gross.' }),
+      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
+  const typedBody = body as Record<string, unknown>;
+  const messages: ChatMessage[] = (typedBody.messages as ChatMessage[]) ?? [];
+  const petContext: PetContext[] = (typedBody.petContext as PetContext[]) ?? [];
+
+  // Input-Validierung: Nachrichten
   const MAX_MESSAGES = 50;
   const MAX_MESSAGE_LENGTH = 2000;
 
@@ -123,21 +168,73 @@ serve(async (req: Request) => {
   for (const msg of messages) {
     if (!msg.role || !msg.content) {
       return new Response(
-        JSON.stringify({ error: 'Ungültiges Nachrichtenformat.' }),
+        JSON.stringify({ error: 'Ungueltiges Nachrichtenformat.' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
     if (msg.role !== 'user' && msg.role !== 'assistant') {
       return new Response(
-        JSON.stringify({ error: 'Ungültige Nachrichtenrolle.' }),
+        JSON.stringify({ error: 'Ungueltige Nachrichtenrolle.' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
     if (typeof msg.content !== 'string' || msg.content.length > MAX_MESSAGE_LENGTH) {
       return new Response(
-        JSON.stringify({ error: 'Nachricht ist zu lang. Bitte kürze deine Anfrage.' }),
+        JSON.stringify({ error: 'Nachricht ist zu lang. Bitte kuerze deine Anfrage.' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
+    }
+  }
+
+  // PetContext validieren: max 10 Tiere
+  if (petContext.length > 10) {
+    return new Response(
+      JSON.stringify({ error: 'Zu viele Tiere im Kontext (max. 10).' }),
+      { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
+  for (const pet of petContext) {
+    // name, type, breed: max 100 Zeichen
+    for (const field of ['name', 'type', 'breed', 'age'] as const) {
+      if (typeof pet[field] !== 'string' || pet[field].length > 100) {
+        return new Response(
+          JSON.stringify({ error: `Ungueltige Tier-Daten: Feld "${field}" ist zu lang oder ungueltig.` }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    // vaccinations: max 20 Eintraege, je max 200 Zeichen
+    if (!Array.isArray(pet.vaccinations) || pet.vaccinations.length > 20) {
+      return new Response(
+        JSON.stringify({ error: 'Ungueltige Tier-Daten: Zu viele Impfeintraege (max. 20).' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    for (const v of pet.vaccinations) {
+      if (typeof v !== 'string' || v.length > 200) {
+        return new Response(
+          JSON.stringify({ error: 'Ungueltige Tier-Daten: Impfeintrag zu lang (max. 200 Zeichen).' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    // treatments: max 20 Eintraege, je max 200 Zeichen
+    if (!Array.isArray(pet.treatments) || pet.treatments.length > 20) {
+      return new Response(
+        JSON.stringify({ error: 'Ungueltige Tier-Daten: Zu viele Behandlungseintraege (max. 20).' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    for (const t of pet.treatments) {
+      if (typeof t !== 'string' || t.length > 200) {
+        return new Response(
+          JSON.stringify({ error: 'Ungueltige Tier-Daten: Behandlungseintrag zu lang (max. 200 Zeichen).' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
     }
   }
 
@@ -184,13 +281,23 @@ serve(async (req: Request) => {
     const errorBody = await anthropicResponse.text();
     console.error('[ai-chat] Anthropic API error:', anthropicResponse.status, errorBody);
     return new Response(
-      JSON.stringify({ error: 'KI-Dienst nicht verfügbar. Bitte versuche es später erneut.' }),
+      JSON.stringify({ error: 'KI-Dienst nicht verfuegbar. Bitte versuche es spaeter erneut.' }),
       { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 
   const anthropicData = await anthropicResponse.json();
   const content: string = anthropicData.content?.[0]?.text ?? '';
+
+  // Usage tracken fuer Rate Limiting
+  const { error: insertError } = await supabase
+    .from('ai_usage')
+    .insert({ user_id: user.id });
+
+  if (insertError) {
+    // Nicht fatal — Antwort trotzdem zurueckgeben, nur loggen
+    console.error('[ai-chat] Usage-Insert fehlgeschlagen:', insertError.message);
+  }
 
   return new Response(
     JSON.stringify({ content }),
