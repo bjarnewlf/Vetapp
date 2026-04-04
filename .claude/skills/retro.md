@@ -11,8 +11,7 @@
 2. **Was lief gut?** — Patterns die funktioniert haben, gute Entscheidungen
 3. **Was lief schlecht?** — Probleme, Umwege, Missverstaendnisse
 4. **Was nehmen wir mit?** — Konkrete Erkenntnisse fuer zukuenftige Sessions
-5. **Claas fragen** — "Soll ich das als Learning festhalten?"
-6. **learnings.md aktualisieren** — Nur nach Bestaetigung
+5. **Wissensmanager aufrufen** — Learnings und Entscheidungen im Vault festhalten
 
 ## Output-Format
 
@@ -27,14 +26,15 @@
 
 **Schlecht:** [Was nicht funktioniert hat]
 
-**Learning-Vorschlag:**
-> [Konkreter Text fuer learnings.md]
+**Learnings fuer den Vault:**
+- [Erkenntnis 1]
+- [Erkenntnis 2]
 
-Soll ich das als Learning festhalten?
+→ Wissensmanager: [Anzahl] Notizen angelegt ✓
 ```
 
 ## Regeln
 - Ehrlich sein — auch wenn etwas schlecht lief
 - Kurz halten — max 150 Woerter
-- Nur echte Erkenntnisse vorschlagen, kein Fuelltext
-- learnings.md nie ohne Claas' OK aendern
+- Learnings direkt an den Wissensmanager delegieren, nicht selbst in learnings.md schreiben
+- Nur echte Erkenntnisse, kein Fuelltext

@@ -7,27 +7,27 @@ paths:
 
 Dieses Dokument regelt die Zusammenarbeit aller Agents in Claas' Dev-Agentur.
 
-## Rollen & Zuständigkeiten
+## Rollen & Zustaendigkeiten
 
-| Agent | Zuständig für | NICHT zuständig für |
+| Agent | Zustaendig fuer | NICHT zustaendig fuer |
 |---|---|---|
-| **Brian (sidekick)** | Planung, Delegation, Projektüberblick, Priorisierung | Code schreiben, Dateien ändern |
+| **Brian (sidekick)** | Planung, Delegation, Projektuebersicht, Priorisierung | Code schreiben, Dateien aendern |
 | **Developer** | Logik, Features, Bugfixes, Datenmodell, API-Anbindung, Navigation | Visuelle Entscheidungen, Testing |
 | **Designer** | Farben, Typografie, Spacing, Layout, UX-Flows, Accessibility, Animationen | Business-Logik, Datenmodell |
-| **QA** | Code-Review, Bug-Hunting, TypeScript-Checks, Security, Datenvalidierung | Code ändern, Design-Entscheidungen |
-| **Wissensmanager** | Agency-Vault pflegen, Learnings/Entscheidungen dokumentieren, Wissen vernetzen | Code, Planung, Tagesgeschaeft |
+| **QA** | Code-Review, Bug-Hunting, TypeScript-Checks, Security, Datenvalidierung | Code aendern (ausser `qa-findings.md`), Design-Entscheidungen |
+| **Wissensmanager** | Agency-Vault pflegen, Learnings/Entscheidungen dokumentieren, Wissen vernetzen (globaler Agent: `~/.claude/agents/`) | Code, Planung, Tagesgeschaeft |
 
-### Routing-Regeln für Brian
+### Routing-Regeln fuer Brian
 
 - **Neues Feature (mit UI)** → Erst Designer (Konzept), dann Developer (Umsetzung), dann QA (Review)
 - **Neues Feature (ohne UI)** → Developer, dann QA
 - **Bug in der Logik** → Developer, dann QA
 - **Bug im Design** → Designer
 - **Refactoring** → Developer, dann QA
-- **Code-Review / Qualitätscheck** → QA
+- **Code-Review / Qualitaetscheck** → QA
 - **Learning / Entscheidung festhalten** → Wissensmanager
-- **Wissen nachschlagen / Kontext fehlt** → Brian liest im Vault, bei Bedarf Wissensmanager fuer Tiefe
 - **Session-Ende** → Wissensmanager (Chronik + Learnings sichern)
+- **Theme-Aenderungen** → Designer entscheidet WAS (Farbwert, Token-Name, Spacing), Developer setzt um WO (Code). Aenderungen an `src/theme/` sind immer ein Designer-Auftrag
 - **Unklar** → Brian fragt Claas nach
 
 ## Auftragsformat
@@ -53,132 +53,33 @@ Wenn Brian einen Auftrag an einen Spezialisten delegiert, nutzt er dieses Format
 - [ ] Kriterium 1
 - [ ] Kriterium 2
 
-**Einschränkungen:**
-- Was NICHT geändert werden soll
+**Einschraenkungen:**
+- Was NICHT geaendert werden soll
 - Besondere Regeln
 ```
 
-## Rückmeldung
+## Rueckmeldung
 
-Wenn ein Spezialist fertig ist, meldet er **kompakt** zurück (max 200 Wörter):
+Wenn ein Spezialist fertig ist, meldet er **kompakt** zurueck (max 200 Woerter):
 
 ```
 ## Ergebnis: [Kurzbeschreibung]
 
-**Geänderte Dateien:**
-- src/screens/XY.tsx — Was wurde geändert
+**Geaenderte Dateien:**
+- src/screens/XY.tsx — Was wurde geaendert
 
 **TypeScript-Check:** Bestanden / X Fehler
 
 **Offene Punkte:**
 - Falls etwas unklar war oder nicht umgesetzt werden konnte
 
-**Nächster Schritt:** [Ein Satz — was sollte als nächstes passieren?]
+**Naechster Schritt:** [Ein Satz — was sollte als naechstes passieren?]
 ```
 
 ## Zusammenarbeit zwischen Spezialisten
 
-Spezialisten arbeiten **nicht direkt zusammen**. Der Workflow läuft immer über Brian:
+Spezialisten arbeiten **nicht direkt zusammen**. Der Workflow laeuft immer ueber Brian:
 
 ```
 Claas → Brian → Spezialist A → Brian → Spezialist B → Brian → Claas
 ```
-
-Beispiel: Neuer Screen
-1. Brian erstellt Plan, delegiert an Designer (UI-Konzept)
-2. Designer liefert Ergebnis zurück an Brian
-3. Brian formuliert Auftrag für Developer (basierend auf Designer-Ergebnis)
-4. Developer implementiert, liefert zurück
-5. Brian delegiert an QA (Review)
-6. QA liefert Findings, Brian fasst zusammen für Claas
-
-## Entscheidungskompetenz
-
-### Brian entscheidet selbst:
-- Welcher Spezialist einen Auftrag bekommt
-- Reihenfolge der Delegation
-- Wie ein Auftrag formuliert wird
-
-### Brian fragt Claas:
-- Bevor er einen Plan umsetzt (Plan zeigen, Bestätigung holen)
-- Bei widersprüchlichen Anforderungen
-- Bei Scope-Erweiterungen ("Das Feature braucht eigentlich auch X")
-- Ob committed werden soll
-
-### Spezialisten fragen Brian:
-- Wenn der Auftrag unklar ist
-- Wenn die Umsetzung vom Plan abweichen muss
-- Wenn sie auf Probleme stoßen die den Scope betreffen
-
-## Uebergabeprotokoll (handoff.md)
-
-Damit Zwischenschritte nicht verloren gehen, fuehrt die Agentur ein Uebergabeprotokoll — wie beim Schichtwechsel.
-
-### Regeln
-
-- **Developer und Designer** aktualisieren `handoff.md` bevor sie fertig sind
-- **QA** hat keinen Schreibzugriff — Brian uebernimmt QA-Findings in `handoff.md`
-- **Brian** liest `handoff.md` bei jedem Session-Start als erstes
-- **Dokumentar** raeumt alte Eintraege auf, sobald sie im Changelog erfasst sind
-
-### Format eines Eintrags
-
-```
-## Aktuelle Uebergabe
-
-**Agent:** [Name]
-**Zeitpunkt:** [YYYY-MM-DD HH:MM]
-**Auftrag:** [Was war der Auftrag?]
-
-### Erledigt
-- [Was wurde gemacht, konkret]
-
-### Offen / Nicht fertig
-- [Was noch fehlt, warum]
-
-### Naechster Schritt
-- [Was sollte als naechstes passieren, wer sollte es tun]
-
-### Wichtig fuer den Naechsten
-- [Stolperfallen, Abhaengigkeiten, Entscheidungen die getroffen wurden]
-```
-
-### Lebenszyklus
-
-1. Agent arbeitet → schreibt Uebergabe in `handoff.md` (Bereich "Aktuelle Uebergabe")
-2. Naechster Agent startet → vorherige Uebergabe rutscht nach "Vorherige Uebergaben"
-3. Commit wird gemacht → `handoff.md` wird mitcommittet
-4. Dokumentar laeuft → alte Eintraege werden aufgeraeumt
-
-## Agency-Vault (Obsidian)
-
-Das zentrale Langzeitgedaechtnis der Agentur. Ein Obsidian-Vault mit vernetzten Markdown-Notizen.
-
-**Pfad:** `D:\Agency-Vault\`
-
-### Struktur
-
-| Ordner | Inhalt |
-|---|---|
-| `Projekte/` | Projekt-Hub-Notizen (z.B. VetApp.md) — zentraler Einstiegspunkt |
-| `Learnings/` | Erkenntnisse als vernetzte Notizen |
-| `Entscheidungen/` | Architektur- und Prozess-Entscheidungen mit Kontext |
-| `Features/` | Feature-Dokumentation |
-| `Technik/` | Technologie-Wissen (Supabase, React Native, etc.) |
-| `Architektur/` | Patterns und Konventionen |
-| `Agentur/` | Agent-Profile, Workflows |
-| `Chronik/` | Session- und Sprint-Zusammenfassungen |
-| `Inbox/` | Unsortiertes |
-| `_Templates/` | Vorlagen fuer neue Notizen |
-
-### Wer macht was
-
-- **Brian liest** den Vault selbst — `Projekte/VetApp.md` beim Start, weitere Notizen bei Bedarf. Er folgt den `[[Wiki-Links]]` fuer Tiefe
-- **Wissensmanager schreibt** — Nur er legt Notizen an, ergaenzt Links und verdichtet das Netz. Brian delegiert Schreibauftraege an ihn
-- **Alle Agents duerfen lesen** — Jeder Agent kann bei Bedarf im Vault nachschlagen
-
-### Vault = Quelle der Wahrheit
-
-- Der Vault ist das ausfuehrliche Langzeitgedaechtnis
-- `learnings.md` im Projekt ist nur ein Index (Einzeiler pro Learning)
-- Bei Widerspruechen gilt der Vault
