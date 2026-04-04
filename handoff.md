@@ -9,41 +9,50 @@
 
 **Agent:** Brian (Sidekick)
 **Zeitpunkt:** 2026-04-04
-**Session:** KI-Chat absichern — Rate Limiting, Validierung, Prompt-Schutz
+**Session:** Vault-Inventur + Hygiene + Design-Tasks
 
 ### Erledigt
-- **Edge Function deployed** — Security-Fix (debug-Felder) ist jetzt live
-- **KI-Chat abgesichert** (Developer + QA-Review + Fixes):
-  - Rate Limiting: max 20 Nachrichten/User/Stunde via Supabase-Tabelle `ai_usage`
-  - PetContext-Validierung: max 10 Pets, Feldlaengen begrenzt (inkl. `age`)
-  - Body-Groesse: max 50KB
-  - Prompt-Injection-Schutz: Sanitizing + Trennzeichen im System-Prompt
-  - Client-Logs: Token-Fragmente entfernt
-  - Rate-Limit-Query ist fail-open (bei DB-Fehler wird durchgelassen)
-- **Migration angewendet** — `ai_usage` Tabelle mit RLS und Index ist live
-- **Edge Function erneut deployed** — alle Security-Aenderungen sind aktiv
-- **tasks.md aktualisiert**
-- **learnings.md aktualisiert** — 3 neue Eintraege (stateless Edge Functions, fail-open, Learnings ohne Rueckfrage)
+- **Vault-Inventur** — Komplettes Team (Developer, Designer, QA) hat Codebase analysiert
+  - 15 neue Notizen im Agency-Vault erstellt
+  - 2 neue Ordner (QA/, Konzepte/)
+  - 10 bestehende Notizen mit Backlinks ergaenzt
+- **Commit: Hygiene** — 17 Dateien (Briefings, Docs, Scripts, Agency-Infrastruktur, .gitignore)
+- **Commit: Design-Tasks D-A bis D-E** — 7 Dateien, QA-geprueft, TypeScript 0 Fehler
+  - D-A: Button + InputField Accessibility (Labels, Roles, States)
+  - D-B: Reminder-Checkbox 28px → 44px
+  - D-C: Settings-Items visuell deaktiviert + "Kommt bald" Alert
+  - D-D: Card + StatusBadge Inline-Werte → Theme-Tokens
+  - D-E: War bereits gefixt
+- **QA-Findings** — 15 Findings aus Vollanalyse, 3 kritische bewertet:
+  - F-01: .env nie committet → Entwarnung
+  - F-02: togglePro() → tasks.md (Vor Release)
+  - F-03: CORS Wildcard → tasks.md (Vor Release)
+- **tasks.md aktualisiert** — Neue Kategorie "Vor Release" mit 6 QA-Findings, D-A bis D-E erledigt
+- **ProfileScreen Settings-Items** — aus Backlog entfernt (durch D-C erledigt)
 
 ### Offen / Nicht fertig
-- **Ungetrackte Dateien** — briefings/, docs/, scripts/, agency-backlog.md etc. noch nicht committet
-- **Aenderungen dieser Session** — noch nicht committet
+- Aenderungen dieser Session noch nicht gepusht
 
 ### Naechster Schritt
-1. Aenderungen committen (Edge Function, Migration, aiService, tasks, learnings, handoff)
-2. Design-Tasks D-A bis D-E (Accessibility, Touch-Targets, Design-System) — Plan liegt fertig in `briefings/2026-04-04-design-plan.md`
-3. Gesundheits-UX Datenmodell (MedicalEvent) — groesserer Umbau, eigene Session
+1. Optional: git push
+2. Gesundheits-UX Datenmodell (MedicalEvent) — groesserer Umbau, eigene Session
+3. "Vor Release" Fixes (F-02 bis F-11) — mittlerer Aufwand
 
 ### Wichtig fuer den Naechsten
-- KI-Assistent nutzt Custom Header `x-user-token` fuer Auth — nicht aendern
-- Rate Limiting nutzt Supabase-Tabelle `ai_usage` — fail-open bei DB-Fehler
-- Anthropic alte Modelle (claude-3-haiku, claude-3-5-haiku) nicht mehr verfuegbar
-- Design-Plan fuer 5 Accessibility-Tasks liegt komplett vor — kann direkt delegiert werden
-- KI-Modell-Kostenoptimierung bewusst zurueckgestellt
+- Vault in D:\Agency-Vault\ ist jetzt umfassend befuellt (55+ Notizen)
+- QA-Findings F-01 bis F-15 dokumentiert in Vault unter QA/QA-Findings 2026-04-04.md
+- Design-Tasks D-A bis D-E sind alle abgeschlossen
+- KI-Assistent nutzt Custom Header `x-user-token` — nicht aendern
+- Rate Limiting nutzt ai_usage Tabelle — fail-open bei DB-Fehler
 
 ---
 
 ## Vorherige Uebergaben
+
+### Brian (Sidekick) — 2026-04-04 (frueherer Eintrag)
+- KI-Chat abgesichert (Rate Limiting, Validierung, Prompt-Schutz)
+- Edge Function deployed
+- Migration ai_usage angewendet
 
 ### Agency Admin — 2026-04-04 ~09:00
 - Uebergabeprotokoll-System eingefuehrt (handoff.md, Agent-Rules aktualisiert)

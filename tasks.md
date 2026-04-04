@@ -4,13 +4,6 @@
 - [ ] Gesundheits-UX: Datenmodell vereinheitlichen (MedicalEvent)
 - [ ] Gesundheits-UX: DataContext + Screens umbauen
 
-## DIESE WOCHE
-- [ ] D-A: Accessibility — Button + InputField (Labels, Roles)
-- [ ] D-B: Touch-Target Checkbox RemindersScreen (28px → 44px)
-- [ ] D-C: Deaktivierte Settings-Items im ProfileScreen
-- [ ] D-D: Inline-Werte bereinigen (Card, StatusBadge)
-- [ ] D-E: Hardcoded Farbe HomeScreen
-
 ## VOR RELEASE
 - [ ] F-02: togglePro() absichern — IAP implementieren, RLS fuer is_premium einschraenken
 - [ ] F-03: CORS in Edge Function einschraenken (Origin statt Wildcard *)
@@ -23,7 +16,6 @@
 - [ ] M7: DataContext refactoren (God-Object, ~350 Zeilen)
 - [ ] Chat-Historie persistent machen (nach MVP)
 - [ ] SelectField: Tap-outside zum Schliessen (QA-Finding)
-- [ ] ProfileScreen: Settings-Items "Datenschutz" + "Hilfe" noch ohne Handler
 - [ ] Demo fuer Kunden vorbereiten (Expo Go / EAS Build / Web)
 - [ ] Guenstigeres KI-Modell evaluieren (claude-sonnet-4-6 ist teuer)
 - [ ] Deno std Version aktualisieren (0.168.0 → aktuell)
@@ -32,6 +24,11 @@
 - [ ] F-14: getAge() — Zukunftsdaten abfangen
 
 ## ERLEDIGT
+- [x] D-A: Accessibility — Button + InputField (Labels, Roles, States)
+- [x] D-B: Touch-Target Checkbox RemindersScreen (28px → 44px)
+- [x] D-C: Deaktivierte Settings-Items im ProfileScreen ("Kommt bald" Alert)
+- [x] D-D: Inline-Werte bereinigen (Card spacing.md, StatusBadge typography.caption)
+- [x] D-E: Hardcoded Farbe HomeScreen (war schon gefixt)
 - [x] F-01: .env in Git-History pruefen — nie committet, Entwarnung
 - [x] Ungetrackte Dateien committen (briefings/, docs/, scripts/)
 - [x] .gitignore erweitert (supabase/.temp/, generierte HTML)
