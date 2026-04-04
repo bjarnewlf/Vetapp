@@ -33,6 +33,18 @@ QA-Review nach Delegationen findet zuverlaessig Reste (toter Code, vergessene St
 ### 2026-04-04 — Edge Function nach Aenderungen deployen
 Edge Function laeuft remote auf Supabase — lokale Aenderungen haben keinen Effekt ohne `npx supabase functions deploy ai-chat`. Claas daran erinnern.
 
+### 2026-04-04 — Pet-Fotos nicht in Storage
+Pet-Fotos werden als lokale `file://`-URI gespeichert. Nach Neuinstall oder Geraetewechsel weg. Fix: in Supabase Storage hochladen, Pfad in DB speichern — analog zum Dokument-Upload.
+
+### 2026-04-04 — SafeAreaView Inkonsistenz
+Nur AIAssistantScreen nutzt SafeAreaView korrekt. Alle anderen Screens hardcoden `paddingTop: 60`. Korrekt: `SafeAreaView` oder `useSafeAreaInsets()` aus `react-native-safe-area-context`.
+
+### 2026-04-04 — Festplatte voll blockiert alles
+C:-Laufwerk voll (0 Bytes) blockiert npm, Caching und Builds vollstaendig. Vor laengeren Sessions kurz pruefen.
+
+### 2026-04-03 — Team auch fuer Teilschritte nutzen
+Nicht alles alleine durchdenken. Ein kurzer Auftrag an Developer oder DB Expert fuer Machbarkeitsanalyse macht die Planung besser.
+
 ### 2026-04-03 — Nicht selbst machen, delegieren
 Auch "kleine" technische Aufgaben gehoeren an den Spezialisten, nicht an Brian. Mein Job ist planen und delegieren.
 
