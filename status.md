@@ -1,16 +1,18 @@
 # Projektstatus
 
-> Wird automatisch vom Dokumentar aktualisiert, manuell von Brian bei Bedarf.
+> Wird automatisch vom Dokumentar aktualisiert.
 
 ## Aktueller Stand
 
 **VetApp** — React Native / Expo, TypeScript strict, Supabase Backend. UI-Sprache Deutsch.
 
+Phase 2 (MVP-Entwicklung) ist inhaltlich abgeschlossen. Handy-Test und Kunden-Demo stehen noch aus.
+
 ### Was funktioniert
 
-- Auth (Supabase), Haustier-CRUD inkl. Bearbeiten
-- **Pet-Fotos in Supabase Storage** — Upload, signed URLs, Neuinstallation-sicher
-- Gesundheits-Events (MedicalEvent-Modell) — Impfungen, Entwurmungen, Checkups, Freie Eintraege
+- Auth (Supabase), Haustier-CRUD inkl. Bearbeiten und Foto-Upload
+- **Pet-Fotos in Supabase Storage** — Upload, signed URLs, neuinstallation-sicher
+- Gesundheits-Events (MedicalEvent-Modell) — Impfungen, Entwurmungen, Checkups, freie Eintraege
 - MedicalEvent-Editing — alle Events editierbar
 - **Error-Handling** — CRUD-Methoden geben boolean zurueck, Screens pruefen vor goBack()
 - Erinnerungen mit Ueberfaellig-Erkennung + **einstellbare Regeln** (ReminderSettings funktionsfaehig)
@@ -19,7 +21,7 @@
 - KI-Gesundheitsassistent: Eigener Tab, Edge Function deployed, Rate Limiting, Sicherheitsschutz
 - Error-Banner-Komponente — sichtbares Feedback bei DB-Fehlern
 
-### Design-System (aktualisiert)
+### Design-System
 
 - Theme-Tokens durchgaengig, Accent WCAG-konform (#CC6B3D), Spacing smd:12
 - **Gradient Header** im HomeScreen (expo-linear-gradient)
@@ -31,27 +33,47 @@
 - **Display-Typography** (38px/28px) fuer emotionale Momente
 - Dezenter KI-Disclaimer
 
+### Animationen (Tier 1)
+
+- Fade-In auf HomeScreen, AIAssistantScreen
+- Scale-Feedback auf Pet-Cards und AI-Card
+- Tab-Slide-Indikator in PetDetailScreen
+- Pulse auf Ueberfaellig-Banner
+- Neue Hilfsdateien: `useFadeIn.ts`, `AnimatedPressable.tsx`
+
+---
+
+## Letzte Aenderungen (04.04.2026)
+
+- Pet-Fotos vollstaendig implementiert (Upload, Storage, Anzeige)
+- Error-Handling in allen CRUD-Methoden und Formular-Screens
+- ReminderSettings jetzt funktionsfaehig
+- 10 QA-Findings behoben (F-014 bis F-025)
+- 8 Design-Verbesserungen umgesetzt (Gradient, Hero-Banner, neue Komponenten)
+- Erste Animationen implementiert (Fade-In, Scale, Slide, Pulse)
+
 ---
 
 ## Offene Punkte
 
 ### Handy-Test (jetzt)
-- App auf echtem Geraet testen (Expo Go)
+- App auf echtem Geraet testen (Expo Go, localhost:8081)
+- Alle Flows durchklicken: Onboarding → Tier (mit Foto) → Event → Erinnerung → Dokument → KI-Chat
 - Bugs sammeln und fixen
-- Alte Tabellen droppen nach Verifikation
+- Alte Tabellen `vaccinations`/`treatments` nach erfolgreichem Test droppen
 
 ### Vor Phase-2-Abschluss
 - notification_id Migration fuer reminders deployen
 - Package-Versionen aktualisieren (Expo-Kompatibilitaet)
-- Demo dem Kunden zeigen
+- Demo dem Kunden zeigen, Phase-2-Zahlung ausloesen (2.160 EUR)
 
 ### Phase 3
-- F-002: togglePro/IAP
-- F-003: CORS einschraenken
+- F-002: togglePro/IAP absichern
+- F-003: CORS einschraenken (nur Web-Version relevant)
 - PDF-Export (Scope mit Kunde klaeren)
 - Tierarztfinder (Scope mit Kunde klaeren)
-- KI-Assistent mit Tool Use (Konzept liegt vor)
-- Animationen (Konzept + Showcase vorhanden)
+- KI-Assistent mit Tool Use (Konzept liegt vor, ~2-3 Tage)
+- Weitere Animationen (Konzept + Showcase vorhanden)
 
 ---
 
@@ -70,21 +92,21 @@
 - Theme: 5 neue Color-Tokens (primaryMid, primaryGradientEnd, primaryBorder, warningBorder, errorBorder)
 - Typography: display (38px) + displaySmall (28px) fuer Hero-Texte
 - MedicalEvent-Edit: route.params.editMedicalEvent (nicht editEvent)
+- Animationen: `useFadeIn` aus `../hooks/useFadeIn`, `AnimatedPressable` aus `../components`
+- `useNativeDriver: true` — nur opacity und transform, kein backgroundColor
 
 ---
 
 ## Konzepte (bereit zur Umsetzung)
 
 - **KI-Assistent mit Tool Use** — Konzept liegt vor, Variante B (Confirm First), ~2-3 Tage
-- **Animations-Konzept** — 8 Animationen, priorisiert, Showcase als HTML
-- **Design-Recherche** — Trends analysiert, alle Quick Wins umgesetzt
+- **Animations-Konzept** — 8 Animationen, priorisiert, Showcase als HTML (Tier 1 umgesetzt)
 
 ---
 
 ## Vault
 
 Agency-Vault in `D:\Agency-Vault\` — ~85 vernetzte Notizen. Agency.md ist zentraler Hub.
-Zuletzt aktualisiert: 2026-04-04
 
 ---
-Zuletzt aktualisiert: 2026-04-04
+Zuletzt aktualisiert: 2026-04-04 17:30
