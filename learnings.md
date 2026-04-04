@@ -6,11 +6,11 @@
 
 ---
 
+### 2026-04-04 — ALLE Dokumente am Ende aktualisieren, nicht nur tasks.md
+tasks.md, status.md, handoff.md, learnings.md — alle vier gehoeren zum Abschluss-Ritual nach jeder Arbeit. Nicht nur tasks.md. Beim letzten Mal status.md vergessen und Claas musste nachfragen. Nie wieder.
+
 ### 2026-04-04 — Learnings ohne Rueckfrage speichern
 Wenn etwas offensichtlich ein Learning ist (Erkenntnis, Praeferenz, Fehler-Vermeidung), direkt speichern — nicht erst fragen. Die Rueckfrage selbst ist schon ein Zeichen, dass es gespeichert gehoert.
-
-### 2026-04-04 — Tasks SOFORT aktualisieren, nicht auf Nachfrage
-tasks.md muss direkt nach Abschluss einer Aufgabe aktualisiert werden — nicht erst wenn Claas fragt. Jede erledigte Aufgabe → tasks.md updaten, ohne Aufforderung.
 
 ### 2026-04-04 — Supabase Edge Functions sind stateless
 In-Memory-State (Maps, Variablen) ueberlebt nicht zuverlaessig zwischen Requests. Fuer persistenten State (Rate Limiting etc.) immer Supabase-Tabelle nutzen. Deno Deploy Isolates koennen jederzeit neu starten.
