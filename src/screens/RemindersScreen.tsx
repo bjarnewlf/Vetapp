@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, Alert, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Button, StatusBadge, ErrorBanner, EmptyState } from '../components';
@@ -16,6 +16,19 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
   const { reminders, completeReminder, error: medicalError, refresh: refreshMedical } = useMedical();
   const { rule: overdueRule, loaded: settingsLoaded } = useOverdueSettings();
   const pendingIds = useRef<Set<string>>(new Set());
+
+  // Animations-State pro Karte: opacity + translateX für slide-out
+  const animValues = useRef<Map<string, { opacity: Animated.Value; translateX: Animated.Value }>>(new Map());
+
+  const getAnimValues = (id: string) => {
+    if (!animValues.current.has(id)) {
+      animValues.current.set(id, {
+        opacity: new Animated.Value(1),
+        translateX: new Animated.Value(0),
+      });
+    }
+    return animValues.current.get(id)!;
+  };
 
   // Überfällige Notifications planen sobald Reminders und Settings geladen sind
   useEffect(() => {
@@ -40,9 +53,28 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
     if (reminder.status === 'completed') return;
     if (pendingIds.current.has(reminder.id)) return;
     pendingIds.current.add(reminder.id);
+
+    const { opacity, translateX } = getAnimValues(reminder.id);
+
     try {
       const success = await completeReminder(reminder.id);
-      if (!success) Alert.alert('Fehler', 'Speichern fehlgeschlagen. Bitte versuche es erneut.');
+      if (!success) {
+        Alert.alert('Fehler', 'Speichern fehlgeschlagen. Bitte versuche es erneut.');
+      } else {
+        // Karte gleitet nach rechts aus und blendet dabei aus
+        Animated.parallel([
+          Animated.timing(translateX, {
+            toValue: 120,
+            duration: 320,
+            useNativeDriver: true,
+          }),
+          Animated.timing(opacity, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+          }),
+        ]).start();
+      }
     } finally {
       pendingIds.current.delete(reminder.id);
     }
@@ -51,37 +83,42 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
   const renderReminder = ({ item }: { item: Reminder }) => {
     const borderColor = item.status === 'overdue' ? colors.error : colors.accent;
     const isCompleted = item.status === 'completed';
+    const { opacity, translateX } = getAnimValues(item.id);
 
     return (
-      <TouchableOpacity
-        style={[styles.reminderCard, { borderLeftColor: borderColor }]}
-        onPress={() => navigation.navigate('EventDetail', { eventId: item.id })}
-        activeOpacity={0.7}
-      >
-        <View style={styles.reminderContent}>
-          <Text style={[styles.reminderTitle, isCompleted && styles.completedText]}>
-            {item.title}
-          </Text>
-          <View style={styles.dateRow}>
-            <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
-            <Text style={styles.reminderDate}>
-              {new Date(item.date).toLocaleDateString('de-DE', {
-                day: 'numeric', month: 'short', year: 'numeric',
-              })}
-            </Text>
-          </View>
-          <StatusBadge status={item.status} />
-          {item.description && (
-            <Text style={styles.reminderDescription}>{item.description}</Text>
-          )}
-        </View>
+      <Animated.View style={{ opacity, transform: [{ translateX }] }}>
         <TouchableOpacity
-          style={[styles.checkbox, isCompleted && styles.checkboxCompleted]}
-          onPress={() => handleToggle(item)}
+          style={[styles.reminderCard, { borderLeftColor: borderColor }]}
+          onPress={() => navigation.navigate('EventDetail', { eventId: item.id })}
+          activeOpacity={0.7}
         >
-          {isCompleted && <Ionicons name="checkmark" size={16} color={colors.surface} />}
+          <View style={styles.reminderContent}>
+            <Text style={[styles.reminderTitle, isCompleted && styles.completedText]}>
+              {item.title}
+            </Text>
+            <View style={styles.dateRow}>
+              <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
+              <Text style={styles.reminderDate}>
+                {new Date(item.date).toLocaleDateString('de-DE', {
+                  day: 'numeric', month: 'short', year: 'numeric',
+                })}
+              </Text>
+            </View>
+            <StatusBadge status={item.status} />
+            {item.description && (
+              <Text style={styles.reminderDescription}>{item.description}</Text>
+            )}
+          </View>
+          <TouchableOpacity
+            style={[styles.checkbox, isCompleted && styles.checkboxCompleted]}
+            onPress={() => handleToggle(item)}
+            accessibilityLabel="Erinnerung als erledigt markieren"
+            accessibilityRole="checkbox"
+          >
+            {isCompleted && <Ionicons name="checkmark" size={16} color={colors.surface} />}
+          </TouchableOpacity>
         </TouchableOpacity>
-      </TouchableOpacity>
+      </Animated.View>
     );
   };
 

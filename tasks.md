@@ -6,10 +6,12 @@
 
 ---
 
-## JETZT — Handy-Test
+## JETZT — Handy-Test fortsetzen
 
-- [ ] App auf echtem Geraet testen (Expo Go laeuft auf localhost:8081)
-- [ ] Alle Flows durchklicken: Onboarding → Tier anlegen (mit Foto!) → Event → Erinnerung → Dokument → KI-Chat
+- [x] App auf echtem Geraet starten (Expo Go, iPhone) ✅
+- [x] Package-Versionen Expo 54-kompatibel ✅
+- [x] Foto-Upload auf Handy getestet ✅
+- [ ] Restliche Flows testen: Hero-Banner, Tier bearbeiten, Event bearbeiten/loeschen, Dokument, Tierarzt-Kontakt, Gradient-Header, Slide-Out-Animation
 - [ ] Bugs sammeln und fixen
 - [ ] Alte Tabellen `vaccinations`/`treatments` droppen (nach erfolgreichem Test)
 
@@ -19,15 +21,29 @@
 
 - [ ] Bugs aus Handy-Test fixen
 - [ ] notification_id Migration fuer reminders deployen
-- [ ] Package-Versionen aktualisieren (Expo-Kompatibilitaet)
 - [ ] Dem Kunden vorzeigbaren MVP praesentieren
 - [ ] Phase-2-Zahlung ausloesen (2.160 EUR)
 
 ---
 
+## SICHERHEIT — Vor Go-Live abarbeiten
+
+> Vollstaendiger Bericht: `sicherheitsbericht-2026-04-04.html`
+
+- [ ] **[KRITISCH] S-1: Premium-Bypass fixen** — `togglePro()` durch echtes IAP ersetzen (RevenueCat empfohlen), RLS fuer `profiles.is_premium` sperren — Pre-Release-Blocker
+- [ ] **[HOCH] S-2: Rate-Limit Fail-Closed** — `ai-chat/index.ts` bei `usageError` mit 429/503 ablehnen statt durchlassen
+- [ ] **[HOCH] S-3: `ai_usage`-Tabelle im Schema** — Definition + RLS-Policies in `supabase-schema.sql` nachtragen (Brian: erst in Supabase-Konsole pruefen ob vorhanden)
+- [ ] **[MITTEL] S-4: Authorization-Header** — User-JWT direkt als Bearer Token, `x-user-token` entfernen
+- [ ] **[MITTEL] S-5: Dokument-URLs verkuerzen** — on-demand generieren, max. 24–48h statt 1 Jahr
+- [ ] **[MITTEL] S-6: Storage-Bucket-Policies** — in Schema erganzen, Bucket `pet-documents` in Supabase-Konsole auf privat pruefen (Brian)
+- [ ] **[NIEDRIG] S-7: E-Mail-Validierung** — Regex-Check in `RegisterScreen.tsx` vor API-Call
+- [ ] **[NIEDRIG] S-8: Auth-Logging** — `console.log/warn` in `aiService.ts` hinter `__DEV__`-Flag
+
+---
+
 ## PHASE 3 — Testing & Uebergabe
 
-- [ ] F-002: togglePro() absichern — IAP implementieren, RLS einschraenken
+- [ ] F-002: togglePro() absichern — IAP implementieren, RLS einschraenken (= S-1 oben, KRITISCH)
 - [ ] F-003: CORS einschraenken (nur relevant falls Web-Version)
 - [ ] PDF-Export definieren und umsetzen (Scope mit Kunde klaeren)
 - [ ] Tierarztfinder definieren und umsetzen (Scope mit Kunde klaeren)
@@ -53,53 +69,42 @@
 - [ ] F-023: ai_usage-Tabelle in Schema-Doku ergaenzen
 - [ ] Accessibility systematisch (Labels, SafeAreaView)
 - [ ] Test-Suite (Claas entscheidet Strategie)
+- [ ] DatePicker statt Textfeld (nice-to-have)
 
 ---
 
 ## ERLEDIGT (heute)
 
+### Handy-Test Fixes
+- [x] AsyncStorage v3→v2.2.0 (Expo Go Crash gefixt)
+- [x] Alle Packages auf Expo 54-kompatible Versionen
+- [x] Foto-Upload: fetch+blob → FormData (funktioniert auf echten Geraeten)
+- [x] Storage-Policy pet-photos: foldername[1] → [2] (Pfad-Fix)
+- [x] Erinnerung abhaken: Slide-Out-Animation (Designer)
+- [x] Erinnerung abhaken: Accessibility-Props ergaenzt
+
 ### Deploys (Claas)
 - [x] DB-Migration: medical_events + Daten-Migration
 - [x] DB-Migration: recurrence_check Constraint
 - [x] Edge Function ai-chat deployed (neues medicalHistory-Format)
-- [x] Storage-Policy fuer Pet-Fotos im SQL-Editor
+- [x] Storage-Policy fuer Pet-Fotos (korrigiert: [2])
 
 ### Code-Fixes (Agentur)
-- [x] F-014: storagePath Fallback gefixt
-- [x] F-015: Error-Handling Pattern — 3 Contexts, 16 CRUD-Aufrufe, boolean-Return
-- [x] F-016: Dropped Promise in RemindersScreen
-- [x] F-017: Guard fuer leere petId in AddEventScreen
-- [x] F-018: Error-Handling im OnboardingScreen
-- [x] F-020: WelcomeScreen.tsx geloescht (toter Code)
-- [x] F-021: Anrufen-Button nur bei vorhandener Telefonnummer
-- [x] F-023: Onboarding Foto-Upload korrekt an PetContext
-- [x] F-024: Navigate-Param eventType statt defaultType
-- [x] F-025: Tote Styles nach EmptyState-Umstellung entfernt
+- [x] F-014 bis F-025 (10 Findings)
+- [x] Erinnerungen: Optimistic Update + Doppel-Tap-Schutz
 
 ### Features (Agentur)
-- [x] F-008: Pet-Fotos in Supabase Storage (Upload-Flow komplett)
-- [x] F-022: ReminderSettings funktionsfaehig (Ueberfaellig-Regeln wirken)
+- [x] F-008: Pet-Fotos in Supabase Storage
+- [x] F-022: ReminderSettings funktionsfaehig
 
-### Design-Polish (8 Punkte — alle umgesetzt)
-- [x] Gradient Header im HomeScreen (expo-linear-gradient)
-- [x] Pet-Hero-Banner im PetDetailScreen (grosses Foto/Icon, Gradient)
-- [x] AI-Card Upgrade im HomeScreen (Premium-Look mit Badge + CTA)
-- [x] EmptyState-Komponente (Emoji + Action-Button)
-- [x] SkeletonLoader-Komponente (animierter Shimmer statt Spinner)
-- [x] Card-Varianten formalisiert (default/tinted/warning/error)
-- [x] Display-Typography (38px/28px) + displaySmall
-- [x] KI-Disclaimer dezenter (Icon weg, kuerzerer Text)
+### Design-Polish
+- [x] 8 Design-Punkte umgesetzt (Gradient, Hero-Banner, EmptyState, etc.)
+- [x] Erste Animationen (Fade-In, Scale, Slide, Pulse, Slide-Out)
 
-### QA (2 Runden)
-- [x] QA-Audit Runde 4: 8 Findings, 0 kritisch — 6 direkt gefixt
-- [x] QA-Audit Runde 5: 3 Findings, 0 kritisch — alle gefixt
-
-### Analyse & Planung
-- [x] Demo-Ready Checklist erstellt
-- [x] Angebot-Abgleich: Scope-Luecken identifiziert
-- [x] Design-Recherche mit Visualisierungen (HTML-Bericht)
-- [x] Animations-Showcase (interaktive HTML-Demos)
-- [x] KI-Assistent Tool Use Konzept (technische Architektur)
+### QA & Analyse
+- [x] QA-Audit Runde 4+5
+- [x] Sicherheitsanalyse (8 Findings, Bericht als HTML)
+- [x] Demo-Ready Checklist, Angebot-Abgleich, Design-Recherche, Animations-Showcase
 
 ---
 Zuletzt aktualisiert: 2026-04-04

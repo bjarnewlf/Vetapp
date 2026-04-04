@@ -40,7 +40,18 @@
       "Bash(npm --version)",
       "Bash(EXPO_OFFLINE=1 npx expo start --web --no-dev)",
       "Bash(kill %1)",
-      "Bash(dir \"C:\\\\Users\\\\claas\\\\claude-workspace\\\\VetApp\\\\\" 2>&1 | head -20:*)"
+      "Bash(dir \"C:\\\\Users\\\\claas\\\\claude-workspace\\\\VetApp\\\\\" 2>&1 | head -20:*)",
+      "Read(//d/Agency-Vault//**)",
+      "Write(//d/Agency-Vault//**)",
+      "Edit(//d/Agency-Vault//**)",
+      "Bash(timeout 10)",
+      "Read(//mnt/c/Users/claas/claude-workspace/**)",
+      "Read(//c//**)",
+      "Bash(ping -n 6 127.0.0.1)",
+      "Bash(ping -n 8 127.0.0.1)",
+      "Bash(wait)",
+      "Bash(findstr \"808[0-9].*LISTENING\")",
+      "Bash(powershell.exe:*)"
     ]
   }
 }

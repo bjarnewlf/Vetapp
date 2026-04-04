@@ -4,6 +4,10 @@
 > Wissensmanager pflegt beides: Vault-Notiz + Einzeiler hier.
 
 ## 2026-04-04
+- AsyncStorage v3 bricht Expo Go (SDK 54) — immer `npx expo install --check` vor Handy-Test, Fix: Downgrade auf v2.2.0
+- Foto-Upload React Native: FormData mit `{ uri, name, type } as any` — fetch+blob funktioniert nicht mit lokalen file:// URIs auf echten Geraeten
+- Storage-Policy Pfad-Segmente: `(storage.foldername(name))[1]` ist 1-basiert — tatsaechlichen Upload-Pfad im Dashboard pruefen bevor Policy geschrieben wird
+- Package-Versionen vor jedem Handy-Test pruefen: `npx expo install --check` / `--fix` — Expo Go kennt nur bestimmte Native-Module
 - Animationen mit built-in Animated API starten — kein Reanimated noetig fuer Fade-In, Scale, Spring
 - useFadeIn als Hook extrahieren — einmal bauen, ueberall einsetzen
 - AnimatedPressable statt TouchableOpacity — Scale-Feedback macht App sofort wertiger

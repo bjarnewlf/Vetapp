@@ -14,13 +14,17 @@ export async function uploadPetPhoto(
 ): Promise<{ path: string }> {
   const path = `pet-photos/${userId}/${petId}.jpg`;
 
-  const response = await fetch(fileUri);
-  const blob = await response.blob();
+  const formData = new FormData();
+  formData.append('file', {
+    uri: fileUri,
+    name: `${petId}.jpg`,
+    type: 'image/jpeg',
+  } as any);
 
   const { error } = await supabase.storage
     .from(BUCKET)
-    .upload(path, blob, {
-      contentType: 'image/jpeg',
+    .upload(path, formData, {
+      contentType: 'multipart/form-data',
       upsert: true, // Überschreiben erlaubt (Foto ersetzen)
     });
 
@@ -67,14 +71,17 @@ export async function uploadFile(
   const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
   const path = `${userId}/${petId}/${timestamp}_${safeName}`;
 
-  // Fetch the file as blob
-  const response = await fetch(fileUri);
-  const blob = await response.blob();
+  const formData = new FormData();
+  formData.append('file', {
+    uri: fileUri,
+    name: safeName,
+    type: mimeType || 'application/octet-stream',
+  } as any);
 
   const { error } = await supabase.storage
     .from(BUCKET)
-    .upload(path, blob, {
-      contentType: mimeType || 'application/octet-stream',
+    .upload(path, formData, {
+      contentType: 'multipart/form-data',
       upsert: false,
     });
 
