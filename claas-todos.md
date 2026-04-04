@@ -12,8 +12,16 @@
 
 ### Agentur-Entscheidungen
 - [ ] **Scheduled Agents** — Full Audit (06:00) + CEO Briefing (07:00) einrichten oder aus Doku streichen?
-- [ ] **QA Schreibzugriff** — Eigene qa-findings.md statt Flaschenhals ueber Brian?
-- [ ] **Theme-Zustaendigkeit** — Wer aendert Theme-Tokens: Designer oder Developer?
+- [ ] **QA Schreibzugriff** — Bereits umgesetzt (qa-findings.md). Passt das so oder anders?
+- [ ] **Theme-Zustaendigkeit** — Bereits umgesetzt (Designer=WAS, Developer=WO). Passt das so?
+
+---
+
+## Aktionen
+
+- [x] **Git push** — 10 Commits gepusht
+- [ ] **Design-Konzept v2 freigeben** — Liegt in docs/design-konzept-v2.md, wartet seit 03.04.
+- [ ] **Festplatte pruefen** — C: war beim letzten Mal voll. Noch genug Platz?
 
 ---
 
@@ -28,19 +36,11 @@
 
 ---
 
-## Aktionen (nur Claas kann das)
-
-- [ ] **Git push** — 7 neue Commits lokal, noch nicht remote
-- [ ] **Design-Konzept v2 freigeben** — Liegt in docs/design-konzept-v2.md, wartet seit 03.04.
-- [ ] **Festplatte pruefen** — C: war beim letzten Mal voll. Noch genug Platz?
-
----
-
 ## Nice to Know
 
-- Vault ist komplett inventarisiert (55+ Notizen)
+- Vault ist komplett inventarisiert (55+ Notizen), Retro dokumentiert
 - Alle Design-Tasks D-A bis D-E sind erledigt
-- Orange-Kontrast und Spacing-Token sind umgesetzt
+- Agentur-Infrastruktur nach Retro aktualisiert (QA-Schreibzugriff, ehrliche Scheduled Agents, Theme-Regel)
 - Naechster grosser Brocken: Gesundheits-UX (MedicalEvent) — wartet auf dein Go
 - 6 "Vor Release"-Findings stehen in tasks.md
 

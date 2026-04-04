@@ -6,7 +6,7 @@
 
 **VetApp** — React Native / Expo, TypeScript strict, Supabase Backend. UI-Sprache Deutsch.
 
-### Was funktioniert (committed)
+### Was funktioniert (committed + gepusht)
 
 - Auth (Supabase), Haustier-CRUD inkl. Bearbeiten, Dokumente mit Storage
 - Impfungen + Behandlungen erfassen, Erinnerungen mit Ueberfaellig-Erkennung
@@ -20,7 +20,7 @@
 
 ## Uncommittete Aenderungen
 
-Docs-Updates (tasks.md, handoff.md, status.md, claas-todos.md) — werden gleich committet.
+Keine. Working tree ist clean, alle Commits gepusht.
 
 ---
 
@@ -51,12 +51,13 @@ Docs-Updates (tasks.md, handoff.md, status.md, claas-todos.md) — werden gleich
 - Supabase CLI: npx supabase (Windows)
 - KI-Assistent: Custom Header x-user-token (JWT-Workaround)
 - Accent-Farbe: #CC6B3D (seit 04.04., vorher #E8895C)
+- Theme-Aenderungen: Designer entscheidet WAS, Developer setzt um WO
 
 ---
 
 ## Vault
 
-Agency-Vault in D:\Agency-Vault\ — 55+ vernetzte Notizen. Zuletzt inventarisiert 04.04.2026.
+Agency-Vault in D:\Agency-Vault\ — 55+ vernetzte Notizen. Retro dokumentiert. Zuletzt inventarisiert 04.04.2026.
 
 ---
 Zuletzt aktualisiert: 2026-04-04

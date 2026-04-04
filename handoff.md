@@ -8,37 +8,40 @@
 ## Aktuelle Uebergabe
 
 **Agent:** Brian (Sidekick)
-**Zeitpunkt:** 2026-04-04
-**Session:** Vault-Inventur, Design-Sprint, Team-Retro, Design-Entscheidungen
+**Zeitpunkt:** 2026-04-04 (Session-Ende)
+**Session:** Vault-Inventur, Design-Sprint, Team-Retro, Design-Entscheidungen, Infrastruktur-Update
 
 ### Erledigt
-- **Vault-Inventur** — 15 neue Notizen, 2 neue Ordner, 10 Backlinks ergaenzt
-- **Design-Tasks D-A bis D-E** — Alle 5 erledigt, QA-geprueft
-- **Team-Retrospektive** — 6 Agents, HTML-Briefing erstellt
-- **Design-Entscheidungen** — 5 offene Fragen geklaert:
-  - Orange-Kontrast: #E8895C → #CC6B3D (WCAG-konform, umgesetzt)
-  - Spacing-Token: smd: 12 eingefuehrt (umgesetzt)
-  - Custom Font (Inter): Spaeter, fruehe Phase 2
+- **Vault-Inventur** — Komplettes Team hat Codebase analysiert, 15 neue Notizen, 2 neue Ordner (QA/, Konzepte/), 10 Backlinks ergaenzt
+- **Design-Tasks D-A bis D-E** — Alle 5 erledigt, QA-geprueft, committet
+- **Team-Retrospektive** — 6 Agents, HTML-Briefing, im Vault dokumentiert
+- **Design-Entscheidungen** — 5 offene Fragen geklaert + umgesetzt:
+  - Orange-Kontrast: #E8895C → #CC6B3D (WCAG-konform)
+  - Spacing-Token: smd: 12 eingefuehrt
+  - Custom Font (Inter): Phase 2
   - Micro-Animationen: MVP ohne
-  - Dark Mode: Nach MVP, erst Semantic Tokens
-- **QA-Findings bewertet** — F-01 Entwarnung, F-02/F-03 in Vor-Release, Rest priorisiert
-- **Alle Dokumente aktualisiert** — tasks.md, status.md, handoff.md, learnings.md, claas-todos.md
+  - Dark Mode: Nach MVP
+- **QA-Findings bewertet** — 15 Findings, 3 Kritische, alle priorisiert
+- **Infrastruktur-Update nach Retro** — QA Schreibzugriff, Scheduled Agents ehrlich, Theme-Zustaendigkeit, Session-Ende-Pflicht, learnings.md als Index
+- **Alle Commits gepusht** — 10 Commits remote
 
 ### Offen / Nicht fertig
-- 7+ Commits lokal, noch nicht gepusht
-- Claas-Todos: 5 Entscheidungen + 3 Aktionen offen (Architektur, Agentur, Push)
+- claas-todos.md: 5 Entscheidungen + 2 Aktionen offen
 
 ### Naechster Schritt
-1. Claas: Restliche TODOs in claas-todos.md abarbeiten (M7 Prio, Test-Strategie, Scheduled Agents)
+1. Claas: Restliche TODOs abarbeiten (M7, Tests, Scheduled Agents, Design-Konzept v2)
 2. Gesundheits-UX Datenmodell (MedicalEvent) — groesserer Umbau, eigene Session
-3. "Vor Release" Fixes (F-02 bis F-11)
+3. "Vor Release" Fixes (F-02 bis F-11) — 6 Stueck
 
 ### Wichtig fuer den Naechsten
 - Accent-Farbe ist jetzt #CC6B3D (nicht mehr #E8895C)
 - Neuer Spacing-Token spacing.smd: 12 verfuegbar
-- accentLight (#F5D0B9) passt noch, aber designerisch pruefenswert
+- accentLight (#F5D0B9) designerisch pruefenswert (passt noch, aber knapp)
 - KI-Assistent nutzt Custom Header x-user-token — nicht aendern
-- Vault hat 55+ Notizen inkl. neue Entscheidung zu Design-Fragen
+- Rate Limiting via ai_usage Tabelle — fail-open bei DB-Fehler
+- QA schreibt Findings jetzt in qa-findings.md (nicht mehr ueber Brian)
+- Theme-Aenderungen: Designer entscheidet WAS, Developer setzt um WO
+- Vault hat 55+ Notizen, Retro dokumentiert in Chronik/2026-04-04 Team-Retrospektive.md
 
 ---
 
