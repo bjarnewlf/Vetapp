@@ -1,6 +1,6 @@
 ---
 paths:
-  - ".claude/agents/sidekick.md"
+  - ".claude/agents/brian.md"
 ---
 
 # Agentur-Prozesse (nur Brian)

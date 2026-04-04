@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Animations-Konzept VetApp</title>
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:        #1B6B5A;
+      --primary-dark:   #145244;
+      --primary-light:  #E8F5F1;
+      --accent:         #CC6B3D;
+      --accent-light:   #F5D0B9;
+      --bg:             #FAF6F1;
+      --surface:        #FFFFFF;
+      --surface-light:  #FFF8F2;
+      --text:           #1A1A1A;
+      --text-secondary: #6B6B6B;
+      --text-light:     #999999;
+      --border:         #E8E0D8;
+      --border-light:   #F0EBE5;
+      --error:          #D94040;
+      --error-light:    #FDEAEA;
+      --success:        #2E8B57;
+      --shadow:         rgba(0,0,0,0.08);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ─── Layout ────────────────────────────────────────────────────────── */
+    .page-header {
+      background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+      color: #fff;
+      padding: 48px 24px 40px;
+      text-align: center;
+    }
+    .page-header h1 {
+      font-size: clamp(1.5rem, 4vw, 2.4rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+    .page-header .meta {
+      font-size: 0.9rem;
+      opacity: 0.75;
+    }
+    .page-header .subtitle {
+      margin-top: 12px;
+      font-size: 1rem;
+      opacity: 0.85;
+      max-width: 540px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .toc {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .toc a {
+      font-size: 0.78rem;
+      color: var(--primary);
+      text-decoration: none;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--primary-light);
+      background: var(--primary-light);
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .toc a:hover { background: var(--primary); color: #fff; }
+
+    main { max-width: 900px; margin: 0 auto; padding: 40px 20px 80px; }
+
+    /* ─── Section ──────────────────────────────────────────────────────── */
+    .section {
+      margin-bottom: 72px;
+      scroll-margin-top: 60px;
+    }
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .section-num {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      margin-top: 2px;
+    }
+    .section-title-block h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .section-title-block p {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      padding: 3px 9px;
+      border-radius: 999px;
+      margin-top: 6px;
+      text-transform: uppercase;
+    }
+    .badge-quick   { background: #E8F5EE; color: #2E7D50; }
+    .badge-reani   { background: #FFF8E1; color: #A07010; }
+    .badge-lottie  { background: var(--accent-light); color: #8B3F14; }
+
+    .demo-area {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 24px;
+      overflow: hidden;
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 560px) { .compare-grid { grid-template-columns: 1fr; } }
+
+    .compare-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+    .compare-label.bad  { color: var(--error); }
+    .compare-label.good { color: var(--success); }
+
+    /* ─── Phone Frame ──────────────────────────────────────────────────── */
+    .phone {
+      width: 280px;
+      min-height: 460px;
+      background: var(--surface);
+      border-radius: 36px;
+      border: 3px solid #2a2a2a;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18), inset 0 0 0 1px rgba(255,255,255,0.1);
+      overflow: hidden;
+      position: relative;
+      margin: 0 auto;
+    }
+    .phone-notch {
+      width: 80px;
+      height: 22px;
+      background: #2a2a2a;
+      border-radius: 0 0 14px 14px;
+      margin: 0 auto 0;
+      position: relative;
+      z-index: 10;
+    }
+    .phone-screen {
+      background: var(--bg);
+      min-height: 420px;
+      display: flex;
+      flex-direction: column;
+    }
+    .phone-status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 18px;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* ─── Utility Buttons ──────────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border-radius: 999px;
+      border: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      font-family: inherit;
+      user-select: none;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-sm {
+      padding: 7px 14px;
+      font-size: 0.8rem;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════ */
+    /* 1. FADE-IN                                                         */
+    /* ═══════════════════════════════════════════════════════════════════ */
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .fadein-demo .phone-screen { padding: 0; }
+
+    .fadein-content {
+      padding: 16px;
+      opacity: 0;
+      flex: 1;
+    }
+    .fadein-content.playing {
+      animation: fadeInUp 0.3s ease-out forwards;
+    }
+
+    .fadein-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+    .fadein-card-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .fadein-card-sub {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+    }
+    .fadein-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+    .fadein-controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 24px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════ */
+    /* 2. BUTTON SCALE FEEDBACK                                           */
+    /* ═══════════════════════════════════════════════════════════════════ */
+
+    .scale-btn-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .demo-btn {
+      width: 200px;
+      padding: 14px 24px;
+      border-radius: 12px;
+      border: none;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      user-select: none;
+      transition: background 0.2s;
+    }
+
+    /* Opacity-only variant */
+    .demo-btn-opacity {
+      background: var(--primary);
+      color: #fff;
+    }
+    .demo-btn-opacity:active {
+      opacity: 0.6;
+    }
+
+    /* Scale variant */
+    .demo-btn-scale {
+      background: var(--primary);
+      color: #fff;
+      transition: transform 0.12s ease-out, box-shadow 0.12s ease-out;
+      box-shadow: 0 4px 16px rgba(27,107,90,0.3);
+    }
+    .demo-btn-scale:active {
+      transform: scale(0.97);
+      box-shadow: 0 2px 8px rgba(27,107,90,0.2);
+    }
+
+    .click-hint {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      text-align: center;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════ */
+    /* 3. TAB INDICATOR SLIDE                                             */
+    /* ═══════════════════════════════════════════════════════════════════ */
+
+    .tabs-demo-wrap {
+      display: flex;
+      justify-content: center;
+    }
+
+    .tabs-mockup {
+      width: 100%;
+      max-width: 340px;
+    }
+
+    .tabs-bar {
+      display: flex;
+      border-bottom: 2px solid var(--border);
+      position: relative;
+    }
+
+    .tab-item {
+      flex: 1;
+      padding: 12px 8px;
+      text-align: center;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+      position: relative;
+      z-index: 1;
+      user-select: none;
+      transition: color 0.2s;
+    }
+    .tab-item.active { color: var(--accent); }
+
+    .tab-indicator {
+      position: absolute;
+      bottom: -2px;
+      height: 2.5px;
+      background: var(--accent);
+      border-radius: 999px;
+      transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                  width 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .tab-content-area {
+      padding: 20px 0 8px;
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .tab-health-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: var(--surface);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      box-shadow: 0 1px 4px var(--shadow);
+    }
+    .tab-health-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .tab-health-text { font-size: 0.8rem; color: var(--text); }
+    .tab-health-sub  { font-size: 0.7rem; color: var(--text-secondary); }
+
+    .doc-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: var(--surface);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      box-shadow: 0 1px 4px var(--shadow);
+    }
+    .doc-icon { font-size: 20px; }
+    .doc-name { font-size: 0.8rem; font-weight: 600; color: var(--text); }
+    .doc-date { font-size: 0.7rem; color: var(--text-secondary); }
+
+    /* ═══════════════════════════════════════════════════════════════════ */
+    /* 4. SKELETON LOADER + SHIMMER                                       */
+    /* ═══════════════════════════════════════════════════════════════════ */
+
+    @keyframes shimmer {
+      0%   { background-position: -400px 0; }
+      100% { background-position:  400px 0; }
+    }
+
+    .skeleton-base {
+      background: #E8E0D8;
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .skeleton-shimmer::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255,255,255,0.6) 40%,
+        rgba(255,255,255,0.8) 50%,
+        rgba(255,255,255,0.6) 60%,
+        transparent 100%
+      );
+      background-size: 400px 100%;
+      animation: shimmer 1.4s ease-in-out infinite;
+    }
+
+    .skel-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 2px 8px var(--shadow);
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+    .skel-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .skel-lines { flex: 1; }
+    .skel-line  { height: 12px; margin-bottom: 8px; }
+    .skel-line:last-child { width: 60%; margin-bottom: 0; }
+
+    /* Spinner comparison */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 40px auto;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════ */
+    /* 5. OVERDUE PULSE                                                   */
+    /* ═══════════════════════════════════════════════════════════════════ */
+
+    @keyframes pulseBanner {
+      0%   { transform: scale(1);    box-shadow: 0 4px 16px rgba(217,64,64,0.25); }
+      50%  { transform: scale(1.04); box-shadow: 0 8px 28px rgba(217,64,64,0.4);  }
+      100% { transform: scale(1);    box-shadow: 0 4px 16px rgba(217,64,64,0.25); }
+    }
+
+    .overdue-banner {
+      background: var(--error);
+      border-radius: 12px;
+      padding: 16px 20px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 4px 16px rgba(217,64,64,0.25);
+    }
+    .overdue-banner.pulsing {
+      animation: pulseBanner 0.6s ease-in-out;
+    }
+    .overdue-icon { font-size: 28px; flex-shrink: 0; }
+    .overdue-title { font-size: 0.9rem; font-weight: 700; margin-bottom: 2px; }
+    .overdue-sub   { font-size: 0.78rem; opacity: 0.85; }
+    .overdue-controls { display: flex; justify-content: center; margin-top: 20px; }
+
+    /* ═══════════════════════════════════════════════════════════════════ */
+    /* 6. CHAT BUBBLE SLIDE-IN                                            */
+    /* ═══════════════════════════════════════════════════════════════════ */
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(24px) translateY(6px); }
+      to   { opacity: 1; transform: translateX(0) translateY(0); }
+    }
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-24px) translateY(6px); }
+      to   { opacity: 1; transform: translateX(0) translateY(0); }
+    }
+    @keyframes fadeInDot {
+      0%,80%,100% { opacity: 0.3; }
+      40%          { opacity: 1; }
+    }
+
+    .chat-phone .phone-screen {
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      background: var(--primary);
+      color: #fff;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .chat-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 12px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 200px;
+      max-height: 220px;
+    }
+
+    .bubble {
+      max-width: 80%;
+      padding: 9px 13px;
+      border-radius: 16px;
+      font-size: 0.78rem;
+      line-height: 1.4;
+    }
+    .bubble-user {
+      background: var(--primary);
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .bubble-ai {
+      background: var(--surface);
+      color: var(--text);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      box-shadow: 0 1px 4px var(--shadow);
+    }
+    .bubble.anim-right { animation: slideInRight 0.3s cubic-bezier(0.34,1.56,0.64,1) both; }
+    .bubble.anim-left  { animation: slideInLeft  0.35s cubic-bezier(0.34,1.56,0.64,1) both; }
+
+    .typing-dots {
+      display: flex;
+      gap: 3px;
+      padding: 9px 13px;
+      background: var(--surface);
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+      width: fit-content;
+      box-shadow: 0 1px 4px var(--shadow);
+    }
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-light);
+    }
+    .typing-dot:nth-child(1) { animation: fadeInDot 1.2s 0.0s infinite; }
+    .typing-dot:nth-child(2) { animation: fadeInDot 1.2s 0.2s infinite; }
+    .typing-dot:nth-child(3) { animation: fadeInDot 1.2s 0.4s infinite; }
+
+    .chat-input-row {
+      display: flex;
+      gap: 6px;
+      padding: 8px 10px;
+      border-top: 1px solid var(--border-light);
+      background: var(--surface);
+    }
+    .chat-input-fake {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 7px 12px;
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+    }
+    .chat-send-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      align-self: center;
+      transition: transform 0.1s ease-out, background 0.15s;
+    }
+    .chat-send-btn:active { transform: scale(0.9); }
+    .chat-send-btn:hover  { background: var(--primary-dark); }
+
+    .chat-outer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════ */
+    /* 7. CHECKMARK                                                       */
+    /* ═══════════════════════════════════════════════════════════════════ */
+
+    @keyframes drawCircle {
+      from { stroke-dashoffset: 166; }
+      to   { stroke-dashoffset: 0;   }
+    }
+    @keyframes drawCheck {
+      from { stroke-dashoffset: 48; }
+      to   { stroke-dashoffset: 0;  }
+    }
+    @keyframes fadeInCheck {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .checkmark-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .checkmark-svg {
+      opacity: 0;
+    }
+    .checkmark-svg.playing {
+      opacity: 1;
+    }
+    .checkmark-circle {
+      stroke-dasharray: 166;
+      stroke-dashoffset: 166;
+    }
+    .checkmark-check {
+      stroke-dasharray: 48;
+      stroke-dashoffset: 48;
+    }
+    .checkmark-svg.playing .checkmark-circle {
+      animation: drawCircle 0.5s cubic-bezier(0.65, 0, 0.45, 1) 0.1s forwards;
+    }
+    .checkmark-svg.playing .checkmark-check {
+      animation: drawCheck 0.35s cubic-bezier(0.65, 0, 0.45, 1) 0.55s forwards;
+    }
+    .checkmark-svg.playing {
+      animation: fadeInCheck 0.1s forwards;
+    }
+
+    .check-label {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════ */
+    /* 8. SWIPE TO DELETE                                                 */
+    /* ═══════════════════════════════════════════════════════════════════ */
+
+    .swipe-container {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      user-select: none;
+      touch-action: pan-y;
+      max-width: 360px;
+      margin: 0 auto;
+    }
+
+    .swipe-delete-bg {
+      position: absolute;
+      inset: 0;
+      background: var(--error);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 20px;
+      border-radius: 12px;
+    }
+    .swipe-delete-icon {
+      color: #fff;
+      font-size: 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+    .swipe-delete-icon span { font-size: 10px; font-weight: 600; }
+    .swipe-delete-bg.revealed .swipe-delete-icon { opacity: 1; }
+
+    .swipe-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 2px 12px var(--shadow);
+      transform: translateX(0);
+      transition: transform 0.08s linear;
+      position: relative;
+      z-index: 1;
+      cursor: grab;
+    }
+    .swipe-card:active { cursor: grabbing; }
+    .swipe-card.snapping {
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .swipe-card-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .swipe-card-title { font-size: 0.88rem; font-weight: 700; color: var(--text); }
+    .swipe-card-sub   { font-size: 0.76rem; color: var(--text-secondary); margin-top: 2px; }
+    .swipe-hint {
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-light);
+      margin-top: 10px;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════ */
+    /* SUMMARY                                                            */
+    /* ═══════════════════════════════════════════════════════════════════ */
+
+    .summary-section {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      margin-top: 80px;
+    }
+    .summary-section h2 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .summary-section .summary-sub {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    .impact-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .impact-table th {
+      text-align: left;
+      padding: 8px 12px;
+      background: var(--bg);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      border-bottom: 2px solid var(--border);
+    }
+    .impact-table td {
+      padding: 12px;
+      border-bottom: 1px solid var(--border-light);
+      vertical-align: top;
+    }
+    .impact-table tr:last-child td { border-bottom: none; }
+    .impact-table .anim-name { font-weight: 600; color: var(--text); }
+
+    .impact-bar-wrap {
+      width: 100%;
+      max-width: 120px;
+      height: 8px;
+      background: var(--border);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .impact-bar {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 999px;
+    }
+
+    .impact-priority {
+      display: inline-block;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+    }
+    .priority-high   { background: #E8F5EE; color: #2E7D50; }
+    .priority-medium { background: #FFF8E1; color: #A07010; }
+    .priority-low    { background: var(--border-light); color: var(--text-secondary); }
+
+    .summary-note {
+      margin-top: 20px;
+      padding: 14px 16px;
+      background: var(--primary-light);
+      border-radius: 10px;
+      font-size: 0.83rem;
+      color: var(--primary-dark);
+      border-left: 3px solid var(--primary);
+    }
+
+    /* ─── Divider ──────────────────────────────────────────────────────── */
+    .section-divider {
+      border: none;
+      border-top: 1px solid var(--border-light);
+      margin: 0 0 72px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── HEADER ─────────────────────────────────────────────────────────── -->
+<header class="page-header">
+  <h1>Animations-Konzept VetApp</h1>
+  <div class="meta">Stand: 04. April 2026 &mdash; UI/UX Design Review</div>
+  <p class="subtitle">Interaktive Demos aller empfohlenen Animationen &mdash; klicken und ausprobieren.</p>
+</header>
+
+<!-- ─── TOC ────────────────────────────────────────────────────────────── -->
+<nav class="toc">
+  <a href="#s1">1. Fade-In</a>
+  <a href="#s2">2. Button Scale</a>
+  <a href="#s3">3. Tab Slide</a>
+  <a href="#s4">4. Skeleton</a>
+  <a href="#s5">5. Overdue Pulse</a>
+  <a href="#s6">6. Chat Bubble</a>
+  <a href="#s7">7. Checkmark</a>
+  <a href="#s8">8. Swipe-to-Delete</a>
+  <a href="#summary">Zusammenfassung</a>
+</nav>
+
+<main>
+
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <!-- 1. FADE-IN                                                       -->
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <section class="section" id="s1">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title-block">
+        <h2>Fade-In beim Screen-Mount</h2>
+        <p>Der Screen-Inhalt blendet sanft ein, statt abrupt zu erscheinen. Verhindert das "Pop"-Gefuehl beim Navigation.</p>
+        <span class="badge badge-quick">Quick Win &mdash; React Native Animated</span>
+      </div>
+    </div>
+    <div class="demo-area fadein-demo">
+      <div class="compare-grid">
+        <div>
+          <div class="compare-label bad">Vorher &mdash; abrupt</div>
+          <div class="phone">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <div class="phone-status-bar"><span>09:41</span><span>100%</span></div>
+              <div style="padding:16px; flex:1;">
+                <div class="fadein-card">
+                  <div class="fadein-avatar">🐕</div>
+                  <div class="fadein-card-title">Bello</div>
+                  <div class="fadein-card-sub">Naechste Impfung: ueberfaellig</div>
+                </div>
+                <div class="fadein-card">
+                  <div class="fadein-card-title">Tollwut-Impfung</div>
+                  <div class="fadein-card-sub">Faellig: 12. Maerz 2026</div>
+                </div>
+                <div class="fadein-card">
+                  <div class="fadein-card-title">Tierarzt Termin</div>
+                  <div class="fadein-card-sub">Morgen, 10:30 Uhr</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="compare-label good">Nachher &mdash; elegant</div>
+          <div class="phone">
+            <div class="phone-notch"></div>
+            <div class="phone-screen">
+              <div class="phone-status-bar"><span>09:41</span><span>100%</span></div>
+              <div id="fadein-content" class="fadein-content">
+                <div class="fadein-card">
+                  <div class="fadein-avatar">🐕</div>
+                  <div class="fadein-card-title">Bello</div>
+                  <div class="fadein-card-sub">Naechste Impfung: ueberfaellig</div>
+                </div>
+                <div class="fadein-card">
+                  <div class="fadein-card-title">Tollwut-Impfung</div>
+                  <div class="fadein-card-sub">Faellig: 12. Maerz 2026</div>
+                </div>
+                <div class="fadein-card">
+                  <div class="fadein-card-title">Tierarzt Termin</div>
+                  <div class="fadein-card-sub">Morgen, 10:30 Uhr</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="fadein-controls">
+            <button class="btn btn-primary btn-sm" onclick="triggerFadeIn()">Demo starten</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <hr class="section-divider" />
+
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <!-- 2. BUTTON SCALE FEEDBACK                                         -->
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <section class="section" id="s2">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div class="section-title-block">
+        <h2>Button-Press Scale-Feedback</h2>
+        <p>Haptisches Feedback durch leichten Scale-Down. Der Button "gibt nach" wie ein echter Knopf &mdash; viel befriedigender als reines Opacity-Dimming.</p>
+        <span class="badge badge-quick">Quick Win &mdash; Pressable / Animated</span>
+      </div>
+    </div>
+    <div class="demo-area">
+      <div class="compare-grid">
+        <div>
+          <div class="compare-label bad">Nur Opacity &mdash; flach</div>
+          <div class="scale-btn-wrap">
+            <button class="demo-btn demo-btn-opacity">Impfung eintragen</button>
+            <div class="click-hint">Druecken und halten</div>
+          </div>
+        </div>
+        <div>
+          <div class="compare-label good">Scale-Feedback &mdash; lebendig</div>
+          <div class="scale-btn-wrap">
+            <button class="demo-btn demo-btn-scale">Impfung eintragen</button>
+            <div class="click-hint">Druecken und halten</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <hr class="section-divider" />
+
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <!-- 3. TAB INDICATOR SLIDE                                           -->
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <section class="section" id="s3">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div class="section-title-block">
+        <h2>Tab-Indikator Slide</h2>
+        <p>Der aktive Tab-Indikator gleitet sanft von Tab zu Tab &mdash; statt abrupt zu springen. Macht die Navigation orientierend und fluessig.</p>
+        <span class="badge badge-quick">Quick Win &mdash; CSS Transition</span>
+      </div>
+    </div>
+    <div class="demo-area">
+      <div class="tabs-demo-wrap">
+        <div class="tabs-mockup">
+          <div class="tabs-bar" id="tabsBar">
+            <div class="tab-item active" onclick="switchTab(0, this)">Gesundheit</div>
+            <div class="tab-item" onclick="switchTab(1, this)">Dokumente</div>
+            <div class="tab-item" onclick="switchTab(2, this)">Tierarzt</div>
+            <div class="tab-indicator" id="tabIndicator"></div>
+          </div>
+          <div class="tab-content-area">
+            <div class="tab-panel active" id="panel0">
+              <div class="tab-health-item">
+                <div class="tab-health-dot" style="background:var(--error)"></div>
+                <div><div class="tab-health-text">Tollwut-Impfung</div><div class="tab-health-sub">Ueberfaellig seit 12. Maerz</div></div>
+              </div>
+              <div class="tab-health-item">
+                <div class="tab-health-dot" style="background:var(--warning)"></div>
+                <div><div class="tab-health-text">FSME-Impfung</div><div class="tab-health-sub">Faellig in 14 Tagen</div></div>
+              </div>
+              <div class="tab-health-item">
+                <div class="tab-health-dot" style="background:var(--success)"></div>
+                <div><div class="tab-health-text">Entwurmung</div><div class="tab-health-sub">Erledigt am 01. Maerz</div></div>
+              </div>
+            </div>
+            <div class="tab-panel" id="panel1">
+              <div class="doc-card"><div class="doc-icon">📄</div><div><div class="doc-name">Impfpass_Bello.pdf</div><div class="doc-date">Hochgeladen: 15. Feb 2026</div></div></div>
+              <div class="doc-card"><div class="doc-icon">🩻</div><div><div class="doc-name">Roentgen_Hufte.jpg</div><div class="doc-date">Hochgeladen: 03. Jan 2026</div></div></div>
+              <div class="doc-card"><div class="doc-icon">📋</div><div><div class="doc-name">Blutbild_Dez.pdf</div><div class="doc-date">Hochgeladen: 12. Dez 2025</div></div></div>
+            </div>
+            <div class="tab-panel" id="panel2">
+              <div class="tab-health-item">
+                <div class="tab-health-dot" style="background:var(--primary)"></div>
+                <div><div class="tab-health-text">Dr. Mueller &mdash; Hauptuntersuchung</div><div class="doc-date">Morgen, 10:30 Uhr</div></div>
+              </div>
+              <div class="tab-health-item">
+                <div class="tab-health-dot" style="background:var(--text-light)"></div>
+                <div><div class="tab-health-text">Dr. Schmidt &mdash; Nachkontrolle</div><div class="doc-date">18. April 2026</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <hr class="section-divider" />
+
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <!-- 4. SKELETON LOADER + SHIMMER                                     -->
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <section class="section" id="s4">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div class="section-title-block">
+        <h2>Skeleton Loader mit Shimmer-Effekt</h2>
+        <p>Waehrend Daten laden, zeigen Platzhalter-Cards die kuenftige Struktur. Der Shimmer-Lichtreflex signalisiert Aktivitaet ohne ablenkenden Spinner.</p>
+        <span class="badge badge-quick">Quick Win &mdash; CSS Animated</span>
+      </div>
+    </div>
+    <div class="demo-area">
+      <div class="compare-grid">
+        <div>
+          <div class="compare-label bad">Spinner &mdash; langweilig</div>
+          <div class="spinner"></div>
+          <div style="text-align:center; font-size:0.78rem; color:var(--text-secondary);">Laden...</div>
+        </div>
+        <div>
+          <div class="compare-label good">Skeleton &mdash; orientierend</div>
+          <div class="skel-card">
+            <div class="skel-avatar skeleton-base skeleton-shimmer"></div>
+            <div class="skel-lines">
+              <div class="skel-line skeleton-base skeleton-shimmer"></div>
+              <div class="skel-line skeleton-base skeleton-shimmer"></div>
+            </div>
+          </div>
+          <div class="skel-card">
+            <div class="skel-avatar skeleton-base skeleton-shimmer"></div>
+            <div class="skel-lines">
+              <div class="skel-line skeleton-base skeleton-shimmer"></div>
+              <div class="skel-line skeleton-base skeleton-shimmer"></div>
+            </div>
+          </div>
+          <div class="skel-card">
+            <div class="skel-avatar skeleton-base skeleton-shimmer"></div>
+            <div class="skel-lines">
+              <div class="skel-line skeleton-base skeleton-shimmer"></div>
+              <div class="skel-line skeleton-base skeleton-shimmer"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <hr class="section-divider" />
+
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <!-- 5. OVERDUE PULSE                                                 -->
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <section class="section" id="s5">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <div class="section-title-block">
+        <h2>Overdue-Banner Pulse</h2>
+        <p>Wenn ein ueberfaelliges Ereignis erscheint, pulsiert das rote Banner einmal subtil. Zieht die Aufmerksamkeit ohne zu nerven &mdash; genau einmal, nicht dauerhaft.</p>
+        <span class="badge badge-quick">Quick Win &mdash; CSS @keyframes</span>
+      </div>
+    </div>
+    <div class="demo-area">
+      <div id="overdue-banner" class="overdue-banner pulsing" style="max-width:420px; margin:0 auto;">
+        <div class="overdue-icon">⚠️</div>
+        <div>
+          <div class="overdue-title">Tollwut-Impfung ueberfaellig!</div>
+          <div class="overdue-sub">Bello &mdash; seit 23 Tagen nicht aktualisiert</div>
+        </div>
+      </div>
+      <div class="overdue-controls">
+        <button class="btn btn-primary btn-sm" onclick="triggerPulse()">Nochmal abspielen</button>
+      </div>
+    </div>
+  </section>
+  <hr class="section-divider" />
+
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <!-- 6. CHAT BUBBLE SLIDE-IN                                         -->
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <section class="section" id="s6">
+    <div class="section-header">
+      <div class="section-num">6</div>
+      <div class="section-title-block">
+        <h2>Chat-Bubble Slide-In</h2>
+        <p>Neue Nachrichten gleiten von der jeweiligen Seite ins Bild. Die KI-Antwort erscheint erst nach einer kurzen Tipp-Animation &mdash; fuehlbares Gespraech.</p>
+        <span class="badge badge-quick">Quick Win &mdash; CSS Animation + JS Timeout</span>
+      </div>
+    </div>
+    <div class="demo-area">
+      <div class="chat-outer">
+        <div class="phone chat-phone" style="min-height:340px;">
+          <div class="phone-notch"></div>
+          <div class="phone-screen">
+            <div class="chat-header">
+              <div class="chat-avatar">🤖</div>
+              VetApp KI-Assistent
+            </div>
+            <div class="chat-messages" id="chatMessages">
+              <div class="bubble bubble-ai">Hallo! Wie kann ich dir bei Bellos Gesundheit helfen?</div>
+              <div class="bubble bubble-user">Wann ist die naechste Impfung faellig?</div>
+              <div class="bubble bubble-ai">Die Tollwut-Impfung von Bello war am 12. Maerz faellig. Soll ich einen Termin vorschlagen?</div>
+            </div>
+            <div class="chat-input-row">
+              <div class="chat-input-fake">Nachricht eingeben...</div>
+              <button class="chat-send-btn" onclick="sendChatMessage()" title="Nachricht senden">➤</button>
+            </div>
+          </div>
+        </div>
+        <div class="click-hint">Sende-Pfeil klicken fuer neue Nachricht</div>
+      </div>
+    </div>
+  </section>
+  <hr class="section-divider" />
+
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <!-- 7. CHECKMARK                                                     -->
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <section class="section" id="s7">
+    <div class="section-header">
+      <div class="section-num">7</div>
+      <div class="section-title-block">
+        <h2>Erfolgs-Checkmark</h2>
+        <p>Kreis zeichnet sich, dann Haken &mdash; rein CSS-animiert. Gibt dem User eine klare Bestaetigung dass die Aktion erfolgreich war.</p>
+        <span class="badge badge-quick">Quick Win &mdash; SVG stroke-dasharray</span>
+      </div>
+    </div>
+    <div class="demo-area">
+      <div class="checkmark-wrap">
+        <svg id="checkmarkSvg" class="checkmark-svg" width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle
+            class="checkmark-circle"
+            cx="50" cy="50" r="46"
+            stroke="#1B6B5A"
+            stroke-width="4"
+            fill="none"
+            stroke-linecap="round"
+          />
+          <polyline
+            class="checkmark-check"
+            points="28,52 43,67 72,36"
+            stroke="#1B6B5A"
+            stroke-width="5"
+            fill="none"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <div class="check-label" id="checkLabel" style="opacity:0;">Impfung erfolgreich eingetragen!</div>
+        <button class="btn btn-primary btn-sm" onclick="triggerCheckmark()">Demo abspielen</button>
+      </div>
+    </div>
+  </section>
+  <hr class="section-divider" />
+
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <!-- 8. SWIPE TO DELETE                                               -->
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <section class="section" id="s8">
+    <div class="section-header">
+      <div class="section-num">8</div>
+      <div class="section-title-block">
+        <h2>Swipe-to-Delete</h2>
+        <p>Card nach links ziehen um Loeschen-Aktion freizulegen. Gewohntes Pattern von iOS Mail &mdash; kein separater Bearbeitungsmodus noetig.</p>
+        <span class="badge badge-reani">Reanimated empfohlen fuer Native-Feel</span>
+      </div>
+    </div>
+    <div class="demo-area">
+      <div class="swipe-container" id="swipeContainer">
+        <div class="swipe-delete-bg" id="swipeDeleteBg">
+          <div class="swipe-delete-icon" id="swipeDeleteIcon">
+            🗑️
+            <span>Loeschen</span>
+          </div>
+        </div>
+        <div class="swipe-card" id="swipeCard">
+          <div class="swipe-card-icon">💉</div>
+          <div>
+            <div class="swipe-card-title">Tollwut-Impfung</div>
+            <div class="swipe-card-sub">Bello &mdash; faellig: 12. Maerz 2026</div>
+          </div>
+        </div>
+      </div>
+      <div class="swipe-hint">Nach links ziehen zum Loeschen</div>
+    </div>
+  </section>
+
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <!-- SUMMARY                                                          -->
+  <!-- ═════════════════════════════════════════════════════════════════ -->
+  <section class="summary-section" id="summary">
+    <h2>Zusammenfassung &mdash; Impact-Ranking</h2>
+    <p class="summary-sub">Welche Animationen haben den groessten Effekt auf die wahrgenommene Qualitaet der App?</p>
+
+    <table class="impact-table">
+      <thead>
+        <tr>
+          <th>Animation</th>
+          <th>Impact auf UX</th>
+          <th>Aufwand</th>
+          <th>Prioritaet</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><div class="anim-name">2. Button Scale-Feedback</div>Jeder Button-Tap fuehlbarer</td>
+          <td><div class="impact-bar-wrap"><div class="impact-bar" style="width:95%"></div></div></td>
+          <td>Gering</td>
+          <td><span class="impact-priority priority-high">Hoch</span></td>
+        </tr>
+        <tr>
+          <td><div class="anim-name">4. Skeleton Loader</div>Ladezeit fuehlt sich kuerzer an</td>
+          <td><div class="impact-bar-wrap"><div class="impact-bar" style="width:90%"></div></div></td>
+          <td>Gering</td>
+          <td><span class="impact-priority priority-high">Hoch</span></td>
+        </tr>
+        <tr>
+          <td><div class="anim-name">7. Erfolgs-Checkmark</div>Klare Bestaetigung nach Aktion</td>
+          <td><div class="impact-bar-wrap"><div class="impact-bar" style="width:88%"></div></div></td>
+          <td>Gering</td>
+          <td><span class="impact-priority priority-high">Hoch</span></td>
+        </tr>
+        <tr>
+          <td><div class="anim-name">3. Tab-Indikator Slide</div>Orientierung beim Wechsel</td>
+          <td><div class="impact-bar-wrap"><div class="impact-bar" style="width:80%"></div></div></td>
+          <td>Gering</td>
+          <td><span class="impact-priority priority-high">Hoch</span></td>
+        </tr>
+        <tr>
+          <td><div class="anim-name">1. Screen Fade-In</div>Weniger hartes Erscheinen</td>
+          <td><div class="impact-bar-wrap"><div class="impact-bar" style="width:72%"></div></div></td>
+          <td>Gering</td>
+          <td><span class="impact-priority priority-medium">Mittel</span></td>
+        </tr>
+        <tr>
+          <td><div class="anim-name">5. Overdue Pulse</div>Aufmerksamkeit auf kritische Info</td>
+          <td><div class="impact-bar-wrap"><div class="impact-bar" style="width:68%"></div></div></td>
+          <td>Sehr gering</td>
+          <td><span class="impact-priority priority-medium">Mittel</span></td>
+        </tr>
+        <tr>
+          <td><div class="anim-name">6. Chat Bubble Slide</div>Gespraechs-Atmosphaere im Chat</td>
+          <td><div class="impact-bar-wrap"><div class="impact-bar" style="width:60%"></div></div></td>
+          <td>Gering</td>
+          <td><span class="impact-priority priority-medium">Mittel</span></td>
+        </tr>
+        <tr>
+          <td><div class="anim-name">8. Swipe-to-Delete</div>Effizienz beim Verwalten</td>
+          <td><div class="impact-bar-wrap"><div class="impact-bar" style="width:50%"></div></div></td>
+          <td>Mittel (Reanimated)</td>
+          <td><span class="impact-priority priority-low">Spaeter</span></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="summary-note">
+      <strong>Empfehlung:</strong> Animationen 2, 4 und 7 sind reine Quick Wins &mdash; geringer Aufwand, unmittelbar spuerbare Qualitaetssteigerung. Diese drei sollten als erstes umgesetzt werden. Animation 8 (Swipe) benoetigt react-native-reanimated und Gesture Handler und sollte nach dem MVP-Launch folgen.
+    </div>
+  </section>
+
+</main>
+
+<!-- ─── JAVASCRIPT ──────────────────────────────────────────────────────── -->
+<script>
+  /* ── 1. FADE-IN ───────────────────────────────────────────────────── */
+  function triggerFadeIn() {
+    const el = document.getElementById('fadein-content');
+    el.classList.remove('playing');
+    void el.offsetWidth; // reflow
+    el.classList.add('playing');
+  }
+  // Auto-play on load
+  window.addEventListener('load', () => {
+    setTimeout(triggerFadeIn, 400);
+  });
+
+  /* ── 3. TABS ──────────────────────────────────────────────────────── */
+  let activeTab = 0;
+  function initTabs() {
+    const bar = document.getElementById('tabsBar');
+    const items = bar.querySelectorAll('.tab-item');
+    const indicator = document.getElementById('tabIndicator');
+    const rect = items[0].getBoundingClientRect();
+    const barRect = bar.getBoundingClientRect();
+    indicator.style.left  = (items[0].offsetLeft) + 'px';
+    indicator.style.width = items[0].offsetWidth + 'px';
+  }
+  function switchTab(index, el) {
+    const bar = document.getElementById('tabsBar');
+    const items = bar.querySelectorAll('.tab-item');
+    const indicator = document.getElementById('tabIndicator');
+    items.forEach((t, i) => {
+      t.classList.toggle('active', i === index);
+      document.getElementById('panel' + i).classList.toggle('active', i === index);
+    });
+    indicator.style.left  = el.offsetLeft + 'px';
+    indicator.style.width = el.offsetWidth + 'px';
+    activeTab = index;
+  }
+  window.addEventListener('load', initTabs);
+  window.addEventListener('resize', initTabs);
+
+  /* ── 5. OVERDUE PULSE ────────────────────────────────────────────── */
+  function triggerPulse() {
+    const el = document.getElementById('overdue-banner');
+    el.classList.remove('pulsing');
+    void el.offsetWidth;
+    el.classList.add('pulsing');
+  }
+  // Auto-play on load
+  window.addEventListener('load', () => {
+    setTimeout(() => triggerPulse(), 600);
+  });
+
+  /* ── 6. CHAT ─────────────────────────────────────────────────────── */
+  const userMessages = [
+    'Welche Impfungen fehlen noch?',
+    'Kannst du einen Termin fuer naechste Woche finden?',
+    'Was kostet eine Tollwut-Impfung ungefaehr?',
+  ];
+  const aiResponses = [
+    'Bello benoetigt noch die FSME-Impfung &mdash; die ist in 14 Tagen faellig. Alle anderen sind aktuell.',
+    'Ich habe Dr. Mueller am Dienstag, 08. April um 10:00 Uhr gefunden. Soll ich den Termin eintragen?',
+    'In Deutschland kostet eine Tollwut-Impfung beim Tierarzt zwischen 20 und 40 Euro, je nach Praxis.',
+  ];
+  let chatIndex = 0;
+
+  function sendChatMessage() {
+    const container = document.getElementById('chatMessages');
+    const msgIndex = chatIndex % userMessages.length;
+
+    // User bubble
+    const userBubble = document.createElement('div');
+    userBubble.className = 'bubble bubble-user anim-right';
+    userBubble.textContent = userMessages[msgIndex];
+    container.appendChild(userBubble);
+    container.scrollTop = container.scrollHeight;
+
+    // Typing indicator
+    setTimeout(() => {
+      const typing = document.createElement('div');
+      typing.className = 'typing-dots';
+      typing.id = 'typing-indicator';
+      typing.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+      container.appendChild(typing);
+      container.scrollTop = container.scrollHeight;
+
+      // AI response
+      setTimeout(() => {
+        typing.remove();
+        const aiBubble = document.createElement('div');
+        aiBubble.className = 'bubble bubble-ai anim-left';
+        aiBubble.innerHTML = aiResponses[msgIndex];
+        container.appendChild(aiBubble);
+        container.scrollTop = container.scrollHeight;
+      }, 1200);
+    }, 400);
+
+    chatIndex++;
+  }
+
+  /* ── 7. CHECKMARK ────────────────────────────────────────────────── */
+  function triggerCheckmark() {
+    const svg = document.getElementById('checkmarkSvg');
+    const label = document.getElementById('checkLabel');
+    svg.classList.remove('playing');
+    label.style.opacity = '0';
+    label.style.transition = 'none';
+    void svg.offsetWidth;
+    svg.classList.add('playing');
+    setTimeout(() => {
+      label.style.transition = 'opacity 0.3s ease';
+      label.style.opacity = '1';
+    }, 900);
+  }
+  window.addEventListener('load', () => {
+    setTimeout(triggerCheckmark, 500);
+  });
+
+  /* ── 8. SWIPE TO DELETE ──────────────────────────────────────────── */
+  (function() {
+    const card = document.getElementById('swipeCard');
+    const bg   = document.getElementById('swipeDeleteBg');
+    const icon = document.getElementById('swipeDeleteIcon');
+    const THRESHOLD = 80;
+
+    let startX = 0;
+    let currentX = 0;
+    let dragging = false;
+    let revealed = false;
+
+    function getClientX(e) {
+      return e.touches ? e.touches[0].clientX : e.clientX;
+    }
+
+    function onStart(e) {
+      if (revealed) return;
+      dragging = true;
+      startX = getClientX(e);
+      card.classList.remove('snapping');
+    }
+
+    function onMove(e) {
+      if (!dragging) return;
+      const dx = getClientX(e) - startX;
+      currentX = Math.min(0, dx); // only left
+      card.style.transform = 'translateX(' + currentX + 'px)';
+      if (Math.abs(currentX) > 30) {
+        bg.classList.add('revealed');
+      } else {
+        bg.classList.remove('revealed');
+      }
+    }
+
+    function onEnd() {
+      if (!dragging) return;
+      dragging = false;
+      card.classList.add('snapping');
+      if (Math.abs(currentX) >= THRESHOLD) {
+        // Fully reveal delete
+        card.style.transform = 'translateX(-90px)';
+        bg.classList.add('revealed');
+        revealed = true;
+        // Auto-reset after 1.5s
+        setTimeout(() => {
+          card.style.transform = 'translateX(0)';
+          bg.classList.remove('revealed');
+          revealed = false;
+          currentX = 0;
+        }, 1500);
+      } else {
+        card.style.transform = 'translateX(0)';
+        bg.classList.remove('revealed');
+        currentX = 0;
+      }
+    }
+
+    card.addEventListener('mousedown',  onStart);
+    card.addEventListener('touchstart', onStart, { passive: true });
+    window.addEventListener('mousemove',  onMove);
+    window.addEventListener('touchmove',  onMove, { passive: true });
+    window.addEventListener('mouseup',    onEnd);
+    window.addEventListener('touchend',   onEnd);
+  })();
+</script>
+</body>
+</html>

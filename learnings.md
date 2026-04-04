@@ -4,6 +4,13 @@
 > Wissensmanager pflegt beides: Vault-Notiz + Einzeiler hier.
 
 ## 2026-04-04
+- Animationen mit built-in Animated API starten — kein Reanimated noetig fuer Fade-In, Scale, Spring
+- useFadeIn als Hook extrahieren — einmal bauen, ueberall einsetzen
+- AnimatedPressable statt TouchableOpacity — Scale-Feedback macht App sofort wertiger
+- useNativeDriver: true nur fuer opacity und transform — backgroundColor geht nicht
+- StyleSheet mit sehr vielen Keys: TypeScript kuerzt Typ-Inferenz ab — bei >50 Styles aufteilen
+- Design-Umsetzung in Batches parallel delegieren spart viel Zeit
+- Changelog am Ende eines produktiven Tages erstellen — sonst geht der Ueberblick verloren
 - God-Object-Refactoring: Erst Fassade, dann schrittweise migrieren, dann Fassade loeschen
 - QA parallel zum Cleanup laufen lassen fuehrt zu False Positives — besser sequentiell
 - MedicalEvent: Ein einheitliches Modell ist flexibler als N separate Tabellen

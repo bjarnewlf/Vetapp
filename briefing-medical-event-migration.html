@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Abschlussbericht: MedicalEvent-Migration</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal:        #2A9D8F;
+      --teal-light:  #E6F5F3;
+      --teal-dark:   #1F7A6E;
+      --orange:      #CC6B3D;
+      --orange-light:#FAF0E8;
+      --warm:        #F4A261;
+      --bg:          #F8F9FA;
+      --surface:     #FFFFFF;
+      --text:        #1A1A2E;
+      --text-muted:  #6B7280;
+      --border:      #E5E7EB;
+      --green:       #22C55E;
+      --green-light: #DCFCE7;
+      --red:         #EF4444;
+      --red-light:   #FEE2E2;
+      --yellow:      #F59E0B;
+      --yellow-light:#FEF3C7;
+      --blue:        #3B82F6;
+      --blue-light:  #DBEAFE;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal) 60%, #3ABFAF 100%);
+      color: white;
+      padding: 48px 40px 40px;
+    }
+    .header-meta {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      opacity: 0.8;
+      margin-bottom: 12px;
+    }
+    .header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+    .header-sub {
+      font-size: 16px;
+      opacity: 0.85;
+      margin-bottom: 24px;
+    }
+    .header-badges {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .badge-white { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.4); }
+    .badge-green { background: var(--green-light); color: #166534; }
+    .badge-orange { background: var(--orange-light); color: var(--orange); }
+    .badge-yellow { background: var(--yellow-light); color: #92400E; }
+    .badge-blue { background: var(--blue-light); color: #1E40AF; }
+    .badge-red { background: var(--red-light); color: #991B1B; }
+    .badge-teal { background: var(--teal-light); color: var(--teal-dark); }
+
+    /* Layout */
+    .container { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
+
+    /* Summary Cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .summary-card {
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    .summary-card .number {
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--teal);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .summary-card .label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Section */
+    .section {
+      background: var(--surface);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .section-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .section-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: var(--teal-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .section-icon.orange { background: var(--orange-light); }
+    .section-icon.yellow { background: var(--yellow-light); }
+    .section-icon.green { background: var(--green-light); }
+    .section-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .section-body { padding: 24px; }
+
+    /* Phase Block */
+    .phase {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 28px;
+      padding-bottom: 28px;
+      border-bottom: 1px solid var(--border);
+    }
+    .phase:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+    .phase-number {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: var(--teal);
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .phase-content { flex: 1; }
+    .phase-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .phase-sub {
+      font-size: 13px;
+      color: var(--teal);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    .phase-body {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+    .phase-body ul { padding-left: 18px; }
+    .phase-body li { margin-bottom: 4px; }
+
+    /* Architektur Vergleich */
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .compare-box {
+      border-radius: 10px;
+      padding: 20px;
+    }
+    .compare-box.before { background: var(--red-light); border: 1px solid #FECACA; }
+    .compare-box.after  { background: var(--green-light); border: 1px solid #BBF7D0; }
+    .compare-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .compare-box.before .compare-label { color: #991B1B; }
+    .compare-box.after .compare-label  { color: #166534; }
+    .compare-box ul {
+      padding-left: 16px;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+    .compare-box.before ul { color: #7F1D1D; }
+    .compare-box.after  ul { color: #14532D; }
+
+    /* QA Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    thead th {
+      background: var(--bg);
+      padding: 10px 14px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+    }
+    tbody td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+    }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: var(--bg); }
+    .code { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 12px; color: var(--teal-dark); }
+
+    /* Status pill */
+    .pill {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    .pill-green  { background: var(--green-light); color: #166534; }
+    .pill-orange { background: var(--orange-light); color: #9A3412; }
+    .pill-yellow { background: var(--yellow-light); color: #92400E; }
+    .pill-red    { background: var(--red-light); color: #991B1B; }
+
+    /* Offene Punkte */
+    .todo-list { list-style: none; }
+    .todo-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+    .todo-item:last-child { border-bottom: none; }
+    .todo-icon {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .todo-icon.deploy { background: var(--orange-light); color: var(--orange); }
+    .todo-icon.feature { background: var(--blue-light); color: var(--blue); }
+    .todo-icon.ui { background: var(--yellow-light); color: var(--yellow); }
+    .todo-text strong { display: block; color: var(--text); margin-bottom: 2px; }
+    .todo-text span { color: var(--text-muted); font-size: 13px; }
+
+    /* Files */
+    .file-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .file-box {
+      border-radius: 8px;
+      padding: 16px;
+      font-size: 13px;
+    }
+    .file-box.deleted { background: var(--red-light); border: 1px solid #FECACA; }
+    .file-box.new     { background: var(--green-light); border: 1px solid #BBF7D0; }
+    .file-box-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .file-box.deleted .file-box-label { color: #991B1B; }
+    .file-box.new     .file-box-label { color: #166534; }
+    .file-path {
+      font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px;
+      padding: 4px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.06);
+      color: inherit;
+    }
+    .file-box.deleted .file-path { color: #7F1D1D; }
+    .file-box.new     .file-path { color: #14532D; }
+    .file-path:last-child { border-bottom: none; }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      padding: 32px;
+      color: var(--text-muted);
+      font-size: 13px;
+      border-top: 1px solid var(--border);
+      margin-top: 40px;
+    }
+    .footer strong { color: var(--teal); }
+
+    /* Divider label */
+    .divider-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    @media (max-width: 640px) {
+      .summary-grid { grid-template-columns: repeat(2, 1fr); }
+      .compare-grid { grid-template-columns: 1fr; }
+      .file-grid    { grid-template-columns: 1fr; }
+      .header { padding: 32px 20px 28px; }
+      .container { padding: 24px 16px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-meta">VetApp &bull; Abschlussbericht &bull; 04. April 2026</div>
+  <h1>MedicalEvent-Migration</h1>
+  <p class="header-sub">
+    Groesstes Refactoring der VetApp — Datenmodell vereinheitlicht, God-Object aufgeloest,
+    alle 16+ Screens migriert.
+  </p>
+  <div class="header-badges">
+    <span class="badge badge-white">4 Phasen</span>
+    <span class="badge badge-white">2 QA-Runden</span>
+    <span class="badge badge-white">13 Findings bearbeitet</span>
+    <span class="badge badge-white">DataContext geloescht</span>
+  </div>
+</div>
+
+<!-- SUMMARY CARDS -->
+<div class="container">
+  <div class="summary-grid">
+    <div class="summary-card">
+      <div class="number">4</div>
+      <div class="label">Phasen</div>
+    </div>
+    <div class="summary-card">
+      <div class="number">16+</div>
+      <div class="label">Screens migriert</div>
+    </div>
+    <div class="summary-card">
+      <div class="number" style="color: var(--green)">0</div>
+      <div class="label">Kritische Findings offen</div>
+    </div>
+    <div class="summary-card">
+      <div class="number" style="color: var(--orange)">4</div>
+      <div class="label">Offene Punkte</div>
+    </div>
+  </div>
+
+  <!-- PHASEN -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2A9D8F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </div>
+      <div>
+        <div class="section-title">Phasen der Migration</div>
+      </div>
+    </div>
+    <div class="section-body">
+
+      <div class="phase">
+        <div class="phase-number">1</div>
+        <div class="phase-content">
+          <div class="phase-title">Neues Datenmodell</div>
+          <div class="phase-sub">Datenbank + TypeScript-Typen</div>
+          <div class="phase-body">
+            <ul>
+              <li>Neuer TypeScript-Typ <code>MedicalEvent</code> mit <code>MedicalEventType</code>: <code>'vaccination' | 'deworming' | 'checkup' | 'custom'</code></li>
+              <li>DB-Migration: Neue Tabelle <code>medical_events</code> mit RLS + Datenmigration aus alten Tabellen</li>
+              <li>Schema-Dokumentation aktualisiert</li>
+              <li><code>notification_id</code> bei Reminders nachgepflegt (F-011)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-number">2</div>
+        <div class="phase-content">
+          <div class="phase-title">Context-Refactoring</div>
+          <div class="phase-sub">God-Object aufloesen</div>
+          <div class="phase-body">
+            <p style="margin-bottom: 10px;">Der <code>DataContext</code> (~350 Zeilen) wurde in drei spezialisierte Contexts aufgeteilt:</p>
+            <ul>
+              <li><code>PetContext</code> / <code>usePets()</code> — Pets + Documents</li>
+              <li><code>MedicalContext</code> / <code>useMedical()</code> — MedicalEvents + Reminders</li>
+              <li><code>VetContactContext</code> / <code>useVetContact()</code> — Tierarzt-Kontakt</li>
+            </ul>
+            <p style="margin-top: 8px;">Jeder Context mit eigenem State, <code>refresh()</code> und Error-Handling. DataContext vollstaendig geloescht — keine Fassade mehr noetig.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-number">3</div>
+        <div class="phase-content">
+          <div class="phase-title">Screen-Migration</div>
+          <div class="phase-sub">16+ Screens umgestellt</div>
+          <div class="phase-body">
+            <ul>
+              <li>ALLE Screens von <code>useData()</code> auf spezialisierte Hooks umgestellt</li>
+              <li><code>AddEventScreen</code>: Einheitlich <code>addMedicalEvent()</code> fuer alle Event-Typen</li>
+              <li><code>PetDetailScreen</code>: Events aus <code>medicalEvents</code> gefiltert</li>
+              <li><code>HomeScreen</code>: Statistiken auf neues Modell umgestellt</li>
+              <li><code>AIAssistantScreen</code> + <code>aiService</code>: Neues <code>medicalHistory</code>-Format</li>
+              <li>Edge Function: Auf neues Format angepasst</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="phase">
+        <div class="phase-number">4</div>
+        <div class="phase-content">
+          <div class="phase-title">Aufraeumen</div>
+          <div class="phase-sub">Altlasten entfernen</div>
+          <div class="phase-body">
+            <ul>
+              <li>Alte Typen <code>Vaccination</code> und <code>Treatment</code> geloescht</li>
+              <li><code>DataContext.tsx</code> geloescht</li>
+              <li>Rules aktualisiert: <code>supabase.md</code>, <code>state-management.md</code></li>
+              <li>Zweite Migration: CHECK-Constraint fuer <code>recurrence_interval</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ARCHITEKTUR VORHER / NACHHER -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon orange">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CC6B3D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+      </div>
+      <div class="section-title">Architektur: Vorher vs. Nachher</div>
+    </div>
+    <div class="section-body">
+      <div class="compare-grid">
+        <div class="compare-box before">
+          <div class="compare-label">Vorher</div>
+          <ul>
+            <li>1x <code>DataContext</code> (~350 Zeilen)</li>
+            <li>Tabellen: <code>vaccinations</code> + <code>treatments</code></li>
+            <li>Hook: <code>useData()</code> in allen Screens</li>
+            <li>CRUD: separate Funktionen pro Typ</li>
+            <li>KI: gemischte Arrays in History</li>
+            <li>Neuer Event-Typ = neue Tabelle</li>
+          </ul>
+        </div>
+        <div class="compare-box after">
+          <div class="compare-label">Nachher</div>
+          <ul>
+            <li>3x spezialisierte Contexts</li>
+            <li>Tabelle: <code>medical_events</code> mit <code>type</code>-Feld</li>
+            <li>Hooks: <code>usePets()</code> / <code>useMedical()</code> / <code>useVetContact()</code></li>
+            <li>CRUD: einheitlich <code>addMedicalEvent()</code></li>
+            <li>KI: sauberes <code>medicalHistory</code>-Format</li>
+            <li>Neuer Event-Typ = neuer String-Wert</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GELOESCHTE / NEUE DATEIEN -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon green">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#22C55E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><polyline points="13 2 13 9 20 9"/>
+        </svg>
+      </div>
+      <div class="section-title">Dateiaenderungen</div>
+    </div>
+    <div class="section-body">
+      <div class="file-grid">
+        <div class="file-box deleted">
+          <div class="file-box-label">Geloescht</div>
+          <div class="file-path">src/context/DataContext.tsx</div>
+        </div>
+        <div class="file-box new">
+          <div class="file-box-label">Neu angelegt</div>
+          <div class="file-path">src/context/PetContext.tsx</div>
+          <div class="file-path">src/context/MedicalContext.tsx</div>
+          <div class="file-path">src/context/VetContactContext.tsx</div>
+          <div class="file-path">supabase/migrations/20260404_medical_events.sql</div>
+          <div class="file-path">supabase/migrations/20260404_medical_events_recurrence_check.sql</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QA FINDINGS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon yellow">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </div>
+      <div class="section-title">QA-Findings (2 Runden)</div>
+    </div>
+    <div class="section-body">
+
+      <div class="divider-label">Runde 1 — 2 kritisch, 4 mittel, 2 niedrig</div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Beschreibung</th>
+            <th>Schwere</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="code">F-001</td>
+            <td>Edge Function Format inkompatibel</td>
+            <td><span class="pill pill-red">Kritisch</span></td>
+            <td><span class="pill pill-green">Gefixt Phase 4</span></td>
+          </tr>
+          <tr>
+            <td class="code">F-002</td>
+            <td>Custom-Events nicht als MedicalEvent erfasst</td>
+            <td><span class="pill pill-red">Kritisch</span></td>
+            <td><span class="pill pill-green">Gefixt</span></td>
+          </tr>
+          <tr>
+            <td class="code">F-003</td>
+            <td>DataProvider nicht entfernt</td>
+            <td><span class="pill pill-yellow">Mittel</span></td>
+            <td><span class="pill pill-green">Gefixt</span></td>
+          </tr>
+          <tr>
+            <td class="code">F-004</td>
+            <td>CHECK-Constraint fuer recurrence_interval fehlte</td>
+            <td><span class="pill pill-yellow">Mittel</span></td>
+            <td><span class="pill pill-green">Gefixt</span></td>
+          </tr>
+          <tr>
+            <td class="code">F-006</td>
+            <td>Loading-Spinner fehlte</td>
+            <td><span class="pill pill-yellow">Mittel</span></td>
+            <td><span class="pill pill-green">Gefixt</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="divider-label" style="margin-top: 24px;">Runde 2 — 0 kritisch, 2 mittel, 3 niedrig</div>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Beschreibung</th>
+            <th>Schwere</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="code">F-009</td>
+            <td>Edit-Mode nur fuer Reminder (nicht fuer MedicalEvents)</td>
+            <td><span class="pill pill-yellow">Mittel</span></td>
+            <td><span class="pill pill-orange">Feature-Gap</span></td>
+          </tr>
+          <tr>
+            <td class="code">F-010</td>
+            <td>Ungenutzter Import</td>
+            <td><span class="pill pill-green">Niedrig</span></td>
+            <td><span class="pill pill-green">Gefixt</span></td>
+          </tr>
+          <tr>
+            <td class="code">F-011</td>
+            <td>Rules-Dateien veraltet</td>
+            <td><span class="pill pill-yellow">Mittel</span></td>
+            <td><span class="pill pill-green">Gefixt</span></td>
+          </tr>
+          <tr>
+            <td class="code">F-012</td>
+            <td>Error-State in Contexts nicht genutzt</td>
+            <td><span class="pill pill-green">Niedrig</span></td>
+            <td><span class="pill pill-green">Gefixt</span></td>
+          </tr>
+          <tr>
+            <td class="code">F-013</td>
+            <td>Label "Behandlungen" nicht angepasst</td>
+            <td><span class="pill pill-green">Niedrig</span></td>
+            <td><span class="pill pill-green">Gefixt — "Weitere Gesundheitseintraege"</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- OFFENE PUNKTE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon orange">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#CC6B3D" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <div class="section-title">Offene Punkte</div>
+    </div>
+    <div class="section-body">
+      <ul class="todo-list">
+        <li class="todo-item">
+          <div class="todo-icon deploy">DB</div>
+          <div class="todo-text">
+            <strong>Migrationen deployen</strong>
+            <span>medical_events Tabelle gegen Supabase-Produktionsumgebung deployen</span>
+          </div>
+        </li>
+        <li class="todo-item">
+          <div class="todo-icon deploy">EF</div>
+          <div class="todo-text">
+            <strong>Edge Function neu deployen</strong>
+            <span>Auf aktualisiertes medicalHistory-Format umstellen</span>
+          </div>
+        </li>
+        <li class="todo-item">
+          <div class="todo-icon feature">F</div>
+          <div class="todo-text">
+            <strong>MedicalEvent-Editing (F-009)</strong>
+            <span>Aktuell koennen nur Reminder editiert werden — MedicalEvents noch nicht</span>
+          </div>
+        </li>
+        <li class="todo-item">
+          <div class="todo-icon ui">UI</div>
+          <div class="todo-text">
+            <strong>Error-States im UI sichtbar machen</strong>
+            <span>State existiert in allen drei Contexts, wird aber noch nicht in den Screens angezeigt</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- LEARNINGS -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2A9D8F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+        </svg>
+      </div>
+      <div class="section-title">Learnings aus diesem Refactoring</div>
+    </div>
+    <div class="section-body">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 30%">Thema</th>
+            <th>Learning</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight: 600; color: var(--teal-dark)">God-Object-Refactoring</td>
+            <td>Erst Fassade einbauen, dann schrittweise migrieren, dann Fassade loeschen</td>
+          </tr>
+          <tr>
+            <td style="font-weight: 600; color: var(--teal-dark)">QA-Timing</td>
+            <td>QA parallel zum Cleanup laufen lassen fuehrt zu False Positives — besser sequentiell</td>
+          </tr>
+          <tr>
+            <td style="font-weight: 600; color: var(--teal-dark)">Datenmodell</td>
+            <td>Ein einheitliches Modell ist flexibler als N separate Tabellen — Typen als Wert, nicht als Schema</td>
+          </tr>
+          <tr>
+            <td style="font-weight: 600; color: var(--teal-dark)">Custom-Events</td>
+            <td>Custom-Events duerfen nicht nur Reminder sein — sie gehoeren auch in die Gesundheitshistorie</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  Erstellt am 04.04.2026 &bull; <strong>VetApp Dev-Agentur</strong> &bull; Wissensmanager
+</div>
+
+</body>
+</html>

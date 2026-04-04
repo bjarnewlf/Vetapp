@@ -11,7 +11,7 @@ Dieses Dokument regelt die Zusammenarbeit aller Agents in Claas' Dev-Agentur.
 
 | Agent | Zustaendig fuer | NICHT zustaendig fuer |
 |---|---|---|
-| **Brian (sidekick)** | Planung, Delegation, Projektuebersicht, Priorisierung | Code schreiben, Dateien aendern |
+| **Brian (brian)** | Planung, Delegation, Projektuebersicht, Priorisierung | Code schreiben, Dateien aendern |
 | **Developer** | Logik, Features, Bugfixes, Datenmodell, API-Anbindung, Navigation | Visuelle Entscheidungen, Testing |
 | **Designer** | Farben, Typografie, Spacing, Layout, UX-Flows, Accessibility, Animationen | Business-Logik, Datenmodell |
 | **QA** | Code-Review, Bug-Hunting, TypeScript-Checks, Security, Datenvalidierung | Code aendern (ausser `qa-findings.md`), Design-Entscheidungen |

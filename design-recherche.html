@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Design-Roadmap VetApp — 2026-04-04</title>
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal:           #1B6B5A;
+      --teal-dark:      #145244;
+      --teal-mid:       #2D8A73;
+      --teal-light:     #E8F5F1;
+      --accent:         #CC6B3D;
+      --accent-light:   #F5D0B9;
+      --bg:             #FAF6F1;
+      --surface:        #FFFFFF;
+      --text:           #1A1A1A;
+      --text-sec:       #6B6B6B;
+      --text-light:     #999999;
+      --border:         #E8E0D8;
+      --border-light:   #F0EBE5;
+      --error:          #D94040;
+      --error-light:    #FDEAEA;
+      --success:        #2E8B57;
+      --success-light:  #E8F5EE;
+      --warning:        #D4A020;
+      --warning-light:  #FFF8E1;
+      --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 24px;
+      --sh-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
+      --sh-md: 0 4px 12px rgba(0,0,0,0.09), 0 2px 4px rgba(0,0,0,0.05);
+      --sh-lg: 0 8px 24px rgba(0,0,0,0.11), 0 3px 8px rgba(0,0,0,0.06);
+    }
+
+    html { font-size: 16px; scroll-behavior: smooth; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ─── Typography ───────────────────────────────────────────────── */
+    h1 { font-size: 2.4rem; font-weight: 800; line-height: 1.2; }
+    h2 { font-size: 1.5rem;  font-weight: 700; }
+    h3 { font-size: 1.125rem; font-weight: 600; }
+    p  { font-size: 0.9375rem; line-height: 1.65; color: var(--text-sec); }
+    strong { color: var(--text); font-weight: 600; }
+
+    /* ─── Layout ───────────────────────────────────────────────────── */
+    .wrap { max-width: 960px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* ─── Site Header ──────────────────────────────────────────────── */
+    .site-header {
+      background: linear-gradient(135deg, var(--teal) 0%, var(--teal-mid) 55%, var(--teal-dark) 100%);
+      padding: 3.5rem 0 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .site-header::before {
+      content: ''; position: absolute;
+      top: -80px; right: -60px;
+      width: 320px; height: 320px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+    }
+    .site-header::after {
+      content: ''; position: absolute;
+      bottom: -80px; left: -50px;
+      width: 240px; height: 240px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    .header-inner { position: relative; z-index: 1; }
+    .eyebrow {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.22);
+      color: rgba(255,255,255,0.9);
+      font-size: 0.75rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.3rem 0.875rem;
+      border-radius: 99px;
+      margin-bottom: 1rem;
+    }
+    .eyebrow .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent-light);
+    }
+    .site-header h1 { color: #fff; margin-bottom: 0.5rem; }
+    .header-sub { color: rgba(255,255,255,0.72); font-size: 1.0625rem; margin-bottom: 1.75rem; }
+    .header-pills { display: flex; gap: 0.875rem; flex-wrap: wrap; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 0.375rem;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.85);
+      font-size: 0.8125rem; font-weight: 500;
+      padding: 0.3rem 0.8rem;
+      border-radius: 99px;
+    }
+
+    /* ─── Section ──────────────────────────────────────────────────── */
+    .section {
+      padding: 3.5rem 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .section:last-of-type { border-bottom: none; }
+    .section-num {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      font-size: 0.6875rem; font-weight: 800;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.4rem;
+    }
+    .section-num span {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 20px; height: 20px;
+      background: var(--accent); color: #fff;
+      border-radius: 50%; font-size: 0.625rem; font-weight: 800;
+    }
+    .section-title { margin-bottom: 0.375rem; }
+    .section-desc { max-width: 640px; margin-bottom: 0.5rem; }
+
+    /* ─── Aufwand-Badge ────────────────────────────────────────────── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 99px;
+      font-size: 0.6875rem; font-weight: 700;
+    }
+    .badge-quick   { background: var(--success-light); color: var(--success); }
+    .badge-medium  { background: var(--warning-light); color: #7a5a00; }
+    .badge-large   { background: var(--error-light);   color: var(--error); }
+    .badge-meta { margin-top: 0.875rem; display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+
+    /* ─── Mockup-Wrapper ───────────────────────────────────────────── */
+    .mockup-row {
+      display: flex;
+      gap: 2rem;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+    .mockup-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.625rem;
+      flex: 1;
+      min-width: 300px;
+    }
+    .mockup-label {
+      font-size: 0.75rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--text-light);
+    }
+    .mockup-label.before { color: var(--error); }
+    .mockup-label.after  { color: var(--success); }
+
+    /* ─── Phone Frame ──────────────────────────────────────────────── */
+    .phone {
+      width: 320px;
+      background: #f0ebe5;
+      border-radius: 36px;
+      padding: 12px;
+      box-shadow:
+        0 0 0 2px #d0cac2,
+        0 20px 60px rgba(0,0,0,0.18),
+        0 4px 12px rgba(0,0,0,0.10);
+      position: relative;
+    }
+    .phone-screen {
+      background: var(--bg);
+      border-radius: 26px;
+      overflow: hidden;
+      position: relative;
+    }
+    .phone-notch {
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 80px; height: 22px;
+      background: #f0ebe5;
+      border-radius: 0 0 14px 14px;
+      z-index: 10;
+    }
+
+    /* ─── Mock-UI Elemente ─────────────────────────────────────────── */
+
+    /* Header-Varianten */
+    .mock-header-before {
+      background: var(--teal);
+      padding: 36px 18px 18px;
+    }
+    .mock-header-after {
+      background: linear-gradient(160deg, var(--teal) 0%, var(--teal-mid) 60%, #3aa08a 100%);
+      padding: 36px 18px 22px;
+      border-bottom-left-radius: 20px;
+      border-bottom-right-radius: 20px;
+    }
+    .mock-greeting {
+      color: rgba(255,255,255,0.7);
+      font-size: 11px;
+      margin-bottom: 2px;
+    }
+    .mock-greeting-name {
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .mock-profile-dot {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      border: 1.5px solid rgba(255,255,255,0.3);
+    }
+    .mock-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Pet-Card-Varianten */
+    .mock-body { padding: 14px; background: var(--bg); }
+    .mock-section-label {
+      font-size: 11px; font-weight: 700;
+      color: var(--text-sec);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 10px;
+    }
+
+    .pet-grid { display: flex; gap: 10px; }
+    .pet-card-before {
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px 10px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 6px;
+      width: 80px;
+      box-shadow: var(--sh-sm);
+      border: 1px solid var(--border-light);
+    }
+    .pet-icon-before {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--teal-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .pet-name-before {
+      font-size: 10px; font-weight: 600;
+      color: var(--text);
+    }
+    .pet-type-before { font-size: 9px; color: var(--text-light); }
+
+    .pet-card-after {
+      background: #fff;
+      border-radius: 14px;
+      overflow: hidden;
+      width: 90px;
+      box-shadow: var(--sh-md);
+    }
+    .pet-img-after {
+      width: 100%; height: 66px;
+      background: linear-gradient(135deg, #c8e6df 0%, #a5d4c8 100%);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+    }
+    .pet-info-after {
+      padding: 6px 8px 8px;
+    }
+    .pet-name-after {
+      font-size: 11px; font-weight: 700;
+      color: var(--text);
+    }
+    .pet-type-after { font-size: 9px; color: var(--text-sec); margin-top: 1px; }
+
+    /* PetDetail Hero */
+    .detail-before {
+      padding: 14px;
+      background: var(--bg);
+    }
+    .detail-info-card-before {
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: var(--sh-sm);
+      border: 1px solid var(--border-light);
+    }
+    .detail-avatar-before {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: var(--teal-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+      flex-shrink: 0;
+    }
+    .detail-meta-before { flex: 1; }
+    .detail-name-before {
+      font-size: 16px; font-weight: 700;
+      color: var(--text);
+    }
+    .detail-sub-before { font-size: 11px; color: var(--text-sec); margin-top: 2px; }
+
+    .detail-hero-after {
+      height: 180px;
+      background: linear-gradient(160deg, #2a9e82 0%, var(--teal) 60%, var(--teal-dark) 100%);
+      position: relative;
+      display: flex;
+      align-items: flex-end;
+      padding: 0 16px 16px;
+    }
+    .detail-hero-emoji {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 60px;
+      opacity: 0.28;
+    }
+    .detail-hero-text { position: relative; z-index: 1; }
+    .detail-hero-name {
+      font-size: 22px; font-weight: 800;
+      color: #fff;
+    }
+    .detail-hero-sub {
+      font-size: 12px; color: rgba(255,255,255,0.75);
+      margin-top: 2px;
+    }
+
+    /* AI-Card */
+    .ai-card-before {
+      background: #fff;
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex; align-items: center; gap: 10px;
+      box-shadow: var(--sh-sm);
+      border: 1px solid var(--border-light);
+      margin-top: 10px;
+    }
+    .ai-icon-before {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      background: var(--teal-light);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .ai-text-before { flex: 1; }
+    .ai-title-before { font-size: 13px; font-weight: 600; color: var(--text); }
+    .ai-sub-before   { font-size: 10px; color: var(--text-sec); }
+    .ai-chevron { font-size: 14px; color: var(--text-light); }
+
+    .ai-card-after {
+      background: var(--teal-light);
+      border-radius: 14px;
+      padding: 16px;
+      margin-top: 10px;
+      border: 1.5px solid #b8ddd4;
+      position: relative;
+      overflow: hidden;
+    }
+    .ai-card-after::before {
+      content: '✦';
+      position: absolute;
+      top: -8px; right: 10px;
+      font-size: 56px;
+      color: rgba(27,107,90,0.08);
+    }
+    .ai-top-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .ai-icon-after {
+      width: 42px; height: 42px;
+      border-radius: 12px;
+      background: var(--teal);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .ai-title-after { font-size: 14px; font-weight: 700; color: var(--teal-dark); }
+    .ai-sub-after   { font-size: 11px; color: var(--teal); margin-top: 2px; }
+    .ai-premium-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: var(--teal);
+      color: #fff;
+      font-size: 9px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 99px;
+      margin-top: 4px;
+    }
+    .ai-cta-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 10px;
+    }
+    .ai-cta-btn {
+      background: var(--teal);
+      color: #fff;
+      font-size: 11px; font-weight: 700;
+      padding: 7px 14px;
+      border-radius: 99px;
+    }
+
+    /* Empty State */
+    .empty-before {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px 14px;
+      text-align: center;
+      box-shadow: var(--sh-sm);
+      border: 1px solid var(--border-light);
+    }
+    .empty-before-text { font-size: 13px; color: var(--text-sec); margin-bottom: 8px; }
+    .empty-before-link { font-size: 12px; color: var(--teal); font-weight: 600; }
+
+    .empty-after {
+      background: #fff;
+      border-radius: 14px;
+      padding: 28px 14px 24px;
+      text-align: center;
+      box-shadow: var(--sh-sm);
+      border: 1px solid var(--border-light);
+    }
+    .empty-after-emoji { font-size: 48px; margin-bottom: 10px; line-height: 1; }
+    .empty-after-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .empty-after-sub   { font-size: 12px; color: var(--text-sec); margin-bottom: 14px; }
+    .empty-after-btn {
+      display: inline-block;
+      background: var(--teal);
+      color: #fff;
+      font-size: 13px; font-weight: 700;
+      padding: 10px 20px;
+      border-radius: 99px;
+    }
+
+    /* Typography Demo */
+    .typo-demo {
+      background: var(--surface);
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border-light);
+      box-shadow: var(--sh-sm);
+      padding: 1.5rem;
+    }
+    .typo-demo-label {
+      font-size: 0.6875rem; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      color: var(--text-light);
+      margin-bottom: 1rem;
+    }
+    .typo-before-h1 {
+      font-size: 28px; font-weight: 700;
+      color: var(--text);
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+    .typo-after-display {
+      font-size: 38px; font-weight: 800;
+      color: var(--text);
+      line-height: 1.1;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.5rem;
+    }
+    .typo-sub {
+      font-size: 16px;
+      color: var(--text-sec);
+    }
+    .typo-separator {
+      height: 1px; background: var(--border-light);
+      margin: 1rem 0;
+    }
+    .typo-row {
+      display: flex;
+      gap: 1rem;
+      align-items: baseline;
+    }
+    .typo-spec {
+      font-size: 0.75rem;
+      color: var(--text-light);
+      font-family: 'SF Mono', 'Fira Mono', monospace;
+    }
+
+    /* Card-Varianten */
+    .card-variants-row {
+      display: flex; gap: 0.75rem; flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+    .cv {
+      flex: 1; min-width: 130px;
+      border-radius: var(--r-md);
+      padding: 1rem;
+      border: 1px solid transparent;
+      box-shadow: var(--sh-sm);
+    }
+    .cv-icon {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+      margin-bottom: 0.625rem;
+    }
+    .cv-title { font-size: 0.8125rem; font-weight: 700; margin-bottom: 0.25rem; }
+    .cv-sub   { font-size: 0.75rem; }
+
+    .cv-default   { background: #fff; border-color: var(--border-light); }
+    .cv-default .cv-icon   { background: var(--teal-light); }
+    .cv-default .cv-title  { color: var(--text); }
+    .cv-default .cv-sub    { color: var(--text-sec); }
+
+    .cv-tinted    { background: var(--teal-light); border-color: #b8ddd4; }
+    .cv-tinted .cv-icon    { background: rgba(27,107,90,0.14); }
+    .cv-tinted .cv-title   { color: var(--teal-dark); }
+    .cv-tinted .cv-sub     { color: var(--teal); }
+
+    .cv-warning   { background: var(--warning-light); border-color: #e8d080; }
+    .cv-warning .cv-icon   { background: rgba(212,160,32,0.18); }
+    .cv-warning .cv-title  { color: #5a3e00; }
+    .cv-warning .cv-sub    { color: #7a5a00; }
+
+    .cv-error     { background: var(--error-light); border-color: #f0b0b0; }
+    .cv-error .cv-icon     { background: rgba(217,64,64,0.14); }
+    .cv-error .cv-title    { color: #7a1c1c; }
+    .cv-error .cv-sub      { color: var(--error); }
+
+    /* Skeleton Loading */
+    @keyframes shimmer {
+      0%   { background-position: -600px 0; }
+      100% { background-position:  600px 0; }
+    }
+    .skel {
+      border-radius: 6px;
+      background: linear-gradient(90deg, #e8e0d8 25%, #f0ebe5 50%, #e8e0d8 75%);
+      background-size: 600px 100%;
+      animation: shimmer 1.4s infinite linear;
+    }
+    .skel-spinner-demo {
+      display: flex; align-items: center; justify-content: center;
+      height: 140px;
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid var(--border-light);
+    }
+    .skel-spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--teal-light);
+      border-top-color: var(--teal);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .skel-card {
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid var(--border-light);
+      padding: 14px;
+    }
+    .skel-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .skel-circle { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; }
+    .skel-lines { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+    .skel-line-a { height: 12px; width: 60%; }
+    .skel-line-b { height: 10px; width: 40%; }
+    .skel-block  { height: 10px; margin-bottom: 6px; }
+    .skel-block:last-child { width: 70%; margin-bottom: 0; }
+
+    /* ─── Fazit ────────────────────────────────────────────────────── */
+    .fazit {
+      background: linear-gradient(135deg, var(--teal) 0%, var(--teal-mid) 55%, var(--teal-dark) 100%);
+      border-radius: var(--r-xl);
+      padding: 3rem 2.5rem;
+      margin: 3rem 0;
+      position: relative;
+      overflow: hidden;
+      color: #fff;
+    }
+    .fazit::before {
+      content: ''; position: absolute;
+      top: -50px; right: -50px;
+      width: 250px; height: 250px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+    .fazit-inner { position: relative; z-index: 1; }
+    .fazit h2 { color: #fff; margin-bottom: 0.75rem; }
+    .fazit p  { color: rgba(255,255,255,0.78); max-width: 580px; }
+    .fazit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      margin-top: 1.75rem;
+    }
+    .fazit-stat {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: var(--r-md);
+      padding: 1rem 1.25rem;
+    }
+    .fazit-stat-num {
+      font-size: 1.75rem; font-weight: 800;
+      color: #fff;
+    }
+    .fazit-stat-label {
+      font-size: 0.8125rem;
+      color: rgba(255,255,255,0.72);
+      margin-top: 0.2rem;
+    }
+
+    /* ─── TOC ──────────────────────────────────────────────────────── */
+    .toc {
+      background: #fff;
+      border-radius: var(--r-lg);
+      border: 1px solid var(--border-light);
+      box-shadow: var(--sh-sm);
+      padding: 1.5rem;
+      margin: 2rem 0 0;
+    }
+    .toc h3 { margin-bottom: 0.875rem; color: var(--text); }
+    .toc-list {
+      display: flex; flex-direction: column; gap: 0.4rem;
+      list-style: none;
+    }
+    .toc-list a {
+      display: flex; align-items: center; gap: 0.625rem;
+      font-size: 0.875rem; color: var(--teal);
+      text-decoration: none; font-weight: 500;
+    }
+    .toc-list a:hover { text-decoration: underline; }
+    .toc-list .toc-badge { flex-shrink: 0; }
+
+    @media (max-width: 640px) {
+      .mockup-row { flex-direction: column; }
+      .mockup-col { min-width: unset; }
+      .phone { width: 100%; max-width: 320px; }
+      .card-variants-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── HEADER ─────────────────────────────────────────────────────────── -->
+<header class="site-header">
+  <div class="wrap">
+    <div class="header-inner">
+      <div class="eyebrow"><span class="dot"></span> Design-Roadmap</div>
+      <h1>Design-Roadmap VetApp</h1>
+      <p class="header-sub">Visuelle Empfehlungen mit Vorher/Nachher-Mockups — 2026-04-04</p>
+      <div class="header-pills">
+        <span class="pill">8 Mockups</span>
+        <span class="pill">Mobile-first</span>
+        <span class="pill">React Native / Expo</span>
+        <span class="pill">Designsystem: Teal + Orange</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ─── INHALTSVERZEICHNIS ─────────────────────────────────────────────── -->
+<div class="wrap">
+  <div class="toc">
+    <h3>Inhalt</h3>
+    <ul class="toc-list">
+      <li><a href="#s1"><span class="badge badge-quick toc-badge">Schnell</span> 1 — HomeScreen Header: Gradient</a></li>
+      <li><a href="#s2"><span class="badge badge-medium toc-badge">Mittel</span> 2 — Pet-Card: Mehr Charakter</a></li>
+      <li><a href="#s3"><span class="badge badge-large toc-badge">Groß</span> 3 — PetDetail: Hero-Banner</a></li>
+      <li><a href="#s4"><span class="badge badge-medium toc-badge">Mittel</span> 4 — AI-Card: Premium-Feature</a></li>
+      <li><a href="#s5"><span class="badge badge-quick toc-badge">Schnell</span> 5 — Empty State: Einladend</a></li>
+      <li><a href="#s6"><span class="badge badge-quick toc-badge">Schnell</span> 6 — Display-Typografie: Paywall</a></li>
+      <li><a href="#s7"><span class="badge badge-quick toc-badge">Schnell</span> 7 — Card-Varianten</a></li>
+      <li><a href="#s8"><span class="badge badge-medium toc-badge">Mittel</span> 8 — Skeleton Loading statt Spinner</a></li>
+    </ul>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     SECTION 1 — HEADER GRADIENT
+     ════════════════════════════════════════════════════════════════════════ -->
+<div class="wrap">
+<section class="section" id="s1">
+  <div class="section-num"><span>1</span> HomeScreen</div>
+  <h2 class="section-title">Header: Flache Fläche → Subtiler Gradient</h2>
+  <p class="section-desc">
+    Der aktuelle Header ist ein einfarbiger Teal-Block (#1B6B5A). Ein leichter Gradient von
+    Teal zu einem etwas helleren Grünton gibt dem Header Tiefe, ohne den ruhigen Charakter
+    der App zu brechen. Die Rundung unten (bereits im Code als <code>borderBottomLeftRadius / borderBottomRightRadius: xl</code>
+    vorhanden) wird durch den Gradient stärker wahrnehmbar.
+  </p>
+  <div class="badge-meta">
+    <span class="badge badge-quick">Schnell — ca. 15 Min.</span>
+    <span class="badge" style="background:#f0ece8;color:var(--text-sec);">Nur Farbwert-Änderung</span>
+  </div>
+
+  <div class="mockup-row">
+    <div class="mockup-col">
+      <span class="mockup-label before">Vorher</span>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="mock-header-before">
+            <div class="mock-header-row">
+              <div>
+                <div class="mock-greeting">Willkommen zurück</div>
+                <div class="mock-greeting-name">Hallo, Claas! 👋</div>
+              </div>
+              <div class="mock-profile-dot"></div>
+            </div>
+          </div>
+          <div class="mock-body">
+            <div class="mock-section-label">Meine Tiere</div>
+            <div class="pet-grid">
+              <div class="pet-card-before">
+                <div class="pet-icon-before">🐾</div>
+                <div class="pet-name-before">Luna</div>
+                <div class="pet-type-before">Hund</div>
+              </div>
+              <div class="pet-card-before">
+                <div class="pet-icon-before">🐾</div>
+                <div class="pet-name-before">Milo</div>
+                <div class="pet-type-before">Katze</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="mockup-label before" style="font-size:0.6875rem;color:var(--text-light);">background: #1B6B5A (flach)</span>
+    </div>
+
+    <div class="mockup-col">
+      <span class="mockup-label after">Nachher</span>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="mock-header-after">
+            <div class="mock-header-row">
+              <div>
+                <div class="mock-greeting">Willkommen zurück</div>
+                <div class="mock-greeting-name">Hallo, Claas! 👋</div>
+              </div>
+              <div class="mock-profile-dot"></div>
+            </div>
+          </div>
+          <div class="mock-body">
+            <div class="mock-section-label">Meine Tiere</div>
+            <div class="pet-grid">
+              <div class="pet-card-before">
+                <div class="pet-icon-before">🐾</div>
+                <div class="pet-name-before">Luna</div>
+                <div class="pet-type-before">Hund</div>
+              </div>
+              <div class="pet-card-before">
+                <div class="pet-icon-before">🐾</div>
+                <div class="pet-name-before">Milo</div>
+                <div class="pet-type-before">Katze</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span class="mockup-label after" style="font-size:0.6875rem;color:var(--text-light);">linear-gradient(#1B6B5A → #2D8A73)</span>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     SECTION 2 — PET CARD
+     ════════════════════════════════════════════════════════════════════════ -->
+<section class="section" id="s2">
+  <div class="section-num"><span>2</span> Pet-Card</div>
+  <h2 class="section-title">Tier-Karten: Mehr Bild, mehr Persönlichkeit</h2>
+  <p class="section-desc">
+    Die aktuellen Pet-Cards sind kompakte Zeilen mit kleinem Paw-Icon und Namen — sachlich,
+    aber ohne Emotionen. Haustiere sind für Besitzer persönlich. Eine Card mit größerem
+    Foto-Bereich (Platzhalter in Teal-Gradient wenn kein Foto vorhanden) macht die App
+    sofort wärmer und persönlicher. Kein neues System nötig — das bestehende <code>pet.photo</code>
+    wird bereits unterstützt.
+  </p>
+  <div class="badge-meta">
+    <span class="badge badge-medium">Mittel — ca. 2–3 Std.</span>
+    <span class="badge" style="background:#f0ece8;color:var(--text-sec);">Nur HomeScreen</span>
+  </div>
+
+  <div class="mockup-row">
+    <div class="mockup-col">
+      <span class="mockup-label before">Vorher</span>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="mock-header-before" style="padding: 28px 14px 14px;">
+            <div class="mock-greeting-name" style="font-size:15px;">Meine Tiere</div>
+          </div>
+          <div class="mock-body">
+            <div class="pet-grid">
+              <div class="pet-card-before">
+                <div class="pet-icon-before">🐾</div>
+                <div class="pet-name-before">Luna</div>
+                <div class="pet-type-before">Hund</div>
+              </div>
+              <div class="pet-card-before">
+                <div class="pet-icon-before">🐾</div>
+                <div class="pet-name-before">Milo</div>
+                <div class="pet-type-before">Katze</div>
+              </div>
+              <div class="pet-card-before">
+                <div class="pet-icon-before">🐾</div>
+                <div class="pet-name-before">Rocky</div>
+                <div class="pet-type-before">Hund</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mockup-col">
+      <span class="mockup-label after">Nachher</span>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="mock-header-after" style="padding: 28px 14px 14px; border-radius: 0 0 16px 16px;">
+            <div class="mock-greeting-name" style="font-size:15px; color:#fff;">Meine Tiere</div>
+          </div>
+          <div class="mock-body">
+            <div class="pet-grid">
+              <div class="pet-card-after">
+                <div class="pet-img-after">🐶</div>
+                <div class="pet-info-after">
+                  <div class="pet-name-after">Luna</div>
+                  <div class="pet-type-after">Labrador</div>
+                </div>
+              </div>
+              <div class="pet-card-after">
+                <div class="pet-img-after" style="background: linear-gradient(135deg, #d4eae4, #b8d6ce);">🐱</div>
+                <div class="pet-info-after">
+                  <div class="pet-name-after">Milo</div>
+                  <div class="pet-type-after">Katze</div>
+                </div>
+              </div>
+              <div class="pet-card-after">
+                <div class="pet-img-after" style="background: linear-gradient(135deg, #dce6c8, #c4d8a8);">🐕</div>
+                <div class="pet-info-after">
+                  <div class="pet-name-after">Rocky</div>
+                  <div class="pet-type-after">Boxer</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     SECTION 3 — PET DETAIL HERO
+     ════════════════════════════════════════════════════════════════════════ -->
+<section class="section" id="s3">
+  <div class="section-num"><span>3</span> PetDetail</div>
+  <h2 class="section-title">Hero-Banner statt Mini-Avatar</h2>
+  <p class="section-desc">
+    Im PetDetailScreen steht aktuell ein 64×64 px Kreis-Bild in einer Info-Card — das sieht
+    aus wie ein Kontakt-Eintrag, nicht wie die Seite des geliebten Haustiers. Ein vollbreites
+    Hero-Banner (ca. 200 px hoch) mit Gradient-Overlay und dem Tiernamen in Weiß schafft
+    sofort eine emotionale Verbindung. Das Pattern ist in Musikapps (Spotify) und
+    Gesundheits-Apps bewährt.
+  </p>
+  <div class="badge-meta">
+    <span class="badge badge-large">Groß — ca. 1 Tag</span>
+    <span class="badge" style="background:#f0ece8;color:var(--text-sec);">PetDetailScreen</span>
+  </div>
+
+  <div class="mockup-row">
+    <div class="mockup-col">
+      <span class="mockup-label before">Vorher</span>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="mock-header-before" style="padding: 28px 14px 12px; display:flex; align-items:center; gap:8px;">
+            <span style="color:rgba(255,255,255,0.7); font-size:18px;">←</span>
+            <span style="color:#fff; font-size:14px; font-weight:600;">Zurück</span>
+          </div>
+          <div class="detail-before">
+            <div class="detail-info-card-before">
+              <div class="detail-avatar-before">🐶</div>
+              <div class="detail-meta-before">
+                <div class="detail-name-before">Luna</div>
+                <div class="detail-sub-before">Labrador · 3 Jahre · weiblich</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mockup-col">
+      <span class="mockup-label after">Nachher</span>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="detail-hero-after">
+            <div class="detail-hero-emoji">🐶</div>
+            <div style="position:absolute; top: 12px; left:14px; z-index:2;">
+              <span style="color:rgba(255,255,255,0.7); font-size:18px; font-weight:300;">←</span>
+            </div>
+            <div class="detail-hero-text">
+              <div class="detail-hero-name">Luna</div>
+              <div class="detail-hero-sub">Labrador · 3 Jahre · weiblich</div>
+            </div>
+          </div>
+          <div class="mock-body">
+            <div style="display:flex; gap:8px; margin-bottom: 12px;">
+              <div style="flex:1; background:#fff; border-radius:10px; padding:10px; text-align:center; border:1px solid var(--border-light); box-shadow:var(--sh-sm);">
+                <div style="font-size:16px; font-weight:700; color:var(--teal);">5</div>
+                <div style="font-size:9px; color:var(--text-sec);">Impfungen</div>
+              </div>
+              <div style="flex:1; background:#fff; border-radius:10px; padding:10px; text-align:center; border:1px solid var(--border-light); box-shadow:var(--sh-sm);">
+                <div style="font-size:16px; font-weight:700; color:var(--accent);">2</div>
+                <div style="font-size:9px; color:var(--text-sec);">Erinnerungen</div>
+              </div>
+              <div style="flex:1; background:#fff; border-radius:10px; padding:10px; text-align:center; border:1px solid var(--border-light); box-shadow:var(--sh-sm);">
+                <div style="font-size:16px; font-weight:700; color:var(--text);">3</div>
+                <div style="font-size:9px; color:var(--text-sec);">Dokumente</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     SECTION 4 — AI CARD
+     ════════════════════════════════════════════════════════════════════════ -->
+<section class="section" id="s4">
+  <div class="section-num"><span>4</span> AI-Assistent</div>
+  <h2 class="section-title">KI-Card: Von Settings-Link zu Premium-Feature</h2>
+  <p class="section-desc">
+    Die aktuelle AI-Card auf dem HomeScreen ist eine schlichte Zeile mit Icon, Text und
+    Chevron — kaum zu unterscheiden von einem normalen Einstellungs-Eintrag. Als
+    Premium-Feature verdient die KI eine vollbreite Card mit primaryLight-Hintergrund,
+    größerem Icon und einem sichtbaren "Pro"-Badge. Das signalisiert Wert, ohne aufdringlich
+    zu wirken.
+  </p>
+  <div class="badge-meta">
+    <span class="badge badge-medium">Mittel — ca. 1–2 Std.</span>
+    <span class="badge" style="background:#f0ece8;color:var(--text-sec);">HomeScreen aiCard-Styles</span>
+  </div>
+
+  <div class="mockup-row">
+    <div class="mockup-col">
+      <span class="mockup-label before">Vorher</span>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="mock-header-before" style="padding:28px 14px 12px;">
+            <div class="mock-greeting-name" style="font-size:14px; color:#fff;">Übersicht</div>
+          </div>
+          <div class="mock-body">
+            <div class="ai-card-before">
+              <div class="ai-icon-before">✨</div>
+              <div class="ai-text-before">
+                <div class="ai-title-before">KI-Gesundheitsassistent</div>
+                <div class="ai-sub-before">Fragen zur Tiergesundheit?</div>
+              </div>
+              <div class="ai-chevron">›</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mockup-col">
+      <span class="mockup-label after">Nachher</span>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="mock-header-after" style="padding:28px 14px 12px; border-radius: 0 0 16px 16px;">
+            <div class="mock-greeting-name" style="font-size:14px; color:#fff;">Übersicht</div>
+          </div>
+          <div class="mock-body">
+            <div class="ai-card-after">
+              <div class="ai-top-row">
+                <div class="ai-icon-after">✨</div>
+                <div>
+                  <div class="ai-title-after">KI-Gesundheitsassistent</div>
+                  <div class="ai-sub-after">Sofortige Antworten zu Symptomen & Pflege</div>
+                  <span class="ai-premium-badge">✦ Pro</span>
+                </div>
+              </div>
+              <div class="ai-cta-row">
+                <span style="font-size:11px; color:var(--teal); font-weight:500;">Jetzt ausprobieren</span>
+                <div class="ai-cta-btn">Assistent öffnen</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     SECTION 5 — EMPTY STATE
+     ════════════════════════════════════════════════════════════════════════ -->
+<section class="section" id="s5">
+  <div class="section-num"><span>5</span> Empty State</div>
+  <h2 class="section-title">Leere Liste: Einladend statt informativ</h2>
+  <p class="section-desc">
+    "Noch keine Haustiere" als Plain-Text in einer weißen Card kommuniziert zwar den Zustand,
+    lädt aber nicht zum Handeln ein. Ein freundlicher Empty State mit großem Tier-Emoji,
+    einer herzlichen Ansprache und einem prominenten CTA-Button reduziert die Hürde für
+    neue Nutzer deutlich — ein klassischer Onboarding-Hebel.
+  </p>
+  <div class="badge-meta">
+    <span class="badge badge-quick">Schnell — ca. 30 Min.</span>
+    <span class="badge" style="background:#f0ece8;color:var(--text-sec);">HomeScreen emptyCard</span>
+  </div>
+
+  <div class="mockup-row">
+    <div class="mockup-col">
+      <span class="mockup-label before">Vorher</span>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="mock-header-before" style="padding:28px 14px 12px;">
+            <div class="mock-greeting-name" style="font-size:14px; color:#fff;">Meine Tiere</div>
+          </div>
+          <div class="mock-body">
+            <div class="empty-before">
+              <div class="empty-before-text">Noch keine Haustiere</div>
+              <div class="empty-before-link">Erstes Tier hinzufügen</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mockup-col">
+      <span class="mockup-label after">Nachher</span>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="mock-header-after" style="padding:28px 14px 12px; border-radius: 0 0 16px 16px;">
+            <div class="mock-greeting-name" style="font-size:14px; color:#fff;">Meine Tiere</div>
+          </div>
+          <div class="mock-body">
+            <div class="empty-after">
+              <div class="empty-after-emoji">🐾</div>
+              <div class="empty-after-title">Noch kein Tier angelegt</div>
+              <div class="empty-after-sub">Füge dein erstes Haustier hinzu und<br>behalte seine Gesundheit im Blick.</div>
+              <div class="empty-after-btn">+ Erstes Tier hinzufügen</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     SECTION 6 — DISPLAY TYPOGRAPHY
+     ════════════════════════════════════════════════════════════════════════ -->
+<section class="section" id="s6">
+  <div class="section-num"><span>6</span> Typografie</div>
+  <h2 class="section-title">Display-Größe für Paywall & Onboarding</h2>
+  <p class="section-desc">
+    Das aktuelle h1 (28 px / fontWeight 700) ist für Inhalts-Überschriften gedacht. Auf der
+    Paywall oder dem Onboarding-Screen, wo Emotion und Überzeugung zählen, braucht es eine
+    eigene Display-Stufe. 38 px / fontWeight 800 mit leichtem negativem Letter-Spacing macht
+    den Unterschied zwischen "Seite" und "Moment". Ein neues Token <code>typography.display</code>
+    reicht dafür.
+  </p>
+  <div class="badge-meta">
+    <span class="badge badge-quick">Schnell — ca. 20 Min.</span>
+    <span class="badge" style="background:#f0ece8;color:var(--text-sec);">src/theme/typography.ts</span>
+  </div>
+
+  <div class="mockup-row">
+    <div class="mockup-col">
+      <span class="mockup-label before">Vorher — h1 (28 px)</span>
+      <div class="typo-demo" style="width:320px;">
+        <div class="typo-demo-label">Paywall / Onboarding</div>
+        <div class="typo-before-h1">VetApp Pro</div>
+        <div class="typo-sub">Alle Features für dein Haustier</div>
+        <div class="typo-separator"></div>
+        <div class="typo-row">
+          <span class="typo-spec">fontSize: 28</span>
+          <span class="typo-spec">fontWeight: '700'</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="mockup-col">
+      <span class="mockup-label after">Nachher — display (38 px)</span>
+      <div class="typo-demo" style="width:320px;">
+        <div class="typo-demo-label">Paywall / Onboarding</div>
+        <div class="typo-after-display">VetApp Pro</div>
+        <div class="typo-sub">Alle Features für dein Haustier</div>
+        <div class="typo-separator"></div>
+        <div class="typo-row">
+          <span class="typo-spec">fontSize: 38</span>
+          <span class="typo-spec">fontWeight: '800'</span>
+          <span class="typo-spec">letterSpacing: -0.5</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     SECTION 7 — CARD VARIANTEN
+     ════════════════════════════════════════════════════════════════════════ -->
+<section class="section" id="s7">
+  <div class="section-num"><span>7</span> Card-System</div>
+  <h2 class="section-title">Vier Card-Varianten für semantische Zustände</h2>
+  <p class="section-desc">
+    Das bestehende <code>&lt;Card&gt;</code>-Component ist immer weiß. Viele Zustände in der App
+    (Impfung fällig, Fehler, Erfolg, Hinweis) könnten durch farbige Card-Varianten sofort
+    semantisch kommuniziert werden — ohne Icons lesen zu müssen. Die Farben kommen alle aus
+    dem existierenden Farbsystem. Ein optionaler <code>variant</code>-Prop reicht.
+  </p>
+  <div class="badge-meta">
+    <span class="badge badge-quick">Schnell — ca. 45 Min.</span>
+    <span class="badge" style="background:#f0ece8;color:var(--text-sec);">src/components/Card.tsx</span>
+  </div>
+
+  <div class="card-variants-row">
+    <div class="cv cv-default">
+      <div class="cv-icon">📋</div>
+      <div class="cv-title">Default</div>
+      <div class="cv-sub">Weiß, neutral — Standard für alle normalen Inhalte</div>
+    </div>
+    <div class="cv cv-tinted">
+      <div class="cv-icon">✨</div>
+      <div class="cv-title">Tinted (primaryLight)</div>
+      <div class="cv-sub">Hintergrund-Akzent für Hinweise & Premium-Features</div>
+    </div>
+    <div class="cv cv-warning">
+      <div class="cv-icon">⏰</div>
+      <div class="cv-title">Warning (warningLight)</div>
+      <div class="cv-sub">Bald fällige Impfungen & Erinnerungen</div>
+    </div>
+    <div class="cv cv-error">
+      <div class="cv-icon">⚠️</div>
+      <div class="cv-title">Error (errorLight)</div>
+      <div class="cv-sub">Überfällige Erinnerungen & kritische Zustände</div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════════════════════════════════════
+     SECTION 8 — SKELETON LOADING
+     ════════════════════════════════════════════════════════════════════════ -->
+<section class="section" id="s8">
+  <div class="section-num"><span>8</span> Loading States</div>
+  <h2 class="section-title">Skeleton statt ActivityIndicator</h2>
+  <p class="section-desc">
+    Der <code>ActivityIndicator</code> (Spinner) zeigt zwar "es lädt", aber nichts darüber, was
+    geladen wird. Skeleton-Screens (graue Platzhalter in der Form der echten Inhalte, mit
+    Shimmer-Animation) reduzieren die wahrgenommene Ladezeit spürbar und fühlen sich
+    polierter an. Kein externes Package nötig — reine CSS-Animation.
+  </p>
+  <div class="badge-meta">
+    <span class="badge badge-medium">Mittel — ca. 2–3 Std.</span>
+    <span class="badge" style="background:#f0ece8;color:var(--text-sec);">HomeScreen + PetDetailScreen</span>
+  </div>
+
+  <div class="mockup-row">
+    <div class="mockup-col">
+      <span class="mockup-label before">Vorher — ActivityIndicator</span>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="mock-header-before" style="padding:28px 14px 12px;">
+            <div class="mock-greeting-name" style="font-size:14px; color:#fff;">Laden…</div>
+          </div>
+          <div class="mock-body">
+            <div class="skel-spinner-demo">
+              <div class="skel-spinner"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="mockup-col">
+      <span class="mockup-label after">Nachher — Skeleton mit Shimmer</span>
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="mock-header-after" style="padding:28px 14px 14px; border-radius: 0 0 16px 16px;">
+            <div style="height:14px; width:140px; border-radius:6px; background:rgba(255,255,255,0.2);"></div>
+            <div style="height:20px; width:180px; border-radius:6px; background:rgba(255,255,255,0.25); margin-top:6px;"></div>
+          </div>
+          <div class="mock-body">
+            <!-- Skeleton Pet Cards -->
+            <div style="display:flex; gap:10px; margin-bottom:14px;">
+              <div style="width:90px; background:#fff; border-radius:14px; overflow:hidden; box-shadow:var(--sh-sm);">
+                <div class="skel" style="height:66px;"></div>
+                <div style="padding:6px 8px 8px;">
+                  <div class="skel skel-line-a" style="height:10px; width:65px; margin-bottom:4px;"></div>
+                  <div class="skel skel-line-b" style="height:8px; width:45px;"></div>
+                </div>
+              </div>
+              <div style="width:90px; background:#fff; border-radius:14px; overflow:hidden; box-shadow:var(--sh-sm);">
+                <div class="skel" style="height:66px;"></div>
+                <div style="padding:6px 8px 8px;">
+                  <div class="skel skel-line-a" style="height:10px; width:65px; margin-bottom:4px;"></div>
+                  <div class="skel skel-line-b" style="height:8px; width:45px;"></div>
+                </div>
+              </div>
+            </div>
+            <!-- Skeleton Content Card -->
+            <div class="skel-card">
+              <div class="skel-row">
+                <div class="skel skel-circle"></div>
+                <div class="skel-lines">
+                  <div class="skel skel-line-a"></div>
+                  <div class="skel skel-line-b"></div>
+                </div>
+              </div>
+              <div class="skel skel-block" style="height:10px;"></div>
+              <div class="skel skel-block" style="height:10px;"></div>
+              <div class="skel skel-block" style="height:10px; width:70%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+
+<!-- ─── FAZIT ──────────────────────────────────────────────────────────── -->
+<div class="wrap">
+  <div class="fazit">
+    <div class="fazit-inner">
+      <h2>Zusammenfassung</h2>
+      <p>
+        Alle 8 Empfehlungen nutzen das bestehende Farbsystem und bauen auf vorhandenen
+        Komponenten auf. Kein Redesign, keine neuen Abhängigkeiten — gezielte
+        Verbesserungen mit messbarem Impact auf Nutzererlebnis und wahrgenommene Qualität.
+      </p>
+      <div class="fazit-grid">
+        <div class="fazit-stat">
+          <div class="fazit-stat-num">3</div>
+          <div class="fazit-stat-label">Schnelle Wins (&lt; 1 Std.)</div>
+        </div>
+        <div class="fazit-stat">
+          <div class="fazit-stat-num">3</div>
+          <div class="fazit-stat-label">Mittlere Aufgaben (1–3 Std.)</div>
+        </div>
+        <div class="fazit-stat">
+          <div class="fazit-stat-num">1</div>
+          <div class="fazit-stat-label">Großes Feature (~1 Tag)</div>
+        </div>
+        <div class="fazit-stat">
+          <div class="fazit-stat-num">0</div>
+          <div class="fazit-stat-label">Neue npm-Packages nötig</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

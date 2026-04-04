@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VetApp Briefing — 04.04.2026</title>
+<style>
+  :root {
+    --teal: #2A9D8F;
+    --teal-light: #E8F5F3;
+    --orange: #CC6B3D;
+    --orange-light: #FFF3ED;
+    --red: #D94F4F;
+    --red-light: #FFF0F0;
+    --yellow: #E9C46A;
+    --yellow-light: #FFFBE6;
+    --green: #4CAF50;
+    --green-light: #F0FAF0;
+    --bg: #FAFAF8;
+    --text: #1A1A1A;
+    --text-muted: #6B7280;
+    --border: #E5E7EB;
+    --card: #FFFFFF;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 3px solid var(--teal);
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--teal);
+  }
+
+  header .date {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  .summary {
+    background: var(--teal-light);
+    border-left: 4px solid var(--teal);
+    padding: 1.25rem 1.5rem;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+  }
+
+  .summary strong { color: var(--teal); }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    text-align: center;
+  }
+
+  .stat-card .number {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .stat-card .label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .stat-card.red .number { color: var(--red); }
+  .stat-card.orange .number { color: var(--orange); }
+  .stat-card.yellow .number { color: var(--yellow); }
+  .stat-card.green .number { color: var(--green); }
+
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  h2 .badge {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .prio-section {
+    margin-bottom: 2.5rem;
+  }
+
+  .task-list {
+    list-style: none;
+  }
+
+  .task-item {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 0.75rem;
+    border-left: 4px solid transparent;
+    transition: box-shadow 0.15s;
+  }
+
+  .task-item:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  .task-item.critical { border-left-color: var(--red); background: var(--red-light); }
+  .task-item.high { border-left-color: var(--orange); background: var(--orange-light); }
+  .task-item.medium { border-left-color: var(--yellow); background: var(--yellow-light); }
+  .task-item.low { border-left-color: var(--teal); background: var(--teal-light); }
+  .task-item.done { border-left-color: var(--green); background: var(--green-light); opacity: 0.7; }
+
+  .task-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.35rem;
+  }
+
+  .task-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .task-tag {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  .tag-critical { background: var(--red); color: white; }
+  .tag-high { background: var(--orange); color: white; }
+  .tag-medium { background: var(--yellow); color: #1A1A1A; }
+  .tag-low { background: var(--teal); color: white; }
+  .tag-phase2 { background: var(--border); color: var(--text-muted); }
+
+  .task-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+  }
+
+  .task-meta {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    display: flex;
+    gap: 1rem;
+  }
+
+  .task-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .section-intro {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    font-style: italic;
+  }
+
+  .decisions {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .decisions h3 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    color: var(--orange);
+  }
+
+  .decisions ul {
+    list-style: none;
+    font-size: 0.9rem;
+  }
+
+  .decisions li {
+    padding: 0.4rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .decisions li:last-child { border-bottom: none; }
+
+  .decisions li::before {
+    content: "\2794  ";
+    color: var(--orange);
+  }
+
+  footer {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .done-section { margin-top: 2rem; }
+  .done-section summary {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--green);
+    margin-bottom: 0.75rem;
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 1rem; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    header { flex-direction: column; gap: 0.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>VetApp Briefing</h1>
+  <span class="date">04. April 2026</span>
+</header>
+
+<div class="summary">
+  <strong>TL;DR:</strong> App laeuft, Design-Sprint abgeschlossen, alle Commits gepusht. Naechster grosser Brocken ist der <strong>Gesundheits-UX Umbau</strong> (MedicalEvent Datenmodell). Daneben 6 Fixes vor Release und ein paar Backlog-Items. Keine Tests, kein CI — TypeScript ist aktuell das einzige Sicherheitsnetz.
+</div>
+
+<div class="stats">
+  <div class="stat-card red">
+    <div class="number">2</div>
+    <div class="label">Sofort</div>
+  </div>
+  <div class="stat-card orange">
+    <div class="number">6</div>
+    <div class="label">Vor Release</div>
+  </div>
+  <div class="stat-card yellow">
+    <div class="number">3</div>
+    <div class="label">Phase 2</div>
+  </div>
+  <div class="stat-card green">
+    <div class="number">9</div>
+    <div class="label">Backlog</div>
+  </div>
+</div>
+
+<!-- SOFORT -->
+<div class="prio-section">
+  <h2>
+    <span>Sofort</span>
+    <span class="badge tag-critical">Blocker</span>
+  </h2>
+  <p class="section-intro">Muss vor allen anderen Features passieren — alles Weitere baut darauf auf.</p>
+
+  <ul class="task-list">
+    <li class="task-item critical">
+      <div class="task-header">
+        <span class="task-title">MedicalEvent Datenmodell vereinheitlichen</span>
+        <span class="task-tag tag-critical">Kritisch</span>
+      </div>
+      <div class="task-desc">
+        Impfungen und Behandlungen teilen sich aktuell kein gemeinsames Datenmodell. Bevor die Gesundheits-UX sinnvoll weitergebaut werden kann, braucht es ein einheitliches <code>MedicalEvent</code> Interface. Betrifft DB-Schema, TypeScript-Typen und Supabase-Queries.
+      </div>
+      <div class="task-meta">
+        <span>Umfang: Gross</span>
+        <span>Team: DB Expert + Developer</span>
+        <span>Risiko: Schema-Migration</span>
+      </div>
+    </li>
+    <li class="task-item critical">
+      <div class="task-header">
+        <span class="task-title">DataContext + Screens auf MedicalEvent umbauen</span>
+        <span class="task-tag tag-critical">Kritisch</span>
+      </div>
+      <div class="task-desc">
+        Nach dem Datenmodell-Umbau muessen DataContext (~350 Zeilen God-Object) und alle Gesundheits-Screens das neue Modell nutzen. Idealerweise gleich das M7-Refactoring (Context aufsplitten) mitmachen.
+      </div>
+      <div class="task-meta">
+        <span>Umfang: Gross</span>
+        <span>Team: Developer</span>
+        <span>Abhaengig von: MedicalEvent Datenmodell</span>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<!-- VOR RELEASE -->
+<div class="prio-section">
+  <h2>
+    <span>Vor Release</span>
+    <span class="badge tag-high">Release-Blocker</span>
+  </h2>
+  <p class="section-intro">Muss gefixt sein bevor die App an echte Nutzer geht. Sortiert nach Risiko.</p>
+
+  <ul class="task-list">
+    <li class="task-item high">
+      <div class="task-header">
+        <span class="task-title">F-02: togglePro() absichern — IAP implementieren</span>
+        <span class="task-tag tag-high">Security</span>
+      </div>
+      <div class="task-desc">
+        Premium-Status kann aktuell clientseitig getoggelt werden. Braucht echte In-App-Purchase Anbindung und RLS-Policy fuer <code>is_premium</code>.
+      </div>
+      <div class="task-meta">
+        <span>Umfang: Gross</span>
+        <span>Team: Developer</span>
+        <span>Risiko: Umsatzverlust ohne IAP</span>
+      </div>
+    </li>
+    <li class="task-item high">
+      <div class="task-header">
+        <span class="task-title">F-03: CORS in Edge Function einschraenken</span>
+        <span class="task-tag tag-high">Security</span>
+      </div>
+      <div class="task-desc">
+        Edge Function erlaubt aktuell <code>Origin: *</code>. Muss auf die App-Domain eingeschraenkt werden.
+      </div>
+      <div class="task-meta">
+        <span>Umfang: Klein</span>
+        <span>Team: Developer</span>
+      </div>
+    </li>
+    <li class="task-item high">
+      <div class="task-header">
+        <span class="task-title">F-07: DB-Fehler in DataContext.refresh() nicht verschlucken</span>
+        <span class="task-tag tag-high">Bug</span>
+      </div>
+      <div class="task-desc">
+        Wenn Supabase-Queries in <code>refresh()</code> fehlschlagen, sieht der User einfach keine Daten — ohne Fehlermeldung. Silent Failures.
+      </div>
+      <div class="task-meta">
+        <span>Umfang: Klein</span>
+        <span>Team: Developer</span>
+      </div>
+    </li>
+    <li class="task-item high">
+      <div class="task-header">
+        <span class="task-title">F-05/F-06: goBack() bei null-Events/Pets absichern</span>
+        <span class="task-tag tag-high">Bug</span>
+      </div>
+      <div class="task-desc">
+        EventDetailScreen und PetDetailScreen crashen wenn sie mit einer ungültigen ID navigiert werden (z.B. geloeschtes Pet/Event). Braucht Null-Checks + Fallback-Navigation.
+      </div>
+      <div class="task-meta">
+        <span>Umfang: Klein</span>
+        <span>Team: Developer</span>
+      </div>
+    </li>
+    <li class="task-item high">
+      <div class="task-header">
+        <span class="task-title">F-08: Pet-Fotos in Supabase Storage</span>
+        <span class="task-tag tag-high">Feature</span>
+      </div>
+      <div class="task-desc">
+        Pet-Fotos werden aktuell nicht persistiert. Gleiche Logik wie Dokumente nutzen: Upload in Storage, Pfad in DB, signed URLs on-demand.
+      </div>
+      <div class="task-meta">
+        <span>Umfang: Mittel</span>
+        <span>Team: Developer</span>
+      </div>
+    </li>
+    <li class="task-item high">
+      <div class="task-header">
+        <span class="task-title">F-11: notification_id ins Schema nachpflegen</span>
+        <span class="task-tag tag-high">Schema-Drift</span>
+      </div>
+      <div class="task-desc">
+        Die Spalte <code>notification_id</code> existiert in der Live-DB, ist aber nicht in <code>supabase-schema.sql</code> dokumentiert. Schema-Drift-Risiko bei Re-Setup.
+      </div>
+      <div class="task-meta">
+        <span>Umfang: Klein</span>
+        <span>Team: Developer / DB Expert</span>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<!-- PHASE 2 -->
+<div class="prio-section">
+  <h2>
+    <span>Phase 2</span>
+    <span class="badge tag-phase2">Nach MVP</span>
+  </h2>
+  <p class="section-intro">Geplant, aber nicht release-kritisch. Reihenfolge beachten.</p>
+
+  <ul class="task-list">
+    <li class="task-item low">
+      <div class="task-header">
+        <span class="task-title">Custom Font (Inter) einfuehren</span>
+        <span class="task-tag tag-phase2">Design</span>
+      </div>
+      <div class="task-desc">
+        Frueh in Phase 2, bevor der Screen-Bestand weiter waechst. Expo Google Fonts Paket nutzen.
+      </div>
+      <div class="task-meta">
+        <span>Umfang: Mittel</span>
+        <span>Team: Designer + Developer</span>
+      </div>
+    </li>
+    <li class="task-item low">
+      <div class="task-header">
+        <span class="task-title">Dark Mode</span>
+        <span class="task-tag tag-phase2">Design</span>
+      </div>
+      <div class="task-desc">
+        Voraussetzung: Semantic Color Tokens im Theme. Erst Tokens, dann Dark-Varianten.
+      </div>
+      <div class="task-meta">
+        <span>Umfang: Gross</span>
+        <span>Team: Designer + Developer</span>
+        <span>Abhaengig von: Semantic Tokens</span>
+      </div>
+    </li>
+    <li class="task-item low">
+      <div class="task-header">
+        <span class="task-title">Micro-Animationen</span>
+        <span class="task-tag tag-phase2">Design</span>
+      </div>
+      <div class="task-desc">
+        Entscheidung: Maximal ein einzelner Effekt (Card-Press). Kein Reanimated fuers MVP.
+      </div>
+      <div class="task-meta">
+        <span>Umfang: Klein</span>
+        <span>Team: Developer</span>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<!-- BACKLOG -->
+<div class="prio-section">
+  <h2>
+    <span>Backlog</span>
+    <span class="badge tag-phase2">Priorisieren bei Bedarf</span>
+  </h2>
+  <p class="section-intro">Bekannte Punkte. Jeder braucht eine explizite Entscheidung — kein stiller Friedhof.</p>
+
+  <ul class="task-list">
+    <li class="task-item" style="border-left-color: var(--text-muted);">
+      <div class="task-header">
+        <span class="task-title">M7: DataContext refactoren</span>
+        <span class="task-tag tag-medium">Tech Debt</span>
+      </div>
+      <div class="task-desc">God-Object mit ~350 Zeilen. Am besten beim MedicalEvent-Umbau gleich mitmachen.</div>
+    </li>
+    <li class="task-item" style="border-left-color: var(--text-muted);">
+      <div class="task-header">
+        <span class="task-title">Chat-Historie persistent machen</span>
+        <span class="task-tag tag-phase2">Feature</span>
+      </div>
+      <div class="task-desc">KI-Chat verliert History beim Tab-Wechsel. Erst nach MVP relevant.</div>
+    </li>
+    <li class="task-item" style="border-left-color: var(--text-muted);">
+      <div class="task-header">
+        <span class="task-title">SelectField: Tap-outside zum Schliessen</span>
+        <span class="task-tag tag-phase2">UX</span>
+      </div>
+      <div class="task-desc">QA-Finding. Dropdown schliesst nur per Auswahl, nicht per Tap ausserhalb.</div>
+    </li>
+    <li class="task-item" style="border-left-color: var(--text-muted);">
+      <div class="task-header">
+        <span class="task-title">Demo vorbereiten</span>
+        <span class="task-tag tag-phase2">Ops</span>
+      </div>
+      <div class="task-desc">Expo Go, EAS Build oder Web? Muss vor erstem Kundentermin geklaert werden.</div>
+    </li>
+    <li class="task-item" style="border-left-color: var(--text-muted);">
+      <div class="task-header">
+        <span class="task-title">Guenstigeres KI-Modell evaluieren</span>
+        <span class="task-tag tag-phase2">Kosten</span>
+      </div>
+      <div class="task-desc">claude-sonnet-4-6 ist teuer. Haiku oder guenstigere Variante testen.</div>
+    </li>
+    <li class="task-item" style="border-left-color: var(--text-muted);">
+      <div class="task-header">
+        <span class="task-title">Deno std Version aktualisieren</span>
+        <span class="task-tag tag-phase2">Maintenance</span>
+      </div>
+      <div class="task-desc">Edge Function nutzt Deno std 0.168.0 — veraltet.</div>
+    </li>
+    <li class="task-item" style="border-left-color: var(--text-muted);">
+      <div class="task-header">
+        <span class="task-title">F-10: signUp Auto-SignIn Fehlermeldung</span>
+        <span class="task-tag tag-phase2">UX</span>
+      </div>
+      <div class="task-desc">Wenn Email-Confirmation aktiv ist, kommt keine klare Meldung.</div>
+    </li>
+    <li class="task-item" style="border-left-color: var(--text-muted);">
+      <div class="task-header">
+        <span class="task-title">F-12: Paywall-Check fuer Recurrence</span>
+        <span class="task-tag tag-phase2">Premium</span>
+      </div>
+      <div class="task-desc">AddReminderScreen prueft nicht ob wiederkehrende Erinnerungen Premium sind.</div>
+    </li>
+    <li class="task-item" style="border-left-color: var(--text-muted);">
+      <div class="task-header">
+        <span class="task-title">F-14: getAge() Zukunftsdaten</span>
+        <span class="task-tag tag-phase2">Bug</span>
+      </div>
+      <div class="task-desc">Geburtsdatum in der Zukunft wird nicht abgefangen.</div>
+    </li>
+  </ul>
+</div>
+
+<!-- OFFENE ENTSCHEIDUNGEN -->
+<div class="decisions">
+  <h3>Offene Entscheidungen (von dir, Claas)</h3>
+  <ul>
+    <li><strong>M7 Timing:</strong> DataContext-Refactoring mit MedicalEvent-Umbau zusammenlegen oder separat?</li>
+    <li><strong>Tests:</strong> 0 Tests aktuell. Wann und was zuerst? (Unit? Integration? E2E?)</li>
+    <li><strong>Scheduled Agents:</strong> Full Audit, CEO Briefing, Vault Verdichtung — aufsetzen oder weiter manuell?</li>
+    <li><strong>Design-Konzept v2:</strong> Liegt im Vault, wartet auf Freigabe</li>
+    <li><strong>Demo-Format:</strong> Expo Go / EAS Build / Web — was fuer erste Kunden-Demo?</li>
+  </ul>
+</div>
+
+<!-- ERLEDIGT -->
+<details class="done-section">
+  <summary>Erledigt (26 Tasks)</summary>
+  <ul class="task-list" style="margin-top: 0.75rem;">
+    <li class="task-item done"><div class="task-title">KI-Assistent komplett (Edge Function, Chat-UI, Tab, Security, Redesign)</div></li>
+    <li class="task-item done"><div class="task-title">Design-Sprint D-A bis D-E (Accessibility, Touch-Targets, Settings, Inline-Werte, Farben)</div></li>
+    <li class="task-item done"><div class="task-title">Orange-Kontrast WCAG-konform: #E8895C -> #CC6B3D</div></li>
+    <li class="task-item done"><div class="task-title">Spacing-Token smd: 12 eingefuehrt</div></li>
+    <li class="task-item done"><div class="task-title">Profil-Tab entfernt, ueber HomeScreen-Header erreichbar</div></li>
+    <li class="task-item done"><div class="task-title">ProfileScreen: Back-Button + Touch-Targets</div></li>
+    <li class="task-item done"><div class="task-title">KI-Chat abgesichert (Rate Limiting, Validation, Prompt-Schutz)</div></li>
+    <li class="task-item done"><div class="task-title">Supabase-Credentials in .env ausgelagert</div></li>
+    <li class="task-item done"><div class="task-title">Dev-Toggle entfernt (Security)</div></li>
+    <li class="task-item done"><div class="task-title">Storage-URLs refactored (Pfad statt signed URL)</div></li>
+    <li class="task-item done"><div class="task-title">SelectField-Komponente extrahiert</div></li>
+    <li class="task-item done"><div class="task-title">Tote Buttons gefixt</div></li>
+    <li class="task-item done"><div class="task-title">Haustier bearbeiten (updatePet + Edit-Modus)</div></li>
+    <li class="task-item done"><div class="task-title">Loading/Error-States + Doppel-Submit-Schutz</div></li>
+    <li class="task-item done"><div class="task-title">Ueberfaellig-Regeln aktiviert (Notifications)</div></li>
+    <li class="task-item done"><div class="task-title">getAge() dedupliziert + Fallback</div></li>
+    <li class="task-item done"><div class="task-title">parseGermanDate() zentral</div></li>
+    <li class="task-item done"><div class="task-title">Temp-Bild + .env geprueft — alles sauber</div></li>
+    <li class="task-item done"><div class="task-title">Quick Wins: Theme-Farben, Security, toter Code</div></li>
+    <li class="task-item done"><div class="task-title">Team-Retrospektive dokumentiert</div></li>
+    <li class="task-item done"><div class="task-title">Infrastruktur-Update nach Retro</div></li>
+  </ul>
+</details>
+
+<footer>
+  Erstellt von Brian — VetApp Dev-Agentur | Stand: 04.04.2026 | Vault: 55+ Notizen, zuletzt inventarisiert heute
+</footer>
+
+</body>
+</html>

@@ -5,7 +5,7 @@
 ## Offen
 
 ### Brian global machen
-- **Was:** Brian (sidekick.md) aus `VetApp/.claude/agents/` nach `~/.claude/agents/` verschieben
+- **Was:** Brian (brian.md) aus `VetApp/.claude/agents/` nach `~/.claude/agents/` verschieben
 - **Warum:** Damit Brian in allen Projekten verfuegbar ist, nicht nur in VetApp
 - **Aenderungen noetig:**
   - Scheduled Agents Sektion generisch machen (nicht mehr hardcoded "Full Audit 06:00")
