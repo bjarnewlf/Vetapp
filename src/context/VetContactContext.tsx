@@ -46,7 +46,7 @@ export function VetContactProvider({ children }: { children: React.ReactNode }) 
       }
     } catch (e: any) {
       const message = e?.message || 'Tierarzt-Kontakt konnte nicht geladen werden.';
-      console.error('Tierarzt-Kontakt konnte nicht geladen werden:', e);
+      if (__DEV__) console.error('Tierarzt-Kontakt konnte nicht geladen werden:', e);
       setError(message);
     } finally {
       setLoading(false);

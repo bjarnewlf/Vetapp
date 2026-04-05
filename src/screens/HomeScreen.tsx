@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
+import React, { useMemo, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -15,6 +15,10 @@ interface HomeScreenProps {
   navigation: CompositeTabStackNavProp<'Home'>;
 }
 
+const HEADER_EXPANDED_HEIGHT = 120;
+const HEADER_COLLAPSED_HEIGHT = 64;
+const SCROLL_THRESHOLD = 80;
+
 export function HomeScreen({ navigation }: HomeScreenProps) {
   const { pets, error: petsError, refresh: refreshPets } = usePets();
   const { medicalEvents, reminders, error: medicalError, refresh: refreshMedical } = useMedical();
@@ -23,6 +27,37 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
   const insets = useSafeAreaInsets();
 
   const fadeIn = useFadeIn(300);
+  const scrollY = useRef(new Animated.Value(0)).current;
+
+  const headerHeight = scrollY.interpolate({
+    inputRange: [0, SCROLL_THRESHOLD],
+    outputRange: [HEADER_EXPANDED_HEIGHT + insets.top, HEADER_COLLAPSED_HEIGHT + insets.top],
+    extrapolate: 'clamp',
+  });
+
+  const headerBorderRadius = scrollY.interpolate({
+    inputRange: [0, SCROLL_THRESHOLD],
+    outputRange: [borderRadius.xl, 0],
+    extrapolate: 'clamp',
+  });
+
+  const greetingOpacity = scrollY.interpolate({
+    inputRange: [0, SCROLL_THRESHOLD],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
+  const greetingTranslateY = scrollY.interpolate({
+    inputRange: [0, SCROLL_THRESHOLD],
+    outputRange: [0, -16],
+    extrapolate: 'clamp',
+  });
+
+  const collapsedTitleOpacity = scrollY.interpolate({
+    inputRange: [SCROLL_THRESHOLD * 0.6, SCROLL_THRESHOLD],
+    outputRange: [0, 1],
+    extrapolate: 'clamp',
+  });
 
   const timelineItems = useMemo(() => {
     const items: {
@@ -68,18 +103,71 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
   }, [pets]);
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <LinearGradient
-        colors={['#1B6B5A', '#2D8A73', '#3AA08A']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[styles.header, { paddingTop: insets.top + 12 }]}
+    <View style={styles.container}>
+      {/* Animated Header — außerhalb der ScrollView, absolut positioniert */}
+      <Animated.View
+        style={[
+          styles.headerWrapper,
+          { height: headerHeight },
+        ]}
       >
-        <View style={styles.headerTopRow}>
-          <View style={styles.headerTextGroup}>
-            <Text style={styles.greeting}>Hallo{userName ? `, ${userName}` : ''}! 👋</Text>
-            <Text style={styles.welcomeText}>Willkommen zurück bei VetApp</Text>
+        <LinearGradient
+          colors={['#1B6B5A', '#2D8A73', '#3AA08A']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={StyleSheet.absoluteFill}
+        />
+        <Animated.View
+          style={[
+            styles.headerBorderRadiusOverlay,
+            { borderBottomLeftRadius: headerBorderRadius, borderBottomRightRadius: headerBorderRadius },
+          ]}
+        />
+
+        {/* Expanded: Greeting + Welcome */}
+        <Animated.View
+          style={[
+            styles.headerExpandedContent,
+            {
+              paddingTop: insets.top + 12,
+              opacity: greetingOpacity,
+              transform: [{ translateY: greetingTranslateY }],
+            },
+          ]}
+        >
+          <View style={styles.headerTopRow}>
+            <View style={styles.headerTextGroup}>
+              <Text style={styles.greeting}>Hallo{userName ? `, ${userName}` : ''}! 👋</Text>
+              <Text style={styles.welcomeText}>Willkommen zurück bei VetApp</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.profileButton}
+              onPress={() => navigation.navigate('Profile')}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="person-circle-outline" size={30} color={colors.textOnPrimary} />
+            </TouchableOpacity>
           </View>
+        </Animated.View>
+
+        {/* Collapsed: "VetApp" zentriert + Profil-Icon rechts */}
+        <Animated.View
+          style={[
+            styles.headerCollapsedContent,
+            { opacity: collapsedTitleOpacity },
+          ]}
+          pointerEvents="none"
+        >
+          <Text style={styles.collapsedTitle}>VetApp</Text>
+        </Animated.View>
+
+        {/* Profil-Icon bleibt immer sichtbar oben rechts */}
+        <Animated.View
+          style={[
+            styles.profileButtonAbsolute,
+            { top: insets.top + 10 },
+          ]}
+        >
           <TouchableOpacity
             style={styles.profileButton}
             onPress={() => navigation.navigate('Profile')}
@@ -87,101 +175,130 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
           >
             <Ionicons name="person-circle-outline" size={30} color={colors.textOnPrimary} />
           </TouchableOpacity>
-        </View>
-      </LinearGradient>
+        </Animated.View>
+      </Animated.View>
 
-      <Animated.View style={{ opacity: fadeIn, flex: 1 }}>
-        <View style={styles.body}>
-          {petsError && <ErrorBanner onRetry={refreshPets} />}
-          {medicalError && <ErrorBanner onRetry={refreshMedical} />}
+      {/* ScrollView mit paddingTop als Ersatz für den Header */}
+      <Animated.ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={{ paddingTop: HEADER_EXPANDED_HEIGHT + insets.top + spacing.md }}
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+        bounces
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false },
+        )}
+      >
+        <Animated.View style={{ opacity: fadeIn }}>
+          <View style={styles.body}>
+            {petsError && <ErrorBanner onRetry={refreshPets} />}
+            {medicalError && <ErrorBanner onRetry={refreshMedical} />}
 
-          {/* Pet-Sektion */}
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Meine Tiere</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('AddPet')}>
-              <Text style={styles.addLink}>+ Tier hinzufügen</Text>
-            </TouchableOpacity>
-          </View>
-
-          {pets.length === 0 ? (
-            <EmptyState
-              emoji="🐾"
-              title="Noch keine Haustiere"
-              subtitle="Füge dein erstes Tier hinzu und behalte die Gesundheit im Blick."
-              actionLabel="Tier hinzufügen"
-              onAction={() => navigation.navigate('AddPet')}
-            />
-          ) : (
-            <View style={styles.petList}>
-              {pets.map(pet => (
-                <PetListRow
-                  key={pet.id}
-                  pet={pet}
-                  onPress={() => navigation.navigate('PetDetail', { petId: pet.id })}
-                />
-              ))}
-            </View>
-          )}
-
-          {/* Timeline-Sektion */}
-          <View style={styles.timelineSection}>
-            <View style={styles.timelineHeader}>
-              <Text style={styles.sectionTitle}>Nächste Termine</Text>
-              <TouchableOpacity onPress={() => navigation.navigate('Reminders')}>
-                <Text style={styles.addLink}>Alle</Text>
+            {/* Pet-Sektion */}
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Meine Tiere</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('AddPet')}>
+                <Text style={styles.addLink}>+ Tier hinzufügen</Text>
               </TouchableOpacity>
             </View>
 
-            {timelineItems.length === 0 ? (
-              <Text style={styles.timelineEmpty}>Keine anstehenden Termine</Text>
+            {pets.length === 0 ? (
+              <EmptyState
+                emoji="🐾"
+                title="Noch keine Haustiere"
+                subtitle="Füge dein erstes Tier hinzu und behalte die Gesundheit im Blick."
+                actionLabel="Tier hinzufügen"
+                onAction={() => navigation.navigate('AddPet')}
+              />
             ) : (
-              timelineItems.map(item => (
-                <TimelineItem
-                  key={item.id}
-                  date={item.date}
-                  title={item.title}
-                  petName={item.petId ? petNameMap.get(item.petId) : undefined}
-                  type={item.type}
-                  isOverdue={item.isOverdue}
-                  onPress={() => navigation.navigate('Reminders')}
-                />
-              ))
+              <View style={styles.petList}>
+                {pets.map(pet => (
+                  <PetListRow
+                    key={pet.id}
+                    pet={pet}
+                    onPress={() => navigation.navigate('PetDetail', { petId: pet.id })}
+                  />
+                ))}
+              </View>
             )}
-          </View>
 
-          {/* KI-Card */}
-          <AnimatedPressable onPress={() => navigation.navigate('AI')} style={styles.aiCardNew}>
-            <View style={styles.aiTopRow}>
-              <View style={styles.aiIconContainer}>
-                <Ionicons name="sparkles" size={22} color="#FFFFFF" />
+            {/* Timeline-Sektion */}
+            <View style={styles.timelineSection}>
+              <View style={styles.timelineHeader}>
+                <Text style={styles.sectionTitle}>Nächste Termine</Text>
+                <TouchableOpacity onPress={() => navigation.navigate('Reminders')}>
+                  <Text style={styles.addLink}>Alle</Text>
+                </TouchableOpacity>
               </View>
-              <View style={styles.aiTextContainer}>
-                <Text style={styles.aiTitle}>KI-Gesundheitsassistent</Text>
-                <Text style={styles.aiSubtitle}>Deine Tiere kennt die KI bereits.</Text>
-              </View>
+
+              {timelineItems.length === 0 ? (
+                <Text style={styles.timelineEmpty}>Keine anstehenden Termine</Text>
+              ) : (
+                timelineItems.map(item => (
+                  <TimelineItem
+                    key={item.id}
+                    date={item.date}
+                    title={item.title}
+                    petName={item.petId ? petNameMap.get(item.petId) : undefined}
+                    type={item.type}
+                    isOverdue={item.isOverdue}
+                    onPress={() => navigation.navigate('Reminders')}
+                  />
+                ))
+              )}
             </View>
-            <View style={styles.aiCtaRow}>
-              <View style={styles.aiProBadge}>
-                <Text style={styles.aiProBadgeText}>PRO</Text>
+
+            {/* KI-Card */}
+            <AnimatedPressable onPress={() => navigation.navigate('AI')} style={styles.aiCardNew}>
+              <View style={styles.aiTopRow}>
+                <View style={styles.aiIconContainer}>
+                  <Ionicons name="sparkles" size={22} color="#FFFFFF" />
+                </View>
+                <View style={styles.aiTextContainer}>
+                  <Text style={styles.aiTitle}>KI-Gesundheitsassistent</Text>
+                  <Text style={styles.aiSubtitle}>Deine Tiere kennt die KI bereits.</Text>
+                </View>
               </View>
-              <View style={styles.aiCtaAction}>
-                <Text style={styles.aiCtaText}>Frage stellen</Text>
-                <Ionicons name="arrow-forward-outline" size={18} color={colors.primary} />
+              <View style={styles.aiCtaRow}>
+                <View style={styles.aiProBadge}>
+                  <Text style={styles.aiProBadgeText}>PRO</Text>
+                </View>
+                <View style={styles.aiCtaAction}>
+                  <Text style={styles.aiCtaText}>Frage stellen</Text>
+                  <Ionicons name="arrow-forward-outline" size={18} color={colors.primary} />
+                </View>
               </View>
-            </View>
-          </AnimatedPressable>
-        </View>
-      </Animated.View>
-    </ScrollView>
+            </AnimatedPressable>
+          </View>
+        </Animated.View>
+      </Animated.ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
-  header: {
+
+  // Header
+  headerWrapper: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+    overflow: 'hidden',
+  },
+  headerBorderRadiusOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    // Wird nur für borderRadius via Animated.View genutzt — Inhalt transparent
+  },
+  headerExpandedContent: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
     paddingHorizontal: spacing.lg,
     paddingBottom: spacing.lg,
-    borderBottomLeftRadius: borderRadius.xl, borderBottomRightRadius: borderRadius.xl,
   },
   headerTopRow: {
     flexDirection: 'row',
@@ -190,17 +307,39 @@ const styles = StyleSheet.create({
   },
   headerTextGroup: {
     flex: 1,
+    paddingRight: spacing.sm,
   },
+  headerCollapsedContent: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: HEADER_COLLAPSED_HEIGHT,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  collapsedTitle: {
+    ...typography.h3,
+    color: colors.textOnPrimary,
+    textAlign: 'center',
+  },
+  profileButtonAbsolute: {
+    position: 'absolute',
+    right: spacing.md,
+  },
+
+  greeting: { ...typography.h1, color: colors.textOnPrimary },
+  welcomeText: { ...typography.bodySmall, color: colors.textOnPrimary, opacity: 0.85, marginTop: 4 },
   profileButton: {
     width: 44,
     height: 44,
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: spacing.sm,
   },
-  greeting: { ...typography.h1, color: colors.textOnPrimary },
-  welcomeText: { ...typography.bodySmall, color: colors.textOnPrimary, opacity: 0.85, marginTop: 4 },
-  body: { padding: spacing.md },
+
+  scrollView: { flex: 1 },
+  body: { paddingHorizontal: spacing.md },
+
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',

@@ -1,8 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert, Animated, Linking } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, Alert, Animated, Linking } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card } from '../components';
 import { usePets } from '../context/PetContext';
@@ -24,6 +25,11 @@ interface PetDetailScreenProps {
 
 type DetailTab = 'vaccinations' | 'documents' | 'vet';
 
+const HERO_EXPANDED_HEIGHT = 240;
+const HERO_COLLAPSED_HEIGHT = 80;
+const SCROLL_THRESHOLD = 160;
+const NAME_FADE_START = 100;
+
 function formatDate(dateStr: string): string {
   if (!dateStr) return '—';
   const d = new Date(dateStr);
@@ -39,6 +45,7 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
   const { pets, documents: allDocuments, addDocument, deleteDocument } = usePets();
   const { medicalEvents: allMedicalEvents, reminders: allReminders, deleteMedicalEvent, loading: medicalLoading, error: medicalError, refresh: refreshMedical } = useMedical();
   const { vetContact } = useVetContact();
+  const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<DetailTab>('vaccinations');
   const [uploading, setUploading] = useState(false);
   const [openingDocId, setOpeningDocId] = useState<string | null>(null);
@@ -46,6 +53,7 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
 
   const fadeOpacity = useRef(new Animated.Value(0)).current;
   const tabIndicatorPosition = useRef(new Animated.Value(0)).current;
+  const scrollY = useRef(new Animated.Value(0)).current;
 
   const tabCount = 3;
 
@@ -78,6 +86,45 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
   const treatments = allMedicalEvents.filter(e => e.petId === petId && e.type !== 'vaccination');
   const reminders = allReminders.filter(r => r.petId === petId);
   const petDocuments = allDocuments.filter(d => d.petId === petId);
+
+  // Animated values für Hero
+  const heroHeight = scrollY.interpolate({
+    inputRange: [0, SCROLL_THRESHOLD],
+    outputRange: [HERO_EXPANDED_HEIGHT + insets.top, HERO_COLLAPSED_HEIGHT + insets.top],
+    extrapolate: 'clamp',
+  });
+
+  // Overscroll: Foto stretcht nach oben
+  const photoHeight = scrollY.interpolate({
+    inputRange: [-200, 0, SCROLL_THRESHOLD],
+    outputRange: [HERO_EXPANDED_HEIGHT + 200, HERO_EXPANDED_HEIGHT, HERO_EXPANDED_HEIGHT],
+    extrapolate: 'clamp',
+  });
+
+  // Parallax: Foto bewegt sich langsamer (0.5x) + Overscroll-Parallax
+  const photoTranslateY = scrollY.interpolate({
+    inputRange: [-200, 0, SCROLL_THRESHOLD],
+    outputRange: [-100, 0, SCROLL_THRESHOLD * 0.5],
+    extrapolate: 'clamp',
+  });
+
+  const heroTextOpacity = scrollY.interpolate({
+    inputRange: [NAME_FADE_START, SCROLL_THRESHOLD],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+
+  const collapsedNavOpacity = scrollY.interpolate({
+    inputRange: [SCROLL_THRESHOLD * 0.75, SCROLL_THRESHOLD],
+    outputRange: [0, 1],
+    extrapolate: 'clamp',
+  });
+
+  const photoOpacity = scrollY.interpolate({
+    inputRange: [0, SCROLL_THRESHOLD * 0.7, SCROLL_THRESHOLD],
+    outputRange: [0.5, 0.2, 0],
+    extrapolate: 'clamp',
+  });
 
   const handlePickDocument = async () => {
     const result = await DocumentPicker.getDocumentAsync({
@@ -169,15 +216,17 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
 
   if (!pet) {
     return (
-      <ScrollView style={styles.container}>
-        <LinearGradient
-          colors={['#2A9E82', '#1B6B5A', '#145244']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0.6, y: 1 }}
-          style={styles.heroContainer}
-        >
+      <View style={styles.container}>
+        {/* Fallback Hero */}
+        <View style={[styles.heroWrapper, { height: HERO_EXPANDED_HEIGHT + insets.top }]}>
+          <LinearGradient
+            colors={['#2A9E82', '#1B6B5A', '#145244']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0.6, y: 1 }}
+            style={StyleSheet.absoluteFill}
+          />
           <Ionicons name="paw" size={72} color="rgba(255,255,255,0.22)" style={styles.heroBackdropIcon} />
-          <View style={styles.heroNavRow}>
+          <View style={[styles.heroNavRowStatic, { top: insets.top + 8 }]}>
             <TouchableOpacity style={styles.heroNavBtn} onPress={() => navigation.goBack()}>
               <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
             </TouchableOpacity>
@@ -186,30 +235,76 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
           <View style={styles.heroTextBlock}>
             <Text style={styles.heroName}>Tier-Details</Text>
           </View>
-        </LinearGradient>
+        </View>
         <Card style={styles.infoCard}>
           <Text style={styles.notFoundText}>Tier nicht gefunden.</Text>
           <Text style={styles.notFoundSub}>Das Tier wurde möglicherweise gelöscht.</Text>
         </Card>
-      </ScrollView>
+      </View>
     );
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Hero Banner */}
-      <LinearGradient
-        colors={['#2A9E82', '#1B6B5A', '#145244']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0.6, y: 1 }}
-        style={styles.heroContainer}
+    <View style={styles.container}>
+      {/* Animated Hero — absolut positioniert, außerhalb der ScrollView */}
+      <Animated.View
+        style={[styles.heroWrapper, { height: heroHeight }]}
+        shouldRasterizeIOS
+        renderToHardwareTextureAndroid
       >
+        {/* Foto mit Parallax */}
         {pet.photo ? (
-          <Image source={{ uri: pet.photo }} style={styles.heroBackdropImage} />
+          <Animated.Image
+            source={{ uri: pet.photo }}
+            style={[
+              styles.heroBackdropImage,
+              {
+                height: photoHeight,
+                opacity: photoOpacity,
+                transform: [{ translateY: photoTranslateY }],
+              },
+            ]}
+          />
         ) : (
           <Ionicons name="paw" size={72} color="rgba(255,255,255,0.22)" style={styles.heroBackdropIcon} />
         )}
-        <View style={styles.heroNavRow}>
+
+        {/* Gradient Overlay: transparent oben → primary unten (untere 40%) */}
+        <LinearGradient
+          colors={['transparent', 'transparent', colors.primary]}
+          locations={[0, 0.6, 1]}
+          style={styles.heroGradientOverlay}
+          pointerEvents="none"
+        />
+
+        {/* Expanded: Tiername + Meta unten links */}
+        <Animated.View
+          style={[
+            styles.heroTextBlock,
+            { opacity: heroTextOpacity },
+          ]}
+          pointerEvents="none"
+        >
+          <Text style={styles.heroName}>{pet.name}</Text>
+          <Text style={styles.heroMeta}>{pet.breed ? `${pet.breed} · ` : ''}{getAge(pet.birthDate)}</Text>
+        </Animated.View>
+
+        {/* Collapsed: Tiername zentriert — Buttons kommen von heroNavRowStatic */}
+        <Animated.View
+          style={[
+            styles.heroCollapsedNav,
+            {
+              top: insets.top,
+              opacity: collapsedNavOpacity,
+            },
+          ]}
+          pointerEvents="none"
+        >
+          <Text style={styles.collapsedPetName}>{pet.name}</Text>
+        </Animated.View>
+
+        {/* Zurück-Button — immer sichtbar oben links */}
+        <View style={[styles.heroNavRowStatic, { top: insets.top + 8 }]}>
           <TouchableOpacity style={styles.heroNavBtn} onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
           </TouchableOpacity>
@@ -217,142 +312,183 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
             <Ionicons name="create-outline" size={22} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
-        <View style={styles.heroTextBlock}>
-          <Text style={styles.heroName}>{pet.name}</Text>
-          <Text style={styles.heroMeta}>{pet.breed ? `${pet.breed} · ` : ''}{getAge(pet.birthDate)}</Text>
-        </View>
-      </LinearGradient>
-
-      <Animated.View style={{ opacity: fadeOpacity }}>
-        {/* Pet Information */}
-        <Card style={styles.infoCard}>
-          <Text style={styles.sectionLabel}>TIER-INFORMATIONEN</Text>
-          <View style={styles.infoRows}>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Tierart</Text>
-              <Text style={styles.infoValue}>{animalTypeDisplayLabels[pet.type]}</Text>
-            </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Alter</Text>
-              <Text style={styles.infoValue}>{getAge(pet.birthDate)}</Text>
-            </View>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Geburtsdatum</Text>
-              <Text style={styles.infoValue}>{formatDate(pet.birthDate)}</Text>
-            </View>
-            {pet.microchipCode && (
-              <View style={styles.infoRow}>
-                <Text style={styles.infoLabel}>Chip-Nr.</Text>
-                <Text style={styles.infoValue}>{pet.microchipCode}</Text>
-              </View>
-            )}
-          </View>
-        </Card>
-
-        {/* Tab Navigation */}
-        <View
-          style={styles.tabBar}
-          onLayout={e => setTabBarWidth(e.nativeEvent.layout.width - 8)}
-        >
-          <Animated.View
-            style={[
-              styles.tabIndicator,
-              {
-                width: tabBarWidth / tabCount,
-                transform: [{
-                  translateX: tabIndicatorPosition.interpolate({
-                    inputRange: [0, 1, 2],
-                    outputRange: [0, tabBarWidth / tabCount, (tabBarWidth / tabCount) * 2],
-                  }),
-                }],
-              },
-            ]}
-          />
-          {tabs.map(tab => (
-            <TouchableOpacity
-              key={tab.id}
-              style={styles.tab}
-              onPress={() => handleTabPress(tab.id, isPro, tab.pro)}
-            >
-              <Ionicons
-                name={tab.icon}
-                size={18}
-                color={activeTab === tab.id ? colors.primary : colors.textSecondary}
-              />
-              <Text style={[styles.tabLabel, activeTab === tab.id && styles.tabLabelActive]}>
-                {tab.label}
-              </Text>
-              {tab.pro && !isPro && (
-                <Ionicons name="lock-closed" size={10} color={colors.accent} />
-              )}
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Tab Content */}
-        {activeTab === 'vaccinations' && (
-          <PetHealthTab
-            navigation={navigation}
-            petId={petId}
-            vaccinations={vaccinations}
-            treatments={treatments}
-            reminders={reminders}
-            medicalLoading={medicalLoading}
-            medicalError={medicalError}
-            onRefreshMedical={refreshMedical}
-            onDeleteVaccination={handleDeleteVaccination}
-            onDeleteTreatment={handleDeleteTreatment}
-          />
-        )}
-
-        {activeTab === 'documents' && isPro && (
-          <PetDocumentsTab
-            petDocuments={petDocuments}
-            uploading={uploading}
-            openingDocId={openingDocId}
-            onPickDocument={handlePickDocument}
-            onOpenDocument={handleOpenDocument}
-            onDeleteDocument={handleDeleteDocument}
-          />
-        )}
-
-        {activeTab === 'vet' && (
-          <PetVetTab vet={vetContact} />
-        )}
-
-        <View style={{ height: 40 }} />
       </Animated.View>
-    </ScrollView>
+
+      {/* ScrollView mit paddingTop als Ersatz für den Hero */}
+      <Animated.ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={{ paddingTop: HERO_EXPANDED_HEIGHT + insets.top }}
+        showsVerticalScrollIndicator={false}
+        scrollEventThrottle={16}
+        bounces
+        overScrollMode="always"
+        removeClippedSubviews
+        onScroll={Animated.event(
+          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
+          { useNativeDriver: false },
+        )}
+      >
+        <Animated.View style={{ opacity: fadeOpacity }}>
+          {/* Pet Information */}
+          <Card style={styles.infoCard}>
+            <Text style={styles.sectionLabel}>TIER-INFORMATIONEN</Text>
+            <View style={styles.infoRows}>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Tierart</Text>
+                <Text style={styles.infoValue}>{animalTypeDisplayLabels[pet.type]}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Alter</Text>
+                <Text style={styles.infoValue}>{getAge(pet.birthDate)}</Text>
+              </View>
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Geburtsdatum</Text>
+                <Text style={styles.infoValue}>{formatDate(pet.birthDate)}</Text>
+              </View>
+              {pet.microchipCode && (
+                <View style={styles.infoRow}>
+                  <Text style={styles.infoLabel}>Chip-Nr.</Text>
+                  <Text style={styles.infoValue}>{pet.microchipCode}</Text>
+                </View>
+              )}
+            </View>
+          </Card>
+
+          {/* Tab Navigation */}
+          <View
+            style={styles.tabBar}
+            onLayout={e => setTabBarWidth(e.nativeEvent.layout.width - 8)}
+          >
+            <Animated.View
+              style={[
+                styles.tabIndicator,
+                {
+                  width: tabBarWidth / tabCount,
+                  transform: [{
+                    translateX: tabIndicatorPosition.interpolate({
+                      inputRange: [0, 1, 2],
+                      outputRange: [0, tabBarWidth / tabCount, (tabBarWidth / tabCount) * 2],
+                    }),
+                  }],
+                },
+              ]}
+            />
+            {tabs.map(tab => (
+              <TouchableOpacity
+                key={tab.id}
+                style={styles.tab}
+                onPress={() => handleTabPress(tab.id, isPro, tab.pro)}
+              >
+                <Ionicons
+                  name={tab.icon}
+                  size={18}
+                  color={activeTab === tab.id ? colors.primary : colors.textSecondary}
+                />
+                <Text style={[styles.tabLabel, activeTab === tab.id && styles.tabLabelActive]}>
+                  {tab.label}
+                </Text>
+                {tab.pro && !isPro && (
+                  <Ionicons name="lock-closed" size={10} color={colors.accent} />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+
+          {/* Tab Content */}
+          {activeTab === 'vaccinations' && (
+            <PetHealthTab
+              navigation={navigation}
+              petId={petId}
+              vaccinations={vaccinations}
+              treatments={treatments}
+              reminders={reminders}
+              medicalLoading={medicalLoading}
+              medicalError={medicalError}
+              onRefreshMedical={refreshMedical}
+              onDeleteVaccination={handleDeleteVaccination}
+              onDeleteTreatment={handleDeleteTreatment}
+            />
+          )}
+
+          {activeTab === 'documents' && isPro && (
+            <PetDocumentsTab
+              petDocuments={petDocuments}
+              uploading={uploading}
+              openingDocId={openingDocId}
+              onPickDocument={handlePickDocument}
+              onOpenDocument={handleOpenDocument}
+              onDeleteDocument={handleDeleteDocument}
+            />
+          )}
+
+          {activeTab === 'vet' && (
+            <PetVetTab vet={vetContact} />
+          )}
+
+          <View style={{ height: 40 }} />
+        </Animated.View>
+      </Animated.ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
 
-  // Hero Banner
-  heroContainer: {
-    height: 200,
-    justifyContent: 'flex-end',
-    paddingHorizontal: spacing.md,
-    paddingBottom: 20,
-    position: 'relative',
+  scrollView: { flex: 1 },
+
+  // Hero
+  heroWrapper: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
     overflow: 'hidden',
+    backgroundColor: colors.primary,
+    justifyContent: 'flex-end',
   },
   heroBackdropImage: {
-    ...StyleSheet.absoluteFillObject,
-    opacity: 0.35,
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    top: 0,
     resizeMode: 'cover',
+    width: '100%',
   },
   heroBackdropIcon: {
     position: 'absolute',
     alignSelf: 'center',
     top: '30%',
   },
-  heroNavRow: {
+  heroGradientOverlay: {
     position: 'absolute',
-    top: 52,
-    left: 16,
-    right: 16,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: HERO_EXPANDED_HEIGHT,
+  },
+  heroTextBlock: {
+    paddingHorizontal: spacing.md,
+    paddingBottom: spacing.md,
+  },
+  heroName: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    letterSpacing: -0.5,
+  },
+  heroMeta: {
+    fontSize: 13,
+    color: 'rgba(255,255,255,0.85)',
+    marginTop: 4,
+  },
+
+  // Nav rows
+  heroNavRowStatic: {
+    position: 'absolute',
+    left: spacing.md,
+    right: spacing.md,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
@@ -364,20 +500,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  heroTextBlock: {},
-  heroName: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: '#FFFFFF',
-    letterSpacing: -0.5,
+
+  // Collapsed nav (zentrierter Name — Buttons kommen von heroNavRowStatic)
+  heroCollapsedNav: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  heroMeta: {
-    fontSize: 13,
-    color: 'rgba(255,255,255,0.78)',
-    marginTop: 4,
+  collapsedPetName: {
+    ...typography.h3,
+    color: colors.textOnPrimary,
+    textAlign: 'center',
+    flex: 1,
   },
 
-  infoCard: { marginHorizontal: spacing.md, marginBottom: spacing.md },
+  infoCard: { marginHorizontal: spacing.md, marginBottom: spacing.md, marginTop: spacing.md },
   sectionLabel: { ...typography.sectionHeader, color: colors.textSecondary, marginBottom: spacing.md },
   infoRows: { gap: spacing.sm },
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },

@@ -52,7 +52,7 @@ export function MedicalProvider({ children }: { children: React.ReactNode }) {
       if (remindersRes.data) setReminders(remindersRes.data.map(mapReminder));
     } catch (e: any) {
       const message = e?.message || 'Medizinische Daten konnten nicht geladen werden.';
-      console.error('Medizinische Daten konnten nicht geladen werden:', e);
+      if (__DEV__) console.error('Medizinische Daten konnten nicht geladen werden:', e);
       setError(message);
     } finally {
       setLoading(false);

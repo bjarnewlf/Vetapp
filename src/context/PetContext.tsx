@@ -103,7 +103,7 @@ export function PetProvider({ children }: { children: React.ReactNode }) {
       if (docsRes.data) setDocuments(docsRes.data.map(mapDocument));
     } catch (e: any) {
       const message = e?.message || 'Haustierdaten konnten nicht geladen werden.';
-      console.error('Haustierdaten konnten nicht geladen werden:', e);
+      if (__DEV__) console.error('Haustierdaten konnten nicht geladen werden:', e);
       setError(message);
     } finally {
       setLoading(false);
@@ -140,7 +140,7 @@ export function PetProvider({ children }: { children: React.ReactNode }) {
           const { path } = await uploadPetPhoto(user.id, inserted.id, photoUri);
           await supabase.from('pets').update({ photo_url: path }).eq('id', inserted.id);
         } catch (e: any) {
-          console.error('Pet-Foto-Upload fehlgeschlagen:', e.message);
+          if (__DEV__) console.error('Pet-Foto-Upload fehlgeschlagen:', e.message);
           // Pet wurde erfolgreich angelegt — Fehler beim Foto ist nicht kritisch
         }
       }
@@ -177,7 +177,7 @@ export function PetProvider({ children }: { children: React.ReactNode }) {
           const { path } = await uploadPetPhoto(user.id, id, photoUri);
           updateData.photo_url = path;
         } catch (e: any) {
-          console.error('Pet-Foto-Upload fehlgeschlagen:', e.message);
+          if (__DEV__) console.error('Pet-Foto-Upload fehlgeschlagen:', e.message);
           // Update ohne Foto fortsetzen
         }
       }
@@ -199,7 +199,7 @@ export function PetProvider({ children }: { children: React.ReactNode }) {
       try {
         await deletePetPhoto(pet.photoStoragePath);
       } catch (e) {
-        console.warn('Pet-Foto konnte nicht aus Storage gelöscht werden:', e);
+        if (__DEV__) console.warn('Pet-Foto konnte nicht aus Storage gelöscht werden:', e);
       }
     }
     const { error } = await supabase.from('pets').delete().eq('id', id);
@@ -226,7 +226,7 @@ export function PetProvider({ children }: { children: React.ReactNode }) {
       await refresh();
       return true;
     } catch (e: any) {
-      console.error('Dokument-Upload fehlgeschlagen:', e.message);
+      if (__DEV__) console.error('Dokument-Upload fehlgeschlagen:', e.message);
       setError(e.message || 'Dokument-Upload fehlgeschlagen.');
       return false;
     }
@@ -238,7 +238,7 @@ export function PetProvider({ children }: { children: React.ReactNode }) {
       try {
         await deleteFile(doc.storagePath);
       } catch (e) {
-        console.warn('Storage-Datei konnte nicht gelöscht werden:', e);
+        if (__DEV__) console.warn('Storage-Datei konnte nicht gelöscht werden:', e);
       }
     }
     const { error } = await supabase.from('documents').delete().eq('id', id);
