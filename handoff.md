@@ -11,26 +11,6 @@
 - **Stitch:** MCP eingerichtet, 3 Screens generiert, Designer-Rule + Vault-Doku erstellt
 - **Projekt 2:** Laeuft parallel in zweiter Claude-Instanz — Doku kommt spaeter in den Vault
 - **Brian Autonomie:** Level 3 freigeschaltet — Standard-Features ohne Rueckfrage
-- **Mehrere Brian-Instanzen aktiv** — tasks.md als Koordinationsdatei nutzen, vor Arbeit pruefen was offen ist
-
----
-
-## Entscheidungslog (2026-04-05)
-
-Alle 10 offenen Entscheidungen mit Claas geklaert:
-
-| # | Entscheidung | Ergebnis |
-|---|---|---|
-| 1 | Async-Freigabe-Regel | **Abgelehnt** — Brian erinnert Claas aktiv statt still durchzuwinken |
-| 2 | Changelog-Automation | **Bestaetigt** — Option C (Git Hook + Scheduler), DevOps setzt um |
-| 3 | Test-Strategie | **Option A** — Jest minimal jetzt, bei Phase 3 evaluieren ob mehr noetig |
-| 4 | Vault-Optimierung | **Weitgehend erledigt** — nur Link-Annotationen offen (nach und nach) |
-| 5 | Guenstigeres KI-Modell | **Spaeter** — erst bei Live-Gang oder Kosten-Auffaelligkeiten |
-| 6 | PDF-Export Scope | **Zurueckgestellt** — noch nicht mit Kunde geklaert |
-| 7 | Tierarztfinder Scope | **Zurueckgestellt** — Backlog fuer spaetere Weiterentwicklung |
-| 8 | Zweites Projekt | **Laeuft** — parallel in zweiter Claude-Instanz |
-| 9 | Vault-Report-Frequenz | **Taeglich** — Wissensmanager als Scheduled Agent |
-| 10 | Autonomie Level 3 | **Freigeschaltet** — Brian delegiert Standard-Features eigenstaendig |
 
 ---
 
@@ -38,42 +18,55 @@ Alle 10 offenen Entscheidungen mit Claas geklaert:
 
 | Migration | Status | Ziel | Notizen |
 |---|---|---|---|
-| notification_id fuer reminders | OFFEN | Production | SQL-Datei muss noch erstellt werden |
+| notification_id fuer reminders | SQL BEREIT | Production | `supabase/migrations/20260405_...sql` — muss noch deployed werden |
 
 ---
 
 ## Aktuelle Uebergabe
 
-**Agent:** Developer
-**Zeitpunkt:** 2026-04-05
-**Session:** QA-Findings F-027 bis F-032 fixen (ausser F-030)
+**Agent:** Brian
+**Zeitpunkt:** 2026-04-05 Nachmittag
+**Session:** Autonomer Arbeitsblock — QA, Bugfixes, Infra
 
-### Erledigt
+### Erledigt (autonom, ohne Claas)
 
-- **F-027:** `PetVetTab.tsx` — leere Felder (phone, email, address, clinic) werden jetzt per truthy-Check nur gerendert wenn vorhanden
-- **F-028:** `HomeScreen.tsx` — KI-Card nutzt jetzt Theme-Tokens (`colors.primaryLight`, `colors.primaryBorder`, `colors.primary`, `colors.primaryDark`, `colors.textOnPrimary`, `typography.label`, `typography.bodySmall`). Einzige Ausnahme: `fontSize: 9` fuer PRO-Badge (kein passender Token, TODO-Kommentar gesetzt)
-- **F-029:** `PetDocumentsTab.tsx` — Guard vor `onOpenDocument`-Aufruf: wenn `storagePath` fehlt, Alert "Dokument nicht verfuegbar" statt leerem String
-- **F-031:** `AppNavigator.tsx` — ESLint-Suppression mit erklarendem Kommentar versehen
-- **F-032:** `RemindersScreen.tsx` — Kommentar ueber `completedIds`-Deklaration erklaert BY DESIGN-Verhalten
-- **TypeScript:** 0 Fehler
+- **API-Key Hygiene:** settings.local.json aus Git-Tracking entfernt, .gitignore ergaenzt, API-Key aus erlaubten Bash-Zeilen entfernt
+- **QA-Runde:** 6 Findings (F-027 bis F-032), keines kritisch
+- **5 QA-Findings gefixt:**
+  - F-027: PetVetTab leere Felder mit Guard geschuetzt
+  - F-028: HomeScreen KI-Card auf Theme-Tokens umgestellt
+  - F-029: PetDocumentsTab storagePath-Guard mit Alert
+  - F-031: ESLint-Kommentar in AppNavigator ergaenzt
+  - F-032: completedIds BY-DESIGN Kommentar in RemindersScreen
+- **notification_id Migration:** SQL-Datei erstellt (nicht deployed)
+- **Jest Setup:** 11 Tests in 3 Suites, alle gruen. Pure Funktionen in medicalHelpers.ts extrahiert
+- **3 Commits:** `cbaa3be`, `5b68e05` + Sammel-Commit von vorhin
 
-### Offen / Naechste Session
+### Wartet auf Claas (Handy-Tests)
 
-- **F-030 (Accessibility)** — bewusst zurueckgestellt (Backlog)
-- **Erinnerungen-Fix V2 testen (ST-04)** — Claas muss auf Handy bestaetigen
-- **API-Key in settings.local.json** — Datei in `.gitignore` aufnehmen
-- notification_id Migration deployen (SQL-Datei fehlt)
-- Sicherheits-Findings S-1 bis S-8
-- Changelog-Automation, Jest Setup, Vault-Report
+- **Erinnerungen Fix V2 testen (ST-04)** — Slide-Out ohne Zurueck-Poppen?
+- **Tierarzt-Kontakt testen (ST-07)** — Anlegen, Bearbeiten, Telefon-Link
 
-### Wichtig fuer naechste Session
+### Offen
 
-- **settings.local.json NICHT committen** — enthaelt API-Key
+- notification_id Migration deployen (`npx supabase db push` oder SQL Editor)
+- Sicherheits-Findings S-1 bis S-8 (Pre-Go-Live, nicht Pre-Demo)
+- Changelog-Automation (DevOps)
+- F-030 Accessibility (Backlog)
+- Stitch API-Key in Git-History — bei Bedarf rotieren
+
+### Wichtig
+
+- **settings.local.json** ist jetzt in .gitignore — wird nicht mehr committed
+- **Jest:** `npm test` laeuft, `npm run test:watch` fuer Entwicklung
 - **Autonomie Level 3** aktiv
 
 ---
 
 ## Vorherige Uebergaben (zusammengefasst)
+
+### 2026-04-05 Session 3 (Nachmittag frueh)
+- Crash-Recovery, Sammel-Commit (60 Dateien), Erinnerungen Slide-Out Fix V2
 
 ### 2026-04-05 Session 2 (Vormittag)
 - Erinnerungen-abhaken-Bug gefixt (Nested Touchables + Race Condition), QA-Findings gefixt
