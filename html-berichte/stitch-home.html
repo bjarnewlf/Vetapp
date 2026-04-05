@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+
+<html class="light" lang="de"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VetApp - Clinical Sanctuary</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Manrope:wght@700;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                "tertiary-container": "#8f4d40",
+                "on-primary": "#ffffff",
+                "primary-container": "#1b6b5a",
+                "error-container": "#ffdad6",
+                "surface-container": "#f1ede8",
+                "secondary-fixed-dim": "#ffb596",
+                "primary-fixed-dim": "#8bd5c0",
+                "on-secondary": "#ffffff",
+                "outline-variant": "#bec9c4",
+                "primary": "#005243",
+                "on-secondary-fixed": "#360f00",
+                "on-primary-fixed": "#002019",
+                "on-tertiary": "#ffffff",
+                "on-primary-fixed-variant": "#005142",
+                "on-tertiary-container": "#ffcfc6",
+                "outline": "#6f7975",
+                "inverse-on-surface": "#f4f0eb",
+                "primary-fixed": "#a6f1db",
+                "on-surface": "#1c1c19",
+                "secondary-container": "#fd9260",
+                "surface-variant": "#e6e2dd",
+                "on-error": "#ffffff",
+                "on-tertiary-fixed-variant": "#71352a",
+                "secondary": "#9a451a",
+                "on-background": "#1c1c19",
+                "surface-container-lowest": "#ffffff",
+                "inverse-primary": "#8bd5c0",
+                "surface-tint": "#1a6a59",
+                "secondary-fixed": "#ffdbcd",
+                "tertiary-fixed-dim": "#ffb4a5",
+                "surface-dim": "#ddd9d5",
+                "tertiary-fixed": "#ffdad3",
+                "surface": "#fdf9f4",
+                "error": "#ba1a1a",
+                "surface-bright": "#fdf9f4",
+                "background": "#fdf9f4",
+                "surface-container-high": "#ebe8e3",
+                "surface-container-low": "#f7f3ee",
+                "inverse-surface": "#31302d",
+                "on-error-container": "#93000a",
+                "on-primary-container": "#9ee9d3",
+                "tertiary": "#72362a",
+                "surface-container-highest": "#e6e2dd",
+                "on-tertiary-fixed": "#390b04",
+                "on-surface-variant": "#3f4945",
+                "on-secondary-container": "#742a00",
+                "on-secondary-fixed-variant": "#7b2f03"
+            },
+            "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+            },
+            "fontFamily": {
+                "headline": ["Manrope"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface min-h-screen pb-32">
+<!-- Top Navigation (Shell) -->
+<header class="w-full top-0 sticky z-40 bg-[#fdf9f4] dark:bg-[#1c1c19] transition-colors duration-300">
+<div class="flex items-center justify-between px-6 py-4 w-full">
+<span class="font-headline font-bold text-lg tracking-tight text-[#005243] dark:text-[#39f7d4]">Clinical Sanctuary</span>
+<div class="flex items-center gap-4">
+<button class="active:scale-95 transition-transform hover:opacity-80">
+<span class="material-symbols-outlined text-[#005243] dark:text-[#39f7d4]" data-icon="notifications">notifications</span>
+</button>
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-primary-fixed">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="Professional headshot of a smiling man with clean background in soft natural studio lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxz_khWRfwR449S0f8RZRjDpu86meCHbscaKoYDcgzO9p1288vMGOOj-dZWfcvwPYPCKoJp0ksvOz-Ok_V5pTUUq7_bkLhZHGbN-OP-H0F4N53ETFrbZVvhswJrgePspTUe9N5Q7O9-30jVTJKdkzvxco5sXCQrQ7Bs87-lLuQmgyPtbvjNir3AcAHGZ4tkS-Cuvgxi5bBj1LES2LSF48l3V9YsP8VYBingZ1YVIlHGfZE1Q20CyfZhFNxjqM_14narkDbbvGsRWfx"/>
+</div>
+</div>
+</div>
+</header>
+<main class="w-full">
+<!-- Hero Header -->
+<section class="px-6 pt-2 pb-8">
+<div class="relative overflow-hidden rounded-[2rem] p-8 bg-gradient-to-br from-[#1B6B5A] to-[#3AA08A] text-white">
+<div class="relative z-10">
+<p class="text-white/85 text-sm font-medium mb-1">Willkommen zurück</p>
+<h1 class="text-[28px] font-bold font-headline leading-tight">Hallo, Claas! 👋</h1>
+</div>
+<!-- Abstract organic shape background element -->
+<div class="absolute -right-10 -bottom-10 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
+</div>
+</section>
+<!-- Section: Meine Tiere -->
+<section class="mt-4">
+<div class="px-6 flex justify-between items-center mb-6">
+<h2 class="text-xl font-bold font-headline text-on-surface">Meine Tiere</h2>
+<a class="text-primary font-semibold text-sm flex items-center gap-1 hover:opacity-80 transition-opacity" href="#">
+<span class="material-symbols-outlined text-lg" data-icon="add">add</span>
+                    Hinzufügen
+                </a>
+</div>
+<div class="flex overflow-x-auto hide-scrollbar gap-5 px-6 pb-4">
+<!-- Pet Card 1 -->
+<div class="flex-none w-[150px] h-[180px] bg-surface-container-lowest rounded-[16px] p-4 flex flex-col items-center justify-center shadow-[0_4px_20px_rgba(28,28,25,0.04)] transition-transform active:scale-95">
+<div class="w-20 h-20 rounded-full overflow-hidden mb-3 border-2 border-surface-container-low">
+<img class="w-full h-full object-cover" data-alt="Close-up portrait of a golden retriever puppy with warm brown eyes and soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDOUEonjBilDJYxPH9HbPB0NLYKvwRNnC7hCcsijEOogcZ4q-zqk0GOqW_DBPQQ_mVxNbSTzi6xJxNc2Q-AddHHs3XqgpiOl6OhyWvSpKUKtKsrQ1y6lrlG8oYaVTWuQmjTCcZM9eYanb6mggOJ6fCTwCoN2gCnR6Lbzn9_Dsn8uBuzEMQpIqbeZWdXTrp2YaglW8-QEnBhOuzBqqEGJwWkdo2nUu5ixMGObbv52O_z7GtVq0BlBuqSTrQJaCEUk4RRalTtDMofeXH5"/>
+</div>
+<span class="font-bold text-on-surface">Luna</span>
+<span class="text-[10px] uppercase tracking-wider text-outline mt-1 font-medium bg-surface-container-low px-2 py-0.5 rounded-full">Hund • 3 J.</span>
+</div>
+<!-- Pet Card 2 -->
+<div class="flex-none w-[150px] h-[180px] bg-surface-container-lowest rounded-[16px] p-4 flex flex-col items-center justify-center shadow-[0_4px_20px_rgba(28,28,25,0.04)] transition-transform active:scale-95">
+<div class="w-20 h-20 rounded-full overflow-hidden mb-3 border-2 border-surface-container-low">
+<img class="w-full h-full object-cover" data-alt="Elegant ginger cat sitting gracefully with soft focus background and cinematic lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAYM2Qcbyeby2UAS0hgJMbvm5tZENsTZ-X2RnqnOm-jhPhI_8l2r3HagJb1Uc1TFzS1bLNFyfMMZN6g0MxA2mwQI2gnYxst6NWeKHDLpBFa1fMZcA-hPdu77w47kjsi6QZS5EDvr9BWB-uX-EzhZZHMPeRN6wQhexYG5zGlwfF3vKVtfNf1U6PReuyT6THY55zdXHnzw1C6G0XwpdtzfPBxPPXF25TXXOp_1JtlSfWINN64F2Gk1mMppvpazCtsW7StM10FaasrhZrI"/>
+</div>
+<span class="font-bold text-on-surface">Milo</span>
+<span class="text-[10px] uppercase tracking-wider text-outline mt-1 font-medium bg-surface-container-low px-2 py-0.5 rounded-full">Katze • 5 J.</span>
+</div>
+<!-- Pet Card 3 (Partial) -->
+<div class="flex-none w-[150px] h-[180px] bg-surface-container-lowest rounded-[16px] p-4 flex flex-col items-center justify-center shadow-[0_4px_20px_rgba(28,28,25,0.04)] opacity-60">
+<div class="w-20 h-20 rounded-full overflow-hidden mb-3 border-2 border-surface-container-low">
+<img class="w-full h-full object-cover" data-alt="Cute french bulldog looking at the camera with a playful expression in a bright room" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB3byEzoXVL_0Tq0NAHUiwktCsBww9BBj2ltEXytWpWQzzD0_xcfP_2gORS7Ud-XXFonCeRsYBnad_3HKNXIQo7O-ZhynUu0EdPsJu0FgW3o8_HgqEQ7NtkCzURMEY0109HdDVx1-nw4CBRG_rlS5E43nRCgFSpHJedRr07FJ3Ui3cKR_XTy4C8znA9avOi6cXQwPNj2QFiwx88HexnzE_t11b_mwjJYFoKPzJVxRkKmisH10XwUt61E9Oq43R2jUJEvFoEmCCb-vNN"/>
+</div>
+<span class="font-bold text-on-surface">Bella</span>
+<span class="text-[10px] uppercase tracking-wider text-outline mt-1 font-medium bg-surface-container-low px-2 py-0.5 rounded-full">Hund • 1 J.</span>
+</div>
+</div>
+</section>
+<!-- Section: AI Assistant Card -->
+<section class="px-6 mt-8">
+<div class="bg-[#E8F5F1] border border-primary/10 rounded-[2rem] p-6 flex items-start gap-5 relative overflow-hidden">
+<div class="w-11 h-11 bg-primary rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-white" data-icon="psychology" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2 mb-1">
+<h3 class="font-bold text-on-surface font-headline">KI-Gesundheitsassistent</h3>
+<span class="bg-secondary-container text-on-secondary-container text-[9px] font-bold px-2 py-0.5 rounded-md uppercase tracking-tighter">PRO</span>
+</div>
+<p class="text-xs text-on-surface/70 leading-relaxed mb-3">Erhalte sofortige Antworten auf Gesundheitsfragen deiner Lieblinge.</p>
+<a class="text-primary font-bold text-sm flex items-center gap-1 hover:underline" href="#">
+                        Frage stellen
+                        <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+</div>
+</section>
+<!-- Section: Nächste Termine -->
+<section class="px-6 mt-10">
+<h2 class="text-xl font-bold font-headline text-on-surface mb-6">Nächste Termine</h2>
+<div class="space-y-4">
+<!-- Timeline Row 1: Overdue -->
+<div class="bg-surface-container-low rounded-2xl p-4 flex items-center gap-4 border-l-4 border-error">
+<div class="w-10 h-10 rounded-full bg-error-container flex items-center justify-center">
+<span class="material-symbols-outlined text-error" data-icon="history_toggle_off">history_toggle_off</span>
+</div>
+<div class="flex-1">
+<div class="flex items-center justify-between">
+<h4 class="font-bold text-on-surface">Jahresimpfung</h4>
+<span class="text-[10px] font-bold text-error uppercase bg-white px-2 py-0.5 rounded-full">Überfällig</span>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-xs font-medium text-on-surface/60">Luna</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="text-xs font-medium text-on-surface/60">12. Okt 2023</span>
+</div>
+</div>
+</div>
+<!-- Timeline Row 2 -->
+<div class="bg-surface-container-low rounded-2xl p-4 flex items-center gap-4 border-l-4 border-primary">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="calendar_today">calendar_today</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-on-surface">Zahnreinigung</h4>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-xs font-medium text-on-surface/60">Milo</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="text-xs font-medium text-on-surface/60">24. Nov 2023</span>
+</div>
+</div>
+</div>
+<!-- Timeline Row 3 -->
+<div class="bg-surface-container-low rounded-2xl p-4 flex items-center gap-4 border-l-4 border-primary">
+<div class="w-10 h-10 rounded-full bg-primary-fixed flex items-center justify-center">
+<span class="material-symbols-outlined text-primary" data-icon="vaccines">vaccines</span>
+</div>
+<div class="flex-1">
+<h4 class="font-bold text-on-surface">Wurmkur Check-up</h4>
+<div class="flex items-center gap-2 mt-1">
+<span class="text-xs font-medium text-on-surface/60">Luna</span>
+<span class="w-1 h-1 rounded-full bg-outline-variant"></span>
+<span class="text-xs font-medium text-on-surface/60">05. Dez 2023</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Bottom Navigation Shell -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 pb-6 pt-3 bg-[#fdf9f4]/80 dark:bg-[#1c1c19]/80 backdrop-blur-xl z-50 rounded-t-3xl shadow-[0_-4px_40px_rgba(28,28,25,0.06)]">
+<!-- Home (Active) -->
+<button class="flex flex-col items-center justify-center bg-gradient-to-br from-[#005243] to-[#1b6b5a] text-white rounded-2xl px-4 py-2 scale-105 active:scale-90 transition-all duration-300">
+<span class="material-symbols-outlined mb-1" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-['Inter'] font-medium text-[10px] uppercase tracking-wider">Home</span>
+</button>
+<!-- Pets -->
+<button class="flex flex-col items-center justify-center text-[#1c1c19]/50 dark:text-white/50 px-4 py-2 hover:text-[#005243] active:scale-90 transition-all duration-300">
+<span class="material-symbols-outlined mb-1" data-icon="pets">pets</span>
+<span class="font-['Inter'] font-medium text-[10px] uppercase tracking-wider">Pets</span>
+</button>
+<!-- AI Health -->
+<button class="flex flex-col items-center justify-center text-[#1c1c19]/50 dark:text-white/50 px-4 py-2 hover:text-[#005243] active:scale-90 transition-all duration-300">
+<span class="material-symbols-outlined mb-1" data-icon="psychology">psychology</span>
+<span class="font-['Inter'] font-medium text-[10px] uppercase tracking-wider">AI Health</span>
+</button>
+<!-- Records -->
+<button class="flex flex-col items-center justify-center text-[#1c1c19]/50 dark:text-white/50 px-4 py-2 hover:text-[#005243] active:scale-90 transition-all duration-300">
+<span class="material-symbols-outlined mb-1" data-icon="description">description</span>
+<span class="font-['Inter'] font-medium text-[10px] uppercase tracking-wider">Records</span>
+</button>
+<!-- Profile -->
+<button class="flex flex-col items-center justify-center text-[#1c1c19]/50 dark:text-white/50 px-4 py-2 hover:text-[#005243] active:scale-90 transition-all duration-300">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="font-['Inter'] font-medium text-[10px] uppercase tracking-wider">Profile</span>
+</button>
+</nav>
+</body></html>

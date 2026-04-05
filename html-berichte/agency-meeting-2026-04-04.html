@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agency Meeting — 04.04.2026</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #0f1117;
+      color: #e2e4e9;
+      line-height: 1.6;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 2.5rem 2rem;
+      background: linear-gradient(135deg, #1a1d2e 0%, #252a3a 100%);
+      border-radius: 16px;
+      border: 1px solid #2a2f42;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    header .date {
+      color: #8b90a0;
+      font-size: 0.95rem;
+    }
+
+    .participants {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1.25rem;
+    }
+
+    .participant {
+      background: #2a2f42;
+      padding: 0.3rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      color: #c0c4d0;
+    }
+
+    .participant.new {
+      border: 1px solid #CC6B3D;
+      color: #CC6B3D;
+    }
+
+    section {
+      margin-bottom: 2.5rem;
+    }
+
+    h2 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #CC6B3D;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    h2 .icon {
+      font-size: 1.2rem;
+    }
+
+    /* Positives */
+    .positives {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .positive-item {
+      background: #1a2a1a;
+      border: 1px solid #2a4a2a;
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      font-size: 0.9rem;
+      color: #8ed08e;
+    }
+
+    /* Pain Points */
+    .pain-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .pain-table thead th {
+      background: #1e2130;
+      color: #8b90a0;
+      text-align: left;
+      padding: 0.65rem 1rem;
+      font-weight: 500;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .pain-table thead th:first-child {
+      border-radius: 8px 0 0 0;
+      width: 2.5rem;
+      text-align: center;
+    }
+
+    .pain-table thead th:last-child {
+      border-radius: 0 8px 0 0;
+      width: 140px;
+    }
+
+    .pain-table tbody td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #1e2130;
+      vertical-align: top;
+    }
+
+    .pain-table tbody td:first-child {
+      text-align: center;
+      color: #CC6B3D;
+      font-weight: 700;
+    }
+
+    .pain-table tbody td strong {
+      color: #f0a0a0;
+    }
+
+    .pain-table .who {
+      color: #8b90a0;
+      font-size: 0.82rem;
+    }
+
+    /* Massnahmen */
+    .category-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.3rem 0.75rem;
+      border-radius: 20px;
+      margin-bottom: 0.85rem;
+    }
+
+    .cat-sofort {
+      background: #2a1a1a;
+      color: #CC6B3D;
+      border: 1px solid #CC6B3D;
+    }
+
+    .cat-woche {
+      background: #1a1a2a;
+      color: #7b9bd4;
+      border: 1px solid #3a4a6a;
+    }
+
+    .cat-claas {
+      background: #2a2a1a;
+      color: #d4c47b;
+      border: 1px solid #6a5a3a;
+    }
+
+    .measures-group {
+      margin-bottom: 1.75rem;
+    }
+
+    .measure {
+      background: #181b24;
+      border: 1px solid #252a3a;
+      border-radius: 10px;
+      padding: 1rem 1.15rem;
+      margin-bottom: 0.6rem;
+      display: flex;
+      gap: 0.85rem;
+      align-items: flex-start;
+      transition: border-color 0.2s;
+    }
+
+    .measure:hover {
+      border-color: #3a4060;
+    }
+
+    .measure-num {
+      background: #CC6B3D;
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.78rem;
+      min-width: 1.7rem;
+      height: 1.7rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+    }
+
+    .cat-woche + .measures-group .measure-num,
+    .measures-group:nth-child(4) .measure-num {
+      background: #4a6a9a;
+    }
+
+    .measures-group:nth-child(6) .measure-num {
+      background: #8a7a3a;
+    }
+
+    .measure-content {
+      flex: 1;
+    }
+
+    .measure-title {
+      font-weight: 600;
+      color: #fff;
+      font-size: 0.92rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .measure-desc {
+      font-size: 0.85rem;
+      color: #9a9eb0;
+    }
+
+    .measure-owner {
+      font-size: 0.75rem;
+      color: #6a6e80;
+      margin-top: 0.3rem;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem 0 1rem;
+      color: #4a4e60;
+      font-size: 0.8rem;
+      border-top: 1px solid #1e2130;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 1rem; }
+      .positives { grid-template-columns: 1fr; }
+      .pain-table thead th:last-child { display: none; }
+      .pain-table tbody td:last-child { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header>
+      <h1>Agency Meeting</h1>
+      <div class="date">04. April 2026 — VetApp Projekt</div>
+      <div class="participants">
+        <span class="participant">Brian (CEO)</span>
+        <span class="participant">Developer</span>
+        <span class="participant">Designer</span>
+        <span class="participant">QA</span>
+        <span class="participant">Wissensmanager</span>
+        <span class="participant new">DevOps (neu)</span>
+        <span class="participant new">Researcher (neu)</span>
+      </div>
+    </header>
+
+    <!-- Was gut laeuft -->
+    <section>
+      <h2><span class="icon">&#10003;</span> Was gut laeuft</h2>
+      <div class="positives">
+        <div class="positive-item">Handoff-Dokumente und Dokumentationskultur funktionieren zuverlaessig</div>
+        <div class="positive-item">Parallele Delegation bei klar abgegrenzten Aufgaben ist effizient</div>
+        <div class="positive-item">QA-Baseline mit Eskalation nach Schwere greift</div>
+        <div class="positive-item">Klare Zustaendigkeiten: Designer = WAS, Developer = WO</div>
+      </div>
+    </section>
+
+    <!-- Schmerzpunkte -->
+    <section>
+      <h2><span class="icon">&#9888;</span> Top 5 Schmerzpunkte</h2>
+      <table class="pain-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Problem</th>
+            <th>Gemeldet von</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td><strong>Fehlender Kontext bei Delegationen</strong> — Developer und QA lesen erstmal 10 Dateien bevor sie anfangen koennen</td>
+            <td class="who">Developer, QA</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td><strong>Entscheidungs-Blockaden</strong> — wenn Claas nicht zeitnah freigibt, steht alles still</td>
+            <td class="who">Designer</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td><strong>Alles manuell</strong> — Deploys, Migrationen, Package-Checks, Changelog</td>
+            <td class="who">DevOps</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td><strong>Kein Test-Sicherheitsnetz</strong> — Regressions-Risiko waechst mit jedem Feature</td>
+            <td class="who">QA</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td><strong>Learnings zu duenn</strong> — Ein-Zeiler ohne "Warum", in 3 Monaten wertlos</td>
+            <td class="who">Wissensmanager</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Massnahmen -->
+    <section>
+      <h2><span class="icon">&#9889;</span> Beschlossene Massnahmen</h2>
+
+      <div class="measures-group">
+        <div class="category-label cat-sofort">Sofort umsetzbar</div>
+
+        <div class="measure">
+          <div class="measure-num">1</div>
+          <div class="measure-content">
+            <div class="measure-title">Delegations-Template standardisieren</div>
+            <div class="measure-desc">Jeder Auftrag enthaelt: betroffene Dateien, relevante Rules, Akzeptanzkriterien, Risikobereiche.</div>
+            <div class="measure-owner">Developer + QA</div>
+          </div>
+        </div>
+
+        <div class="measure">
+          <div class="measure-num">2</div>
+          <div class="measure-content">
+            <div class="measure-title">Aenderungskontext vor QA</div>
+            <div class="measure-desc">Developer dokumentiert kurz "Was + Warum + Risiko" bei Uebergabe an QA.</div>
+            <div class="measure-owner">Developer &rarr; QA</div>
+          </div>
+        </div>
+
+        <div class="measure">
+          <div class="measure-num">3</div>
+          <div class="measure-content">
+            <div class="measure-title">Learning-Mindestformat</div>
+            <div class="measure-desc">Drei Pflichtfelder: Was passierte, warum, was aendern wir. Kein Roman, aber kein Ein-Zeiler mehr.</div>
+            <div class="measure-owner">Wissensmanager</div>
+          </div>
+        </div>
+
+        <div class="measure">
+          <div class="measure-num">4</div>
+          <div class="measure-content">
+            <div class="measure-title">Researcher &rarr; Designer Pipeline</div>
+            <div class="measure-desc">Vor neuen Features liefert Researcher eine Evaluierung, bevor Designer Screens plant.</div>
+            <div class="measure-owner">Researcher &rarr; Designer</div>
+          </div>
+        </div>
+
+        <div class="measure">
+          <div class="measure-num">5</div>
+          <div class="measure-content">
+            <div class="measure-title">Researcher &rarr; Wissensmanager Pipeline</div>
+            <div class="measure-desc">Recherche-Ergebnisse landen direkt als vernetzte Vault-Notizen. Kein Wissen geht verloren.</div>
+            <div class="measure-owner">Researcher &rarr; Wissensmanager</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="measures-group">
+        <div class="category-label cat-woche">Diese Woche</div>
+
+        <div class="measure">
+          <div class="measure-num" style="background:#4a6a9a">6</div>
+          <div class="measure-content">
+            <div class="measure-title">Deploy-Checkliste</div>
+            <div class="measure-desc">DevOps erstellt ein Template fuer Pre-Release-Checks: Packages, Migrationen, Functions.</div>
+            <div class="measure-owner">DevOps</div>
+          </div>
+        </div>
+
+        <div class="measure">
+          <div class="measure-num" style="background:#4a6a9a">7</div>
+          <div class="measure-content">
+            <div class="measure-title">Smoke-Test-Checkliste</div>
+            <div class="measure-desc">QA definiert 5-10 kritische User-Flows als Standard-Pruefliste fuer jedes Review.</div>
+            <div class="measure-owner">QA</div>
+          </div>
+        </div>
+
+        <div class="measure">
+          <div class="measure-num" style="background:#4a6a9a">8</div>
+          <div class="measure-content">
+            <div class="measure-title">Migration-Tracking sichtbar machen</div>
+            <div class="measure-desc">Offene Migrationen als eigene Sektion in handoff.md — nicht in Notizen vergraben.</div>
+            <div class="measure-owner">DevOps</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="measures-group">
+        <div class="category-label cat-claas">Vorschlag an Claas</div>
+
+        <div class="measure">
+          <div class="measure-num" style="background:#8a7a3a">9</div>
+          <div class="measure-content">
+            <div class="measure-title">Async-Freigabe-Regel</div>
+            <div class="measure-desc">Wenn innerhalb von 24h kein Feedback kommt, gilt der Vorschlag als angenommen. Verhindert Blockaden.</div>
+            <div class="measure-owner">Designer &rarr; Claas</div>
+          </div>
+        </div>
+
+        <div class="measure">
+          <div class="measure-num" style="background:#8a7a3a">10</div>
+          <div class="measure-content">
+            <div class="measure-title">Changelog-Automation</div>
+            <div class="measure-desc">DevOps setzt Git Hook + Task Scheduler um — sobald Claas Option C bestaetigt.</div>
+            <div class="measure-owner">DevOps &rarr; Claas</div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <footer>
+      Agency Meeting &middot; Protokoll erstellt von Brian &middot; 04.04.2026
+    </footer>
+
+  </div>
+</body>
+</html>

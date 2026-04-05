@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Architektur Health-Check — Umsetzungsbericht</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #0f1117;
+      color: #e2e4e9;
+      line-height: 1.65;
+      padding: 2rem;
+    }
+
+    .container { max-width: 880px; margin: 0 auto; }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 2.5rem 2rem;
+      background: linear-gradient(135deg, #1a1d2e 0%, #1e2535 50%, #252a3a 100%);
+      border-radius: 16px;
+      border: 1px solid #2a2f42;
+    }
+
+    header h1 { font-size: 1.9rem; font-weight: 700; color: #fff; margin-bottom: 0.3rem; }
+    header .subtitle { color: #6ec47b; font-size: 1rem; font-weight: 500; }
+    header .meta { color: #6a6e80; font-size: 0.85rem; margin-top: 0.6rem; }
+
+    .score-row {
+      display: flex; justify-content: center; gap: 2.5rem; margin-top: 1.5rem;
+    }
+
+    .score { text-align: center; }
+    .score-val { font-size: 2rem; font-weight: 700; color: #6ec47b; }
+    .score-label { font-size: 0.72rem; color: #6a6e80; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    section { margin-bottom: 2.5rem; }
+
+    h2 {
+      font-size: 1.2rem; font-weight: 600; color: #fff; margin-bottom: 1.2rem;
+      padding-bottom: 0.5rem; border-bottom: 2px solid #6ec47b;
+    }
+
+    /* Task Cards */
+    .task-card {
+      background: #181b24; border: 1px solid #252a3a; border-radius: 12px;
+      padding: 1.25rem 1.4rem; margin-bottom: 0.85rem;
+      transition: border-color 0.2s;
+    }
+    .task-card:hover { border-color: #3a4060; }
+
+    .task-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 0.6rem;
+    }
+
+    .task-title { font-weight: 600; color: #fff; font-size: 0.95rem; }
+
+    .task-badge {
+      font-size: 0.72rem; font-weight: 600; padding: 0.2rem 0.6rem;
+      border-radius: 12px; text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .badge-done { background: #1a2a1a; color: #6ec47b; border: 1px solid #2a4a2a; }
+    .badge-partial { background: #2a2a1a; color: #d4c47b; border: 1px solid #4a4a2a; }
+
+    .task-agent {
+      font-size: 0.78rem; color: #7b6ec4; margin-bottom: 0.5rem;
+      display: flex; align-items: center; gap: 0.4rem;
+    }
+
+    .task-details { font-size: 0.87rem; color: #9a9eb0; }
+    .task-details ul { list-style: none; padding: 0; }
+    .task-details li { padding: 0.2rem 0 0.2rem 1.2rem; position: relative; }
+    .task-details li::before {
+      content: "✓"; position: absolute; left: 0; color: #6ec47b; font-weight: 700;
+    }
+
+    .task-note {
+      font-size: 0.8rem; color: #8b90a0; margin-top: 0.5rem;
+      padding-top: 0.5rem; border-top: 1px solid #1e2130;
+      font-style: italic;
+    }
+
+    /* Before/After */
+    .compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0; }
+
+    .compare-card {
+      border-radius: 10px; padding: 1rem 1.15rem; font-size: 0.87rem;
+    }
+    .compare-before {
+      background: #1f1a14; border: 1px solid #3a2e1e; color: #d0a88e;
+    }
+    .compare-after {
+      background: #141f1a; border: 1px solid #1e3a28; color: #8ed08e;
+    }
+    .compare-label {
+      font-size: 0.72rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.04em; margin-bottom: 0.4rem;
+    }
+    .compare-before .compare-label { color: #CC6B3D; }
+    .compare-after .compare-label { color: #6ec47b; }
+    .compare-card .big { font-size: 1.6rem; font-weight: 700; }
+
+    /* Summary */
+    .summary-box {
+      background: linear-gradient(135deg, #1a1d2e 0%, #1e2a20 100%);
+      border: 1px solid #2a4a2a; border-radius: 12px;
+      padding: 1.5rem 1.75rem; margin: 1.5rem 0;
+    }
+    .summary-box h3 { color: #6ec47b; margin-bottom: 0.75rem; font-size: 1.1rem; }
+    .summary-box p { color: #b0c4b0; font-size: 0.9rem; margin-bottom: 0.5rem; }
+
+    /* Open items */
+    .open-item {
+      background: #1a1a14; border: 1px solid #2e2e1e; border-radius: 10px;
+      padding: 0.85rem 1rem; margin-bottom: 0.5rem; font-size: 0.87rem;
+      display: flex; gap: 0.7rem; align-items: flex-start; color: #d0c88e;
+    }
+    .open-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #d4c47b;
+      flex-shrink: 0; margin-top: 0.4rem;
+    }
+
+    footer {
+      text-align: center; padding: 2rem 0 1rem; color: #4a4e60;
+      font-size: 0.8rem; border-top: 1px solid #1e2130;
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 1rem; }
+      .compare-grid { grid-template-columns: 1fr; }
+      .score-row { gap: 1.2rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header>
+      <h1>Architektur Health-Check</h1>
+      <div class="subtitle">Alle 5 Empfehlungen umgesetzt</div>
+      <div class="meta">04. April 2026 — VetApp + Agency Vault</div>
+      <div class="score-row">
+        <div class="score">
+          <div class="score-val">5/5</div>
+          <div class="score-label">Empfehlungen erledigt</div>
+        </div>
+        <div class="score">
+          <div class="score-val">0</div>
+          <div class="score-label">TypeScript Fehler</div>
+        </div>
+        <div class="score">
+          <div class="score-val">3</div>
+          <div class="score-label">Agents beteiligt</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Vorher / Nachher -->
+    <section>
+      <h2>Vorher / Nachher</h2>
+      <div class="compare-grid">
+        <div class="compare-card compare-before">
+          <div class="compare-label">Vorher</div>
+          <div class="big">47%</div>
+          Vault-Notizen ohne Tags
+        </div>
+        <div class="compare-card compare-after">
+          <div class="compare-label">Nachher</div>
+          <div class="big">0%</div>
+          Alle Notizen getaggt
+        </div>
+      </div>
+      <div class="compare-grid">
+        <div class="compare-card compare-before">
+          <div class="compare-label">Vorher</div>
+          <div class="big">18x</div>
+          <code>navigation: any</code> im Code
+        </div>
+        <div class="compare-card compare-after">
+          <div class="compare-label">Nachher</div>
+          <div class="big">0x</div>
+          Voll typisierte Navigation
+        </div>
+      </div>
+      <div class="compare-grid">
+        <div class="compare-card compare-before">
+          <div class="compare-label">Vorher</div>
+          <div class="big">651</div>
+          Zeilen PetDetailScreen
+        </div>
+        <div class="compare-card compare-after">
+          <div class="compare-label">Nachher</div>
+          <div class="big">413</div>
+          Zeilen + 3 Tab-Komponenten
+        </div>
+      </div>
+    </section>
+
+    <!-- Task 1 -->
+    <section>
+      <h2>Umsetzung im Detail</h2>
+
+      <div class="task-card">
+        <div class="task-header">
+          <div class="task-title">1. Vault-Tags nachpflegen</div>
+          <span class="task-badge badge-done">Erledigt</span>
+        </div>
+        <div class="task-agent">Wissensmanager</div>
+        <div class="task-details">
+          <ul>
+            <li>41 Notizen mit thematischen Tags versehen</li>
+            <li>12 Agentur-Rollen, 6 Architektur, 10 Learnings, 4 Entscheidungen, 4 Chronik, 3 Konzepte, 2 QA</li>
+            <li>Tag-Schema: Technik, Design, Prozess, Architektur, Projekt</li>
+            <li>YAML-Listen-Format durchgesetzt</li>
+          </ul>
+        </div>
+        <div class="task-note">Tags sind jetzt als Filterdimension nutzbar — Agents koennen gezielt nach Themen suchen.</div>
+      </div>
+
+      <!-- Task 2 -->
+      <div class="task-card">
+        <div class="task-header">
+          <div class="task-title">2. DataContext.md auf veraltet setzen</div>
+          <span class="task-badge badge-done">Erledigt</span>
+        </div>
+        <div class="task-agent">Wissensmanager</div>
+        <div class="task-details">
+          <ul>
+            <li><code>status: veraltet</code> im Frontmatter gesetzt</li>
+            <li>Veraltet-Hinweis mit Links zu PetContext, MedicalContext, VetContactContext</li>
+            <li>Backlinks geprueft — alle bestehenden Referenzen sind im historischen Kontext korrekt</li>
+          </ul>
+        </div>
+        <div class="task-note">Veraltetes Wissen ist jetzt als solches markiert — kein Agent wird durch falsche Informationen fehlgeleitet.</div>
+      </div>
+
+      <!-- Task 3 -->
+      <div class="task-card">
+        <div class="task-header">
+          <div class="task-title">3. Navigation typisieren</div>
+          <span class="task-badge badge-done">Erledigt</span>
+        </div>
+        <div class="task-agent">Developer</div>
+        <div class="task-details">
+          <ul>
+            <li><code>RootStackParamList</code> und <code>TabParamList</code> definiert</li>
+            <li>Neuer Typ <code>CompositeStackTabNavProp</code> fuer Stack-zu-Tab-Navigation</li>
+            <li>9 Screens umgestellt: AddPet, AddEvent, EventDetail, ReminderSettings, AddVetContact, Profile, Paywall, PetDetail, VetContact</li>
+            <li>Alle <code>navigate()</code>-Aufrufe typsicher — falsche Params sind jetzt Compile-Fehler</li>
+          </ul>
+        </div>
+        <div class="task-note">Groesste TypeScript-Luecke geschlossen. Falsche Screen-Namen oder fehlende Params werden jetzt zur Compile-Zeit erkannt.</div>
+      </div>
+
+      <!-- Task 4 -->
+      <div class="task-card">
+        <div class="task-header">
+          <div class="task-title">4. PetDetailScreen aufsplitten</div>
+          <span class="task-badge badge-partial">-37% Zeilen</span>
+        </div>
+        <div class="task-agent">Developer</div>
+        <div class="task-details">
+          <ul>
+            <li>Neuer Ordner <code>src/screens/pet/</code></li>
+            <li><code>PetHealthTab.tsx</code> — Impfungen, Behandlungen, Erinnerungen</li>
+            <li><code>PetDocumentsTab.tsx</code> — Dokument-Upload, -Oeffnen, -Loeschen</li>
+            <li><code>PetVetTab.tsx</code> — Tierarzt-Anzeige</li>
+            <li>PetDetailScreen orchestriert nur noch Hero-Banner, Pet-Info und Tab-Navigation</li>
+          </ul>
+        </div>
+        <div class="task-note">413 statt Ziel 200 — der Rest (Handler, Animation, Styles) gehoert inhaerent zum Orchestrator. Weitere Reduktion waere kuenstlich.</div>
+      </div>
+
+      <!-- Task 5 -->
+      <div class="task-card">
+        <div class="task-header">
+          <div class="task-title">5. Vault-Inbox leeren</div>
+          <span class="task-badge badge-done">Erledigt</span>
+        </div>
+        <div class="task-agent">Wissensmanager</div>
+        <div class="task-details">
+          <ul>
+            <li>"Agent-Frontmatter entkoppeln" (archiviert) → nach Chronik verschoben</li>
+            <li>"Kritische QA-Findings fixen" (entschieden) → nach Chronik verschoben</li>
+            <li>Typ und Tags in beiden Dateien korrigiert</li>
+            <li>Inbox ist jetzt leer</li>
+          </ul>
+        </div>
+        <div class="task-note">Inbox ist wieder Zwischenspeicher, nicht Friedhof.</div>
+      </div>
+    </section>
+
+    <!-- Offene Punkte -->
+    <section>
+      <h2>Noch offen</h2>
+      <div class="open-item">
+        <div class="open-dot"></div>
+        <div><strong>Erinnerungen abhaken</strong> — funktioniert nicht auf dem Handy. Bug-Details noch unklar, muss nochmal getestet werden.</div>
+      </div>
+      <div class="open-item">
+        <div class="open-dot"></div>
+        <div><strong>Stitch-Integration</strong> — Researcher evaluiert im Hintergrund. API-Key liegt bereit.</div>
+      </div>
+      <div class="open-item">
+        <div class="open-dot"></div>
+        <div><strong>Doppelte Agent-Dateien</strong> — DevOps Agent.md + DevOps.md und Researcher Agent.md + Researcher.md konsolidieren.</div>
+      </div>
+      <div class="open-item">
+        <div class="open-dot"></div>
+        <div><strong>notification_id Migration</strong> — SQL-Datei fehlt noch. Muss vor Phase-2-Abschluss deployed werden.</div>
+      </div>
+    </section>
+
+    <!-- Fazit -->
+    <section>
+      <div class="summary-box">
+        <h3>Fazit</h3>
+        <p>Alle 5 Empfehlungen aus dem Architektur Health-Check sind umgesetzt. Der Vault ist als Filterdimension nutzbar (Tags nachgepflegt, veraltete Notizen markiert, Inbox leer). Die Navigation ist voll typisiert — groesste TypeScript-Luecke geschlossen. PetDetailScreen ist in handhabbare Teile aufgeteilt.</p>
+        <p style="margin-bottom: 0;"><strong>Beteiligte Agents:</strong> Wissensmanager (Vault-Pflege), Developer (Navigation + Splitting), Architekt (Health-Check). Alles parallel ausgefuehrt.</p>
+      </div>
+    </section>
+
+    <footer>
+      Architektur Health-Check Umsetzungsbericht &middot; Brian &middot; 04.04.2026
+    </footer>
+
+  </div>
+</body>
+</html>

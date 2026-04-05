@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Obsidian-Recherche — Agency Vault Optimierung</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      background: #0f1117;
+      color: #e2e4e9;
+      line-height: 1.65;
+      padding: 2rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 2.5rem 2rem;
+      background: linear-gradient(135deg, #1a1d2e 0%, #1e2a35 50%, #252a3a 100%);
+      border-radius: 16px;
+      border: 1px solid #2a2f42;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.4rem;
+    }
+
+    header .subtitle {
+      color: #7b6ec4;
+      font-size: 1.05rem;
+      font-weight: 500;
+    }
+
+    header .meta {
+      color: #6a6e80;
+      font-size: 0.85rem;
+      margin-top: 0.75rem;
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 1.5rem;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      color: #6a6e80;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-num.green { color: #6ec47b; }
+    .stat-num.purple { color: #7b6ec4; }
+    .stat-num.orange { color: #CC6B3D; }
+
+    /* Sections */
+    section {
+      margin-bottom: 2.5rem;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #fff;
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid #7b6ec4;
+    }
+
+    h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #c8c0e8;
+      margin: 1.5rem 0 0.75rem;
+    }
+
+    p {
+      margin-bottom: 0.85rem;
+      color: #b0b4c4;
+      font-size: 0.92rem;
+    }
+
+    /* Ist-Analyse Cards */
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .analysis-card {
+      border-radius: 10px;
+      padding: 1rem 1.15rem;
+      font-size: 0.88rem;
+    }
+
+    .analysis-card.good {
+      background: #141f1a;
+      border: 1px solid #1e3a28;
+      color: #8ed08e;
+    }
+
+    .analysis-card.improve {
+      background: #1f1a14;
+      border: 1px solid #3a2e1e;
+      color: #d0a88e;
+    }
+
+    .analysis-card .card-title {
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .analysis-card.good .card-title { color: #6ec47b; }
+    .analysis-card.improve .card-title { color: #CC6B3D; }
+
+    .analysis-card ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .analysis-card li {
+      padding: 0.2rem 0;
+      padding-left: 1.1rem;
+      position: relative;
+    }
+
+    .analysis-card.good li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: #6ec47b;
+      font-weight: 700;
+    }
+
+    .analysis-card.improve li::before {
+      content: "!";
+      position: absolute;
+      left: 0.15rem;
+      color: #CC6B3D;
+      font-weight: 700;
+    }
+
+    /* Methoden-Vergleich */
+    .method-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+    }
+
+    .method-card {
+      background: #181b24;
+      border: 1px solid #252a3a;
+      border-radius: 10px;
+      padding: 1rem 1.15rem;
+    }
+
+    .method-name {
+      font-weight: 600;
+      color: #fff;
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .method-desc {
+      font-size: 0.82rem;
+      color: #8b90a0;
+      margin-bottom: 0.5rem;
+    }
+
+    .method-verdict {
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.2rem 0.6rem;
+      border-radius: 12px;
+      display: inline-block;
+    }
+
+    .verdict-yes {
+      background: #1a2a1a;
+      color: #6ec47b;
+      border: 1px solid #2a4a2a;
+    }
+
+    .verdict-partial {
+      background: #1a1a2a;
+      color: #7b9bd4;
+      border: 1px solid #3a4a6a;
+    }
+
+    .verdict-no {
+      background: #2a1a1a;
+      color: #d08e8e;
+      border: 1px solid #4a2a2a;
+    }
+
+    /* Frontmatter Schema */
+    .schema-box {
+      background: #12141c;
+      border: 1px solid #252a3a;
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin: 1rem 0;
+      font-family: 'Consolas', 'SF Mono', 'Monaco', monospace;
+      font-size: 0.84rem;
+      line-height: 1.7;
+      color: #b0b4c4;
+      overflow-x: auto;
+    }
+
+    .schema-box .key { color: #7b9bd4; }
+    .schema-box .value { color: #6ec47b; }
+    .schema-box .comment { color: #555a6e; font-style: italic; }
+    .schema-box .separator { color: #CC6B3D; }
+
+    /* Ordnerstruktur */
+    .folder-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      margin: 1rem 0;
+    }
+
+    .folder-table thead th {
+      background: #1e2130;
+      color: #8b90a0;
+      text-align: left;
+      padding: 0.6rem 1rem;
+      font-weight: 500;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .folder-table thead th:first-child { border-radius: 8px 0 0 0; }
+    .folder-table thead th:last-child { border-radius: 0 8px 0 0; text-align: center; }
+
+    .folder-table tbody td {
+      padding: 0.55rem 1rem;
+      border-bottom: 1px solid #1e2130;
+      color: #b0b4c4;
+    }
+
+    .folder-table tbody td:first-child {
+      font-family: 'Consolas', monospace;
+      color: #7b9bd4;
+    }
+
+    .folder-table tbody td:last-child {
+      text-align: center;
+      color: #8b90a0;
+    }
+
+    /* Empfehlungen */
+    .rec-group {
+      margin-bottom: 2rem;
+    }
+
+    .rec-priority {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding: 0.3rem 0.75rem;
+      border-radius: 20px;
+      margin-bottom: 0.85rem;
+    }
+
+    .prio-sofort {
+      background: #2a1a1a;
+      color: #CC6B3D;
+      border: 1px solid #CC6B3D;
+    }
+
+    .prio-woche {
+      background: #1a1a2a;
+      color: #7b9bd4;
+      border: 1px solid #3a4a6a;
+    }
+
+    .prio-spaeter {
+      background: #1a1a1a;
+      color: #8b90a0;
+      border: 1px solid #3a3a3a;
+    }
+
+    .rec-card {
+      background: #181b24;
+      border: 1px solid #252a3a;
+      border-radius: 10px;
+      padding: 1.1rem 1.25rem;
+      margin-bottom: 0.65rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      transition: border-color 0.2s;
+    }
+
+    .rec-card:hover { border-color: #3a4060; }
+
+    .rec-num {
+      font-weight: 700;
+      font-size: 0.78rem;
+      min-width: 1.7rem;
+      height: 1.7rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 0.1rem;
+      color: #fff;
+    }
+
+    .prio-sofort + .rec-group-inner .rec-num,
+    .rec-group:nth-child(1) .rec-num { background: #CC6B3D; }
+    .rec-group:nth-child(2) .rec-num { background: #4a6a9a; }
+    .rec-group:nth-child(3) .rec-num { background: #555a6e; }
+
+    .rec-title {
+      font-weight: 600;
+      color: #fff;
+      font-size: 0.92rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .rec-desc {
+      font-size: 0.85rem;
+      color: #9a9eb0;
+    }
+
+    .rec-meta {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.4rem;
+      font-size: 0.78rem;
+    }
+
+    .rec-effort {
+      color: #7b9bd4;
+      background: #1a1e2e;
+      padding: 0.15rem 0.5rem;
+      border-radius: 8px;
+    }
+
+    .rec-impact {
+      color: #6ec47b;
+      background: #1a251a;
+      padding: 0.15rem 0.5rem;
+      border-radius: 8px;
+    }
+
+    /* Plugins */
+    .plugin-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+
+    .plugin-card {
+      background: #181b24;
+      border: 1px solid #252a3a;
+      border-radius: 10px;
+      padding: 1rem 1.15rem;
+    }
+
+    .plugin-name {
+      font-weight: 600;
+      color: #7b6ec4;
+      font-size: 0.95rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .plugin-what {
+      font-size: 0.84rem;
+      color: #9a9eb0;
+      margin-bottom: 0.4rem;
+    }
+
+    .plugin-prio {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 8px;
+      display: inline-block;
+    }
+
+    .plugin-prio.high {
+      background: #2a1e2e;
+      color: #b08ed0;
+    }
+
+    .plugin-prio.medium {
+      background: #1e2130;
+      color: #7b9bd4;
+    }
+
+    .plugin-prio.low {
+      background: #1e1e1e;
+      color: #8b90a0;
+    }
+
+    /* Anti-Patterns */
+    .anti-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      margin: 1rem 0;
+    }
+
+    .anti-card {
+      background: #1a1417;
+      border: 1px solid #2e2024;
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      font-size: 0.85rem;
+      color: #d0a0a0;
+    }
+
+    .anti-card strong {
+      color: #e8b0b0;
+    }
+
+    /* Strategie-Empfehlung */
+    .strategy-box {
+      background: linear-gradient(135deg, #1a1d2e 0%, #1e2a20 100%);
+      border: 1px solid #2a4a2a;
+      border-radius: 12px;
+      padding: 1.5rem 1.75rem;
+      margin: 1.5rem 0;
+    }
+
+    .strategy-box h3 {
+      color: #6ec47b;
+      margin-top: 0;
+      margin-bottom: 0.75rem;
+      font-size: 1.1rem;
+    }
+
+    .strategy-box p {
+      color: #b0c4b0;
+    }
+
+    .strategy-pillars {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .pillar {
+      flex: 1;
+      background: rgba(0,0,0,0.2);
+      border-radius: 8px;
+      padding: 0.85rem;
+      text-align: center;
+    }
+
+    .pillar-icon {
+      font-size: 1.5rem;
+      margin-bottom: 0.3rem;
+    }
+
+    .pillar-label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #c0d0c0;
+    }
+
+    .pillar-desc {
+      font-size: 0.75rem;
+      color: #7a8a7a;
+      margin-top: 0.2rem;
+    }
+
+    /* Naming */
+    .naming-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin: 1rem 0;
+    }
+
+    .naming-table thead th {
+      background: #1e2130;
+      color: #8b90a0;
+      text-align: left;
+      padding: 0.55rem 0.85rem;
+      font-weight: 500;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .naming-table thead th:first-child { border-radius: 8px 0 0 0; }
+    .naming-table thead th:last-child { border-radius: 0 8px 0 0; }
+
+    .naming-table tbody td {
+      padding: 0.5rem 0.85rem;
+      border-bottom: 1px solid #1e2130;
+      color: #b0b4c4;
+    }
+
+    .naming-table tbody td:first-child {
+      font-family: 'Consolas', monospace;
+      font-size: 0.82rem;
+      color: #7b9bd4;
+    }
+
+    /* Link-Annotation */
+    .link-example {
+      background: #12141c;
+      border: 1px solid #252a3a;
+      border-radius: 10px;
+      padding: 1.15rem 1.35rem;
+      margin: 1rem 0;
+      font-size: 0.86rem;
+      line-height: 1.8;
+    }
+
+    .link-example .heading {
+      color: #7b6ec4;
+      font-weight: 600;
+    }
+
+    .link-example .link {
+      color: #7b9bd4;
+    }
+
+    .link-example .annotation {
+      color: #6a6e80;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem 0 1rem;
+      color: #4a4e60;
+      font-size: 0.8rem;
+      border-top: 1px solid #1e2130;
+    }
+
+    @media (max-width: 650px) {
+      body { padding: 1rem; }
+      .analysis-grid, .method-grid, .plugin-grid, .anti-grid { grid-template-columns: 1fr; }
+      .stats-row { gap: 1rem; }
+      .strategy-pillars { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <header>
+      <h1>Obsidian-Recherche</h1>
+      <div class="subtitle">Agency Vault Optimierung fuer AI-Agents</div>
+      <div class="meta">Researcher — 04. April 2026</div>
+      <div class="stats-row">
+        <div class="stat">
+          <div class="stat-num purple">127</div>
+          <div class="stat-label">Dateien</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num green">0</div>
+          <div class="stat-label">Gebrochene Links</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num">14</div>
+          <div class="stat-label">Ordner</div>
+        </div>
+        <div class="stat">
+          <div class="stat-num orange">8</div>
+          <div class="stat-label">Templates</div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Ist-Analyse -->
+    <section>
+      <h2>Ist-Analyse des Vaults</h2>
+      <p>Der Vault existiert seit 2 Tagen, waechst schnell und hat bereits gute Grundstrukturen. Claas arbeitet visuell ueber die Obsidian-GUI, waehrend AI-Agents per Dateisystem zugreifen.</p>
+
+      <div class="analysis-grid">
+        <div class="analysis-card good">
+          <div class="card-title">Was bereits gut laeuft</div>
+          <ul>
+            <li>0 gebrochene Links — Vernetzung konsistent</li>
+            <li>100% Frontmatter-Abdeckung</li>
+            <li>8 Templates fuer verschiedene Notiz-Typen</li>
+            <li>Klare Ordnerstruktur mit logischer Trennung</li>
+            <li>Hub-Notizen (Agency.md, VetApp.md) als MOCs</li>
+            <li>Learning-Notizen mit echter Tiefe</li>
+          </ul>
+        </div>
+        <div class="analysis-card improve">
+          <div class="card-title">Was verbessert werden sollte</div>
+          <ul>
+            <li>Frontmatter inkonsistent: <code>datum</code> fehlt in 36 Dateien</li>
+            <li>Tags als Komma-String statt YAML-Liste</li>
+            <li>Keine Trennung Typ-Tags vs. Themen-Tags</li>
+            <li>Tag-Duplikate (<code>prozess</code> / <code>prozesse</code>)</li>
+            <li>Kein <code>typ</code>-Feld im Frontmatter</li>
+            <li>Learnings dominieren (39 von 127 = 33%)</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Ordnerstruktur -->
+    <section>
+      <h2>Aktuelle Ordnerstruktur</h2>
+      <p>Die Typ-basierte Ordnerstruktur funktioniert gut — keine Aenderung noetig.</p>
+      <table class="folder-table">
+        <thead>
+          <tr><th>Ordner</th><th>Zweck</th><th>Notizen</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Agentur/</td><td>Team, Workflows, Rollen</td><td>15</td></tr>
+          <tr><td>Architektur/</td><td>Technische Patterns</td><td>13</td></tr>
+          <tr><td>Chronik/</td><td>Was wann passiert ist</td><td>9</td></tr>
+          <tr><td>Entscheidungen/</td><td>Architecture Decision Records</td><td>11</td></tr>
+          <tr><td>Features/</td><td>Feature-Dokumentation</td><td>8</td></tr>
+          <tr><td>Konzepte/</td><td>Entwuerfe, Plaene</td><td>7</td></tr>
+          <tr><td>Learnings/</td><td>Erkenntnisse</td><td>39</td></tr>
+          <tr><td>Persoenlich/</td><td>Claas' private Notizen</td><td>2</td></tr>
+          <tr><td>Projekte/</td><td>Projekt-Hubs</td><td>1</td></tr>
+          <tr><td>QA/</td><td>Qualitaetsberichte</td><td>2</td></tr>
+          <tr><td>Technik/</td><td>Technologie-Referenzen</td><td>9</td></tr>
+          <tr><td>Inbox/</td><td>Unverarbeitetes</td><td>2</td></tr>
+          <tr><td>_Templates/</td><td>Vorlagen</td><td>8</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Strategie -->
+    <section>
+      <h2>Empfohlene Strategie</h2>
+      <div class="strategy-box">
+        <h3>Ordner fuer Typ — Tags fuer Themen — Links fuer Beziehungen</h3>
+        <p>Diese Kombination funktioniert am besten fuer AI-Agents. Ordner geben sofort den Kontext ("was fuer eine Information ist das"), Tags ermoeglichen thematische Filterung, Links erklaeren Zusammenhaenge.</p>
+        <div class="strategy-pillars">
+          <div class="pillar">
+            <div class="pillar-icon">&#128193;</div>
+            <div class="pillar-label">Ordner = Typ</div>
+            <div class="pillar-desc">Learning, Entscheidung, Chronik...</div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon">&#127991;</div>
+            <div class="pillar-label">Tags = Themen</div>
+            <div class="pillar-desc">react-native, supabase, auth...</div>
+          </div>
+          <div class="pillar">
+            <div class="pillar-icon">&#128279;</div>
+            <div class="pillar-label">Links = Beziehungen</div>
+            <div class="pillar-desc">Mit Annotation: warum verlinkt?</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Methoden-Vergleich -->
+    <section>
+      <h2>Methoden-Vergleich</h2>
+      <div class="method-grid">
+        <div class="method-card">
+          <div class="method-name">MOCs (Maps of Content)</div>
+          <div class="method-desc">Hub-Notizen die Themen-Cluster organisieren — genau das was Agency.md und VetApp.md bereits sind</div>
+          <span class="method-verdict verdict-yes">Bereits im Einsatz</span>
+        </div>
+        <div class="method-card">
+          <div class="method-name">Zettelkasten</div>
+          <div class="method-desc">Atomare Notizen, stark verlinkt — die Learnings folgen diesem Prinzip. Numerische IDs fuer AI schlecht</div>
+          <span class="method-verdict verdict-partial">Teilweise passend</span>
+        </div>
+        <div class="method-card">
+          <div class="method-name">PARA</div>
+          <div class="method-desc">Projects / Areas / Resources / Archive — zu starr, optimiert fuer persoenliche Produktivitaet</div>
+          <span class="method-verdict verdict-no">Nicht empfohlen</span>
+        </div>
+        <div class="method-card">
+          <div class="method-name">Johnny Decimal</div>
+          <div class="method-desc">Numerische Ordner-IDs (10-19, 20-29) — fuer AI schlecht lesbar, zu rigide</div>
+          <span class="method-verdict verdict-no">Nicht empfohlen</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Frontmatter Schema -->
+    <section>
+      <h2>Frontmatter-Schema — Groesster Hebel</h2>
+      <p>Ein konsistentes Schema ermoeglicht es Agents, Relevanz zu beurteilen <strong>ohne den gesamten Inhalt lesen zu muessen</strong>. Das ist der einzelne groesste Effizienz-Gewinn.</p>
+
+      <h3>Basis-Schema (alle Notizen)</h3>
+      <div class="schema-box">
+        <span class="separator">---</span><br>
+        <span class="key">typ:</span> <span class="value">learning</span> <span class="comment"># learning | entscheidung | chronik | feature | konzept | technik | agent | research | qa</span><br>
+        <span class="key">tags:</span> <span class="value">[react-native, supabase]</span> <span class="comment"># NUR Themen-Tags, als YAML-Liste</span><br>
+        <span class="key">datum:</span> <span class="value">2026-04-04</span> <span class="comment"># Erstellungsdatum</span><br>
+        <span class="key">projekt:</span> <span class="value">"[[VetApp]]"</span> <span class="comment"># Projekt-Referenz oder "agentur"</span><br>
+        <span class="key">scope:</span> <span class="value">vetapp</span> <span class="comment"># vetapp | agentur | global — Schnellfilter fuer Agents</span><br>
+        <span class="key">status:</span> <span class="value">aktiv</span> <span class="comment"># aktiv | erledigt | veraltet</span><br>
+        <span class="separator">---</span>
+      </div>
+
+      <h3>Erweiterte Felder je nach Typ</h3>
+      <div class="schema-box">
+        <span class="comment"># Entscheidungen</span><br>
+        <span class="key">entscheidung:</span> <span class="value">"Option B gewaehlt"</span> <span class="comment"># Ein-Satz-Zusammenfassung</span><br>
+        <span class="key">auswirkung:</span> <span class="value">hoch</span> <span class="comment"># hoch | mittel | niedrig</span><br>
+        <br>
+        <span class="comment"># Learnings</span><br>
+        <span class="key">kategorie:</span> <span class="value">technik</span> <span class="comment"># technik | prozess | tool | architektur</span><br>
+        <span class="key">anwendbar-auf:</span> <span class="value">[react-native, supabase]</span><br>
+        <br>
+        <span class="comment"># Chronik</span><br>
+        <span class="key">teilnehmer:</span> <span class="value">[Brian, Developer, QA]</span><br>
+        <br>
+        <span class="comment"># Agents</span><br>
+        <span class="key">rolle:</span> <span class="value">Developer</span><br>
+      </div>
+    </section>
+
+    <!-- Naming Conventions -->
+    <section>
+      <h2>Naming Conventions</h2>
+      <p>Sprechende Dateinamen sind fuer AI deutlich besser als IDs oder Abkuerzungen. Die aktuelle Konvention ist bereits gut.</p>
+      <table class="naming-table">
+        <thead>
+          <tr><th>Notiz-Typ</th><th>Format</th><th>Beispiel</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Chronik / Entscheidungen</td><td>YYYY-MM-DD Beschreibung.md</td><td>2026-04-04 Agency Meeting.md</td></tr>
+          <tr><td>Learnings</td><td>Sprechender Name.md</td><td>Foto-Upload React Native FormData statt fetch blob.md</td></tr>
+          <tr><td>Alles andere</td><td>Sprechender Name.md</td><td>Storage Pattern.md</td></tr>
+        </tbody>
+      </table>
+      <p style="color: #CC6B3D; font-size: 0.85rem; margin-top: 0.5rem;"><strong>Achtung:</strong> Es gibt Duplikate — <code>DevOps Agent.md</code> + <code>DevOps.md</code> und <code>Researcher Agent.md</code> + <code>Researcher.md</code> sollten jeweils zusammengefuehrt werden.</p>
+    </section>
+
+    <!-- Link-Annotationen -->
+    <section>
+      <h2>Link-Annotationen</h2>
+      <p>Nicht nur am Ende verlinken — kurze Annotationen erklaeren die Art der Beziehung. So koennen Agents entscheiden ob sie einem Link folgen sollen.</p>
+
+      <div class="link-example">
+        <span class="heading">## Verknuepft mit</span><br>
+        <span class="link">- [[VetApp]]</span> <span class="annotation">— Projekt</span><br>
+        <span class="link">- [[Storage Pattern]]</span> <span class="annotation">— Technische Grundlage</span><br>
+        <span class="link">- [[Pet-Fotos nicht in Storage]]</span> <span class="annotation">— Verwandtes Learning</span><br>
+        <span class="link">- [[2026-04-04 Foto-Upload Fix]]</span> <span class="annotation">— Chronik-Eintrag zum Kontext</span>
+      </div>
+    </section>
+
+    <!-- Plugins -->
+    <section>
+      <h2>Empfohlene Plugins</h2>
+      <p>Aktuell sind nur Core-Plugins aktiv. Diese Community-Plugins verbessern Claas' GUI-Erlebnis — AI-Agents arbeiten weiterhin direkt mit den Markdown-Dateien.</p>
+
+      <div class="plugin-grid">
+        <div class="plugin-card">
+          <div class="plugin-name">Dataview</div>
+          <div class="plugin-what">Dynamische Tabellen per Query — z.B. "alle offenen Entscheidungen" oder "Learnings zu Supabase". Nur in GUI sichtbar, nicht fuer Agents.</div>
+          <span class="plugin-prio high">Hohe Prioritaet — 1h Setup</span>
+        </div>
+        <div class="plugin-card">
+          <div class="plugin-name">Templater</div>
+          <div class="plugin-what">Maechtiger als Core-Templates — Datumslogik, Ordner-Automatik, Cursor-Positionierung beim Anlegen neuer Notizen.</div>
+          <span class="plugin-prio medium">Mittlere Prioritaet — 30min</span>
+        </div>
+        <div class="plugin-card">
+          <div class="plugin-name">Tag Wrangler</div>
+          <div class="plugin-what">Tags umbenennen und zusammenfuehren — z.B. <code>prozess</code> + <code>prozesse</code> auf einen Nenner bringen.</div>
+          <span class="plugin-prio medium">Mittlere Prioritaet — 10min</span>
+        </div>
+        <div class="plugin-card">
+          <div class="plugin-name">Calendar</div>
+          <div class="plugin-what">Chronik-Notizen per Kalender-View navigieren. Hilfreich wenn die Chronik waechst.</div>
+          <span class="plugin-prio low">Niedrige Prioritaet — 10min</span>
+        </div>
+      </div>
+
+      <p style="margin-top: 1rem; font-size: 0.85rem; color: #8b90a0;"><strong>Wichtig:</strong> Dataview-Queries sind nur in der Obsidian-GUI sichtbar. Alles was Agents brauchen, muss als echtes Markdown existieren. Keine Dataview-Abhaengigkeit fuer AI-Workflows.</p>
+    </section>
+
+    <!-- Empfehlungen priorisiert -->
+    <section>
+      <h2>Konkrete Empfehlungen — priorisiert</h2>
+
+      <div class="rec-group">
+        <div class="rec-priority prio-sofort">Sofort — 30 Minuten, groesster Hebel</div>
+
+        <div class="rec-card">
+          <div class="rec-num" style="background:#CC6B3D">1</div>
+          <div class="rec-content">
+            <div class="rec-title">Frontmatter-Schema standardisieren</div>
+            <div class="rec-desc">Alle Notizen bekommen <code>typ</code>, <code>scope</code> und <code>status</code>. Tags werden zu YAML-Listen. Mechanische Aufgabe fuer den Wissensmanager.</div>
+            <div class="rec-meta">
+              <span class="rec-effort">~20 Min Aufwand</span>
+              <span class="rec-impact">Groesster Einzelhebel</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="rec-card">
+          <div class="rec-num" style="background:#CC6B3D">2</div>
+          <div class="rec-content">
+            <div class="rec-title">Doppelte Agent-Dateien konsolidieren</div>
+            <div class="rec-desc"><code>DevOps Agent.md</code> in <code>DevOps.md</code> zusammenfuehren, ebenso <code>Researcher Agent.md</code> in <code>Researcher.md</code>.</div>
+            <div class="rec-meta">
+              <span class="rec-effort">~5 Min Aufwand</span>
+              <span class="rec-impact">Keine Verwirrung bei Navigation</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="rec-card">
+          <div class="rec-num" style="background:#CC6B3D">3</div>
+          <div class="rec-content">
+            <div class="rec-title">Tag-Duplikate bereinigen</div>
+            <div class="rec-desc"><code>prozess</code> und <code>prozesse</code> zusammenlegen. Kanonische Tag-Liste festlegen.</div>
+            <div class="rec-meta">
+              <span class="rec-effort">~10 Min Aufwand</span>
+              <span class="rec-impact">Saubere Filterung</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rec-group">
+        <div class="rec-priority prio-woche">Diese Woche — 1-2 Stunden, mittlerer Hebel</div>
+
+        <div class="rec-card">
+          <div class="rec-num" style="background:#4a6a9a">4</div>
+          <div class="rec-content">
+            <div class="rec-title">Learnings-Index anlegen</div>
+            <div class="rec-desc">MOC in <code>Learnings/Index.md</code>, gruppiert nach Kategorien: Technik, Prozess, Architektur, Tool. 39 Learnings werden navigierbar.</div>
+            <div class="rec-meta">
+              <span class="rec-effort">~30 Min Aufwand</span>
+              <span class="rec-impact">Breite wird Tiefe</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="rec-card">
+          <div class="rec-num" style="background:#4a6a9a">5</div>
+          <div class="rec-content">
+            <div class="rec-title">Link-Annotationen einfuehren</div>
+            <div class="rec-desc">Im "Verknuepft mit"-Abschnitt kurze Erklaerungen hinter die Links. Als Standard fuer neue Notizen und bei gelegentlicher Ueberarbeitung.</div>
+            <div class="rec-meta">
+              <span class="rec-effort">~5 Sek pro Link</span>
+              <span class="rec-impact">Agents verstehen Beziehungen</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="rec-card">
+          <div class="rec-num" style="background:#4a6a9a">6</div>
+          <div class="rec-content">
+            <div class="rec-title">Dataview Plugin installieren</div>
+            <div class="rec-desc">3-4 Dashboard-Queries in den Hub-Notizen — z.B. alle offenen Entscheidungen, Learnings nach Projekt, Chronik-Timeline.</div>
+            <div class="rec-meta">
+              <span class="rec-effort">~1h Setup</span>
+              <span class="rec-impact">Dynamische Uebersichten fuer Claas</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="rec-group">
+        <div class="rec-priority prio-spaeter">Spaeter — Nice-to-have</div>
+
+        <div class="rec-card">
+          <div class="rec-num" style="background:#555a6e">7</div>
+          <div class="rec-content">
+            <div class="rec-title">Automatischer Vault-Health-Check</div>
+            <div class="rec-desc">Regelmaessig: Frontmatter-Vollstaendigkeit, verwaiste Notizen, veraltete Eintraege identifizieren.</div>
+            <div class="rec-meta">
+              <span class="rec-effort">Laufend</span>
+              <span class="rec-impact">Vault bleibt sauber</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="rec-card">
+          <div class="rec-num" style="background:#555a6e">8</div>
+          <div class="rec-content">
+            <div class="rec-title">Projekt-uebergreifende Learnings-Taxonomie</div>
+            <div class="rec-desc">Wenn Projekt 2 kommt — Systematik wie Learnings projekt-uebergreifend nutzbar werden.</div>
+            <div class="rec-meta">
+              <span class="rec-effort">Bei Bedarf</span>
+              <span class="rec-impact">Skalierung vorbereiten</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Anti-Patterns -->
+    <section>
+      <h2>Was man NICHT tun sollte</h2>
+      <div class="anti-grid">
+        <div class="anti-card"><strong>Keine numerischen IDs</strong> — sprechende Namen sind fuer AI besser als 202604041530</div>
+        <div class="anti-card"><strong>Kein PARA-System</strong> — optimiert fuer persoenliche Produktivitaet, nicht fuer Team/AI</div>
+        <div class="anti-card"><strong>Keine verschachtelten Ordner</strong> — flach + Tags ist fuer AI-Navigation schneller</div>
+        <div class="anti-card"><strong>Kein Plugin-Overload</strong> — Dataview + Templater reichen, jedes Plugin ist eine Abhaengigkeit</div>
+        <div class="anti-card"><strong>Keine Obsidian Sync</strong> — Git-Versionierung waere sinnvoller</div>
+        <div class="anti-card"><strong>Keine Dataview-Abhaengigkeit</strong> — nur GUI-Feature, Agents brauchen echtes Markdown</div>
+      </div>
+    </section>
+
+    <!-- Fazit -->
+    <section>
+      <div class="strategy-box">
+        <h3>Fazit</h3>
+        <p>Der Vault ist fuer 2 Tage Alter bemerkenswert gut strukturiert. Keine gebrochenen Links, konsistente Verlinkung, gute Hub-Notizen. <strong>Die Grundarchitektur stimmt — es braucht Polieren, keinen Umbau.</strong></p>
+        <p style="margin-bottom: 0;">Der groesste Einzelhebel ist das Frontmatter-Schema: Ein Agent der 127 Dateien durchsucht, kann mit konsistenten <code>typ</code>, <code>scope</code> und <code>status</code>-Feldern in Millisekunden filtern — statt Dateiinhalte parsen zu muessen.</p>
+      </div>
+    </section>
+
+    <footer>
+      Obsidian-Recherche &middot; Researcher &middot; 04.04.2026 &middot; Quelle: Direkte Vault-Analyse + Obsidian Docs + Zettelkasten/MOC-Methodik
+    </footer>
+
+  </div>
+</body>
+</html>

@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VetApp — Zwischenstandsbriefing 03.04.2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:       #4A90D9;
+      --primary-dark:  #2E6BAF;
+      --primary-light: #D6E9F8;
+      --accent:        #F0A500;
+      --success:       #3CB371;
+      --warning:       #E07B39;
+      --danger:        #C94A4A;
+      --surface:       #FFFFFF;
+      --bg:            #F5F0E8;
+      --bg-alt:        #EDE8DF;
+      --text:          #1A1A2E;
+      --text-muted:    #6B6B7B;
+      --border:        #DDD6CC;
+      --radius:        10px;
+      --radius-lg:     16px;
+      --shadow:        0 2px 12px rgba(0,0,0,0.08);
+      --shadow-lg:     0 6px 28px rgba(0,0,0,0.12);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    /* ── Masthead ── */
+    .masthead {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, #6BAEE0 100%);
+      color: #fff;
+      padding: 52px 40px 44px;
+      position: relative;
+      overflow: hidden;
+    }
+    .masthead::before {
+      content: "";
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 280px; height: 280px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+    .masthead::after {
+      content: "";
+      position: absolute;
+      bottom: -80px; left: 30%;
+      width: 360px; height: 360px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    .masthead-inner { max-width: 860px; margin: 0 auto; position: relative; z-index: 1; }
+    .masthead-label {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.28);
+      border-radius: 20px;
+      padding: 4px 14px;
+      margin-bottom: 18px;
+    }
+    .masthead h1 {
+      font-size: 32px;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+    }
+    .masthead h1 span { opacity: 0.75; font-weight: 400; }
+    .masthead-sub {
+      font-size: 15px;
+      opacity: 0.85;
+      margin-bottom: 28px;
+    }
+    .masthead-meta {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+    .meta-pill {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .meta-pill .icon { font-size: 14px; }
+
+    /* ── Layout ── */
+    .container { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+
+    /* ── Blocker-Banner ── */
+    .blocker-banner {
+      background: #FFF3E0;
+      border: 2px solid var(--warning);
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      margin-bottom: 36px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .blocker-icon { font-size: 26px; flex-shrink: 0; line-height: 1; margin-top: 2px; }
+    .blocker-title { font-size: 14px; font-weight: 700; color: var(--warning); margin-bottom: 6px; letter-spacing: 0.3px; }
+    .blocker-text { font-size: 14px; color: #5C3D00; line-height: 1.5; }
+    .blocker-text code {
+      background: rgba(0,0,0,0.08);
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-family: "SF Mono", "Fira Code", Menlo, monospace;
+      font-size: 13px;
+    }
+
+    /* ── Stat-Bar ── */
+    .stat-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 20px 18px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+    .stat-num {
+      font-size: 30px;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Sections ── */
+    .section { margin-bottom: 40px; }
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .section-icon {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+      flex-shrink: 0;
+    }
+    .icon-blue   { background: var(--primary-light); }
+    .icon-green  { background: #D4F0E2; }
+    .icon-orange { background: #FDEBD0; }
+    .icon-red    { background: #FADADD; }
+    .icon-gray   { background: var(--bg-alt); }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .section-title small {
+      font-size: 13px;
+      font-weight: 400;
+      color: var(--text-muted);
+      margin-left: 8px;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .card + .card { margin-top: 12px; }
+
+    .card-head {
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--bg-alt);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-head-title { font-size: 14px; font-weight: 700; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      border-radius: 20px;
+      padding: 3px 10px;
+    }
+    .badge-green  { background: #D4F0E2; color: #1E6B44; }
+    .badge-blue   { background: var(--primary-light); color: var(--primary-dark); }
+    .badge-orange { background: #FDEBD0; color: #8A4A00; }
+    .badge-red    { background: #FADADD; color: #8B1A1A; }
+    .badge-gray   { background: var(--bg-alt); color: var(--text-muted); }
+
+    .card-body { padding: 18px 20px; }
+
+    .item-list { list-style: none; }
+    .item-list li {
+      display: flex;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--bg-alt);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+    .item-list li:last-child { border-bottom: none; padding-bottom: 0; }
+    .item-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .item-main { flex: 1; }
+    .item-main strong { display: block; margin-bottom: 2px; font-size: 14px; }
+    .item-meta { font-size: 12px; color: var(--text-muted); }
+    .item-files {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: "SF Mono", "Fira Code", Menlo, monospace;
+      background: var(--bg-alt);
+      border-radius: 4px;
+      padding: 2px 7px;
+      margin-top: 4px;
+      display: inline-block;
+    }
+
+    /* ── Highlight Card (KI-Assistent) ── */
+    .highlight-card {
+      background: linear-gradient(135deg, #EAF4FD 0%, #F0F8FF 100%);
+      border: 2px solid var(--primary-light);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow);
+    }
+    .highlight-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--primary);
+      margin-bottom: 10px;
+    }
+    .highlight-title {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 8px;
+      color: var(--text);
+    }
+    .highlight-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+    .feature-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chip {
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 4px 12px;
+      color: var(--text);
+    }
+
+    /* ── Uncommitted Files ── */
+    .file-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 8px;
+    }
+    .file-item {
+      background: var(--bg-alt);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      font-size: 12px;
+      font-family: "SF Mono", "Fira Code", Menlo, monospace;
+      color: var(--text-muted);
+      word-break: break-all;
+    }
+
+    /* ── Priority Table ── */
+    .priority-table { width: 100%; border-collapse: collapse; }
+    .priority-table th {
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 8px 14px;
+      border-bottom: 2px solid var(--border);
+      background: var(--bg-alt);
+    }
+    .priority-table td {
+      padding: 11px 14px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--bg-alt);
+      vertical-align: top;
+    }
+    .priority-table tr:last-child td { border-bottom: none; }
+    .priority-table tr:hover td { background: #F9F7F4; }
+
+    /* ── Technical Status ── */
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    .tech-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: var(--shadow);
+    }
+    .tech-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .dot-green  { background: var(--success); box-shadow: 0 0 0 3px #D4F0E2; }
+    .dot-orange { background: var(--warning); box-shadow: 0 0 0 3px #FDEBD0; }
+    .dot-gray   { background: #ABABAB;        box-shadow: 0 0 0 3px #EBEBEB; }
+    .tech-info { flex: 1; }
+    .tech-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+    .tech-desc { font-size: 12px; color: var(--text-muted); }
+
+    /* ── Footer ── */
+    .footer {
+      text-align: center;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+      margin-top: 48px;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    @media (max-width: 600px) {
+      .masthead { padding: 36px 20px 32px; }
+      .masthead h1 { font-size: 24px; }
+      .stat-bar { grid-template-columns: repeat(2, 1fr); }
+      .tech-grid { grid-template-columns: 1fr; }
+      .file-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Masthead ── -->
+<div class="masthead">
+  <div class="masthead-inner">
+    <div class="masthead-label">Projektbriefing</div>
+    <h1>VetApp <span>— Zwischenstand</span></h1>
+    <div class="masthead-sub">Intensiver Entwicklungstag &middot; Session-Zusammenfassung fuer Claas</div>
+    <div class="masthead-meta">
+      <div class="meta-pill"><span class="icon">&#128197;</span> 03. April 2026</div>
+      <div class="meta-pill"><span class="icon">&#128204;</span> 2 Sessions</div>
+      <div class="meta-pill"><span class="icon">&#128221;</span> React Native / Expo</div>
+      <div class="meta-pill"><span class="icon">&#128274;</span> Erstellt vom Dokumentar</div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ── Blocker ── -->
+  <div class="blocker-banner">
+    <div class="blocker-icon">&#9888;&#65039;</div>
+    <div>
+      <div class="blocker-title">Aktion von Claas erforderlich — KI-Assistent noch nicht live</div>
+      <div class="blocker-text">
+        Die Edge Function <code>ai-chat</code> ist auf Supabase deployed, aber der
+        <code>ANTHROPIC_API_KEY</code> fehlt noch als Secret. Ohne den Key antwortet
+        der KI-Assistent nicht. Key erstellen unter
+        <code>console.anthropic.com</code>, dann als Supabase Secret eintragen.
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Stats ── -->
+  <div class="stat-bar">
+    <div class="stat-card">
+      <div class="stat-num">7+</div>
+      <div class="stat-label">Commits heute</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">22+</div>
+      <div class="stat-label">Dateien geaendert</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">0</div>
+      <div class="stat-label">TypeScript-Fehler</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">2</div>
+      <div class="stat-label">Sessions</div>
+    </div>
+  </div>
+
+  <!-- ── Highlight ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-blue">&#10024;</div>
+      <div class="section-title">Highlight dieser Session</div>
+    </div>
+
+    <div class="highlight-card">
+      <div class="highlight-label">&#9733; Hauptfeature</div>
+      <div class="highlight-title">KI-Gesundheitsassistent — vollstaendig umgebaut</div>
+      <div class="highlight-desc">
+        Der KI-Assistent hat jetzt einen eigenen Tab in der Mitte der Bottom-Navigation (Position 3).
+        Das komplette UI wurde von Grund auf redesigned: Premium-Willkommensbildschirm, Chat-Bubbles
+        mit AI-Avatar-Badge, hochwertige Input-Bar, Disclaimer als fester Strip.
+        Die Edge Function laeuft auf Supabase — ein API-Key-Secret ist der letzte Schritt zur Live-Schaltung.
+      </div>
+      <div class="feature-chips">
+        <span class="chip">&#128123; Eigener Tab (Position 3)</span>
+        <span class="chip">&#127775; sparkles-Icon</span>
+        <span class="chip">&#128172; Chat-Bubbles mit AI-Badge</span>
+        <span class="chip">&#9989; Premium-Welcome-Screen</span>
+        <span class="chip">&#127959; Edge Function deployed</span>
+        <span class="chip">&#127381; Quick-Actions</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Session 1 ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-green">&#128218;</div>
+      <div class="section-title">Session 1 — Qualitaets-Sprint<small>5 Commits &middot; 16 Dateien &middot; ~540 Zeilen neu</small></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span>&#128737;&#65039;</span>
+        <span class="card-head-title">Security &amp; Housekeeping</span>
+        <span class="badge badge-red">Security</span>
+      </div>
+      <div class="card-body">
+        <ul class="item-list">
+          <li>
+            <span class="item-icon">&#128683;</span>
+            <div class="item-main">
+              <strong>Dev-Toggle entfernt</strong>
+              Der Debug-Toggle zum manuellen Aktivieren des Premium-Modus wurde aus dem Profil-Screen entfernt. War in der Production-Version sichtbar und ermoeglichte das Umgehen der Paywall.
+              <div class="item-files">ProfileScreen.tsx</div>
+            </div>
+          </li>
+          <li>
+            <span class="item-icon">&#128465;&#65039;</span>
+            <div class="item-main">
+              <strong>Verwaiste Bild-Datei geloescht</strong>
+              Eine nicht referenzierte <code>.webp</code>-Datei im Projekt-Root wurde entfernt.
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span>&#9878;&#65039;</span>
+        <span class="card-head-title">Code-Qualitaet &amp; Refactoring</span>
+        <span class="badge badge-blue">Refactoring</span>
+      </div>
+      <div class="card-body">
+        <ul class="item-list">
+          <li>
+            <span class="item-icon">&#128296;</span>
+            <div class="item-main">
+              <strong>getAge() dedupliziert</strong>
+              Funktion war identisch in zwei Screens. Jetzt zentral in <code>petHelpers.ts</code> mit Fallback auf "Alter unbekannt" bei ungueltigen Eingaben.
+              <div class="item-files">petHelpers.ts &middot; PetDetailScreen.tsx &middot; MyPetsScreen.tsx</div>
+            </div>
+          </li>
+          <li>
+            <span class="item-icon">&#128197;</span>
+            <div class="item-main">
+              <strong>Datums-Validierung zentralisiert</strong>
+              Neue Funktion <code>parseGermanDate()</code> in <code>petHelpers.ts</code> prueft Format, Wertebereiche und kalendarische Gueltigkeit. Vorher wurde tt.mm.jjjj-Eingabe in 5 Screens ohne Validierung akzeptiert.
+              <div class="item-files">petHelpers.ts &middot; AddEventScreen &middot; EventDetailScreen &middot; AddReminderScreen &middot; AddPetScreen &middot; OnboardingScreen</div>
+            </div>
+          </li>
+          <li>
+            <span class="item-icon">&#129518;</span>
+            <div class="item-main">
+              <strong>SelectField-Komponente extrahiert</strong>
+              Custom-Picker war 4x identisch kopiert. Neue wiederverwendbare Komponente mit label, value, options, onSelect und rightElement-Props. Ca. 240 Zeilen Duplikat entfernt.
+              <div class="item-files">SelectField.tsx (neu) &middot; components/index.ts &middot; 4 Screens</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span>&#10024;</span>
+        <span class="card-head-title">Neue Features</span>
+        <span class="badge badge-green">Feature</span>
+      </div>
+      <div class="card-body">
+        <ul class="item-list">
+          <li>
+            <span class="item-icon">&#9998;&#65039;</span>
+            <div class="item-main">
+              <strong>Haustier bearbeiten</strong>
+              User koennen jetzt bestehende Haustiere bearbeiten. <code>updatePet()</code> in DataContext implementiert. AddPetScreen erkennt Edit-Modus und fuellt alle Felder vor. Bearbeiten-Button (Stift-Icon) im Header des PetDetailScreens.
+              <div class="item-files">DataContext.tsx &middot; AddPetScreen.tsx &middot; PetDetailScreen.tsx</div>
+            </div>
+          </li>
+          <li>
+            <span class="item-icon">&#128282;</span>
+            <div class="item-main">
+              <strong>Tote Buttons aktiviert</strong>
+              Drei Buttons ohne Handler: "Behandlung hinzufuegen" navigiert jetzt zu AddEvent mit vorausgewaehltem Typ, Profil-Bleistift zeigt In-Entwicklung-Alert, "Premium-Funktionen" navigiert zur Paywall.
+              <div class="item-files">PetDetailScreen.tsx &middot; ProfileScreen.tsx &middot; AddEventScreen.tsx</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span>&#128274;</span>
+        <span class="card-head-title">Stabilitaet &amp; UX</span>
+        <span class="badge badge-blue">Stabilitaet</span>
+      </div>
+      <div class="card-body">
+        <ul class="item-list">
+          <li>
+            <span class="item-icon">&#128230;</span>
+            <div class="item-main">
+              <strong>Storage-URLs refactored</strong>
+              Dokument-URLs wurden als signed URLs mit Ablaufdatum gespeichert. Neue Dokumente speichern den Storage-Pfad direkt, signed URLs werden on-demand generiert. Loeschen nutzt den Pfad direkt — kein fragiles Regex mehr.
+              <div class="item-files">DataContext.tsx &middot; PetDetailScreen.tsx &middot; types/index.ts</div>
+            </div>
+          </li>
+          <li>
+            <span class="item-icon">&#9203;</span>
+            <div class="item-main">
+              <strong>Loading-States + Doppel-Submit-Schutz</strong>
+              Alle 5 Formular-Screens haben saving-State mit Guard. Buttons zeigen "Wird gespeichert..." und sind disabled. Fehler werden als Alert angezeigt. Button-Komponente unterstuetzt neue disabled-Prop.
+              <div class="item-files">Button.tsx &middot; 5 Formular-Screens</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Session 2 ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-blue">&#128640;</div>
+      <div class="section-title">Session 2 — Navigation &amp; Design<small>KI-Assistent-Tab &middot; Theme-Konsistenz &middot; Accessibility</small></div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span>&#128250;</span>
+        <span class="card-head-title">Navigation-Umbau</span>
+        <span class="badge badge-blue">Navigation</span>
+      </div>
+      <div class="card-body">
+        <ul class="item-list">
+          <li>
+            <span class="item-icon">&#10024;</span>
+            <div class="item-main">
+              <strong>KI-Assistent als eigener Tab (Position 3)</strong>
+              Neuer Tab mit sparkles-Icon in der Mitte der Bottom-Navigation. Der Assistent ist ein Kern-Feature und bekommt einen permanenten Einstiegspunkt.
+              <div class="item-files">src/navigation/AppNavigator.tsx</div>
+            </div>
+          </li>
+          <li>
+            <span class="item-icon">&#128101;</span>
+            <div class="item-main">
+              <strong>Profil-Tab in HomeScreen-Header verschoben</strong>
+              Profil-Tab weicht dem KI-Assistenten. Profil ist jetzt ueber <code>person-circle-outline</code>-Icon im Header des HomeScreens erreichbar. Back-Button im ProfileScreen ergaenzt.
+              <div class="item-files">AppNavigator.tsx &middot; HomeScreen.tsx &middot; ProfileScreen.tsx</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span>&#127912;</span>
+        <span class="card-head-title">Design &amp; Accessibility</span>
+        <span class="badge badge-green">Audit D1/D4</span>
+      </div>
+      <div class="card-body">
+        <ul class="item-list">
+          <li>
+            <span class="item-icon">&#127881;</span>
+            <div class="item-main">
+              <strong>AIAssistantScreen — komplettes Redesign</strong>
+              Premium-Willkommensbildschirm mit Hero-Badge und 3 Feature-Cards, Chat-Bubbles mit AI-Avatar-Badge und Schatten, hochwertige Input-Bar, Disclaimer als fester Strip, sauberes Drei-Spalten-Header-Layout.
+              <div class="item-files">src/screens/AIAssistantScreen.tsx</div>
+            </div>
+          </li>
+          <li>
+            <span class="item-icon">&#127775;</span>
+            <div class="item-main">
+              <strong>Hardcodierte Farben durch Theme-Tokens ersetzt</strong>
+              Alle <code>#FFF8E1</code>- und <code>#D4A020</code>-Werte ersetzt. Dark-Mode-Vorbereitung.
+              <div class="item-files">AIAssistantScreen.tsx</div>
+            </div>
+          </li>
+          <li>
+            <span class="item-icon">&#128075;</span>
+            <div class="item-main">
+              <strong>Touch-Targets auf 44px angehoben</strong>
+              Send-Button von 40px auf 44px. TextInput erhaelt minHeight 44px. Typing-Indikator nutzt textSecondary fuer besseren WCAG-Kontrast.
+              <div class="item-files">AIAssistantScreen.tsx</div>
+            </div>
+          </li>
+          <li>
+            <span class="item-icon">&#128196;</span>
+            <div class="item-main">
+              <strong>ProfileScreen "Kommt bald"-Text ersetzt</strong>
+              Platzhaltertext durch Produktionstext ersetzt, der auf den fertigen KI-Assistenten verweist.
+              <div class="item-files">ProfileScreen.tsx</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <span>&#128027;</span>
+        <span class="card-head-title">Bug-Fixes</span>
+        <span class="badge badge-red">Fixes</span>
+      </div>
+      <div class="card-body">
+        <ul class="item-list">
+          <li>
+            <span class="item-icon">&#128657;</span>
+            <div class="item-main">
+              <strong>Paywall-Crash behoben</strong>
+              <code>navigation.replace</code> durch <code>navigation.navigate</code> ersetzt.
+            </div>
+          </li>
+          <li>
+            <span class="item-icon">&#9203;</span>
+            <div class="item-main">
+              <strong>Race Condition beim Subscription-Check behoben</strong>
+              isLoading-Guard verhindert Fehlzustand beim schnellen Tippen.
+            </div>
+          </li>
+          <li>
+            <span class="item-icon">&#128074;</span>
+            <div class="item-main">
+              <strong>Retry-Button Doppel-Tap verhindert</strong>
+              Zusaetzlicher disabled-State waehrend laufendem Retry.
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Uncommitted Files ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-orange">&#128196;</div>
+      <div class="section-title">Noch nicht committete Aenderungen</div>
+    </div>
+    <div class="card">
+      <div class="card-body">
+        <div class="file-grid">
+          <div class="file-item">.claude/rules/navigation.md</div>
+          <div class="file-item">src/navigation/AppNavigator.tsx</div>
+          <div class="file-item">src/screens/AIAssistantScreen.tsx</div>
+          <div class="file-item">src/screens/HomeScreen.tsx</div>
+          <div class="file-item">src/screens/ProfileScreen.tsx</div>
+          <div class="file-item">tasks.md</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Technischer Status ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-green">&#9881;&#65039;</div>
+      <div class="section-title">Technischer Status</div>
+    </div>
+    <div class="tech-grid">
+      <div class="tech-item">
+        <div class="tech-dot dot-green"></div>
+        <div class="tech-info">
+          <div class="tech-name">TypeScript</div>
+          <div class="tech-desc">0 Fehler, strict mode</div>
+        </div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-dot dot-green"></div>
+        <div class="tech-info">
+          <div class="tech-name">Edge Function ai-chat</div>
+          <div class="tech-desc">Deployed auf Supabase</div>
+        </div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-dot dot-orange"></div>
+        <div class="tech-info">
+          <div class="tech-name">ANTHROPIC_API_KEY</div>
+          <div class="tech-desc">Fehlt als Supabase Secret — Aktion von Claas</div>
+        </div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-dot dot-orange"></div>
+        <div class="tech-info">
+          <div class="tech-name">Uncommitted Changes</div>
+          <div class="tech-desc">6 Dateien noch nicht im Repo</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Naechste Schritte ── -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-icon icon-orange">&#128203;</div>
+      <div class="section-title">Naechste Schritte</div>
+    </div>
+    <div class="card">
+      <div class="card-body" style="padding: 0;">
+        <table class="priority-table">
+          <thead>
+            <tr>
+              <th style="width: 100px;">Prioritaet</th>
+              <th>Aufgabe</th>
+              <th style="width: 120px;">Verantwortlich</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge badge-red">Sofort</span></td>
+              <td>ANTHROPIC_API_KEY als Supabase Secret setzen &rarr; KI-Assistent geht live</td>
+              <td style="font-weight:600; color: var(--primary);">Claas</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-red">Sofort</span></td>
+              <td>Uncommitted Changes committen (6 Dateien)</td>
+              <td style="color: var(--text-muted);">Dev</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-orange">Diese Woche</span></td>
+              <td>Gesundheits-UX Overhaul (Tab umbenennen, MedicalEvent-Modell, Screens umbauen)</td>
+              <td style="color: var(--text-muted);">Dev</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-orange">Diese Woche</span></td>
+              <td>Accessibility Basics vervollstaendigen (Labels, weitere Touch-Targets)</td>
+              <td style="color: var(--text-muted);">Dev</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-orange">Diese Woche</span></td>
+              <td>Farbkonsistenz haerten — Theme konsequent in allen verbleibenden Screens</td>
+              <td style="color: var(--text-muted);">Dev</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-gray">Backlog</span></td>
+              <td>DataContext refactoren (~350 Zeilen God-Object)</td>
+              <td style="color: var(--text-muted);">Dev</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-gray">Backlog</span></td>
+              <td>Chat-Historie persistent machen (aktuell nur In-Memory)</td>
+              <td style="color: var(--text-muted);">Dev</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-gray">Backlog</span></td>
+              <td>SelectField: Tap-outside schliesst nicht</td>
+              <td style="color: var(--text-muted);">Dev</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-gray">Backlog</span></td>
+              <td>ProfileScreen Settings-Handler (Datenschutz, Hilfe)</td>
+              <td style="color: var(--text-muted);">Dev</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Footer ── -->
+  <div class="footer">
+    Erstellt vom Dokumentar &middot; VetApp Dev-Agentur &middot; 03.04.2026
+  </div>
+
+</div>
+</body>
+</html>

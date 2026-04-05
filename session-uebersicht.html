@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VetApp — Session-Übersicht 04.04.2026</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal:        #1B6B5A;
+      --teal-mid:    #2A8C74;
+      --teal-light:  #D4EDE8;
+      --teal-border: #A8D5CC;
+      --orange:      #CC6B3D;
+      --orange-light:#FAE8DC;
+      --orange-border:#E8B89A;
+      --bg:          #FAF6F1;
+      --surface:     #FFFFFF;
+      --text:        #1A1A1A;
+      --text-sub:    #5A5A5A;
+      --text-muted:  #8A8A8A;
+      --border:      #E8E0D8;
+      --success:     #2E7D5E;
+      --success-bg:  #E8F5EF;
+      --warn:        #B07D2A;
+      --warn-bg:     #FDF4E0;
+      --neutral-bg:  #F0EBE4;
+      --radius:      12px;
+      --radius-lg:   20px;
+      --shadow:      0 2px 12px rgba(27,107,90,0.08);
+      --shadow-lg:   0 8px 32px rgba(27,107,90,0.12);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    .page-header {
+      background: linear-gradient(135deg, var(--teal) 0%, var(--teal-mid) 60%, #3AA88C 100%);
+      color: white;
+      padding: 48px 32px 40px;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-header::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 260px; height: 260px;
+      background: rgba(255,255,255,0.06);
+      border-radius: 50%;
+    }
+    .page-header::after {
+      content: '';
+      position: absolute;
+      bottom: -80px; left: 30%;
+      width: 320px; height: 320px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 50%;
+    }
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      border-radius: 999px;
+      padding: 4px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .header-badge-dot {
+      width: 6px; height: 6px;
+      background: #7FE0C8;
+      border-radius: 50%;
+    }
+    .page-header h1 {
+      font-size: clamp(24px, 4vw, 38px);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    .page-header p {
+      font-size: 16px;
+      opacity: 0.85;
+      font-weight: 400;
+    }
+    .header-date {
+      margin-top: 20px;
+      font-size: 13px;
+      opacity: 0.6;
+      letter-spacing: 0.03em;
+    }
+
+    /* ── LAYOUT ── */
+    .page-body {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    section { margin-bottom: 48px; }
+
+    /* ── KPI GRID ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 16px;
+    }
+    .kpi-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 20px 16px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
+    .kpi-card.accent {
+      background: linear-gradient(135deg, var(--teal) 0%, var(--teal-mid) 100%);
+      border-color: transparent;
+      color: white;
+    }
+    .kpi-card.accent .kpi-label { color: rgba(255,255,255,0.75); }
+    .kpi-card.orange {
+      background: linear-gradient(135deg, var(--orange) 0%, #D4814F 100%);
+      border-color: transparent;
+      color: white;
+    }
+    .kpi-card.orange .kpi-label { color: rgba(255,255,255,0.75); }
+    .kpi-number {
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -2px;
+      display: block;
+      margin-bottom: 8px;
+    }
+    .kpi-card.accent .kpi-number,
+    .kpi-card.orange .kpi-number { color: white; }
+    .kpi-number.green { color: var(--teal); }
+    .kpi-number.orange-text { color: var(--orange); }
+    .kpi-label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-sub);
+      letter-spacing: 0.02em;
+      line-height: 1.3;
+    }
+
+    /* ── PROGRESS ── */
+    .progress-list { display: flex; flex-direction: column; gap: 20px; }
+    .progress-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      box-shadow: var(--shadow);
+    }
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .progress-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .progress-pct {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+    .progress-pct.done { color: var(--teal); }
+    .progress-pct.partial { color: var(--warn); }
+    .progress-pct.zero { color: var(--text-muted); }
+    .progress-note {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+    .progress-bar-bg {
+      height: 10px;
+      background: var(--neutral-bg);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      border-radius: 99px;
+      transition: width 0.6s ease;
+    }
+    .progress-bar-fill.done { background: linear-gradient(90deg, var(--teal), var(--teal-mid)); }
+    .progress-bar-fill.partial {
+      background: linear-gradient(90deg, #D4A017, #E8C84A);
+    }
+    .progress-bar-fill.zero { background: var(--border); width: 0%; }
+
+    /* ── TIMELINE / KARTEN ── */
+    .timeline { display: flex; flex-direction: column; gap: 16px; }
+    .timeline-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .timeline-card:hover {
+      transform: translateX(4px);
+      box-shadow: var(--shadow-lg);
+    }
+    .timeline-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .tl-teal { background: var(--teal-light); }
+    .tl-orange { background: var(--orange-light); }
+    .tl-purple { background: #EDE8F5; }
+    .tl-blue { background: #E8F0FA; }
+    .timeline-content { flex: 1; }
+    .timeline-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .timeline-desc {
+      font-size: 14px;
+      color: var(--text-sub);
+      line-height: 1.6;
+    }
+    .timeline-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 12px;
+    }
+    .tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .tag-teal { background: var(--teal-light); color: var(--teal); }
+    .tag-orange { background: var(--orange-light); color: var(--orange); }
+    .tag-purple { background: #EDE8F5; color: #6B4FA0; }
+    .tag-blue { background: #E8F0FA; color: #2A5FA0; }
+    .tag-gray { background: var(--neutral-bg); color: var(--text-sub); }
+
+    /* ── CHECKLIST ── */
+    .checklist-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      box-shadow: var(--shadow);
+    }
+    .checklist-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 10px;
+    }
+    .check-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      border: 1px solid transparent;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .check-item.done {
+      background: var(--success-bg);
+      border-color: #B8DFD0;
+      color: var(--success);
+    }
+    .check-item.partial {
+      background: var(--warn-bg);
+      border-color: #F0DC9A;
+      color: var(--warn);
+    }
+    .check-item.todo {
+      background: var(--neutral-bg);
+      border-color: var(--border);
+      color: var(--text-muted);
+    }
+    .check-icon {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    /* ── NEXT STEPS ── */
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .step-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .step-num {
+      width: 32px;
+      height: 32px;
+      background: var(--teal);
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+    .step-card:nth-child(4) .step-num { background: var(--orange); }
+    .step-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.4;
+    }
+    .step-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+      font-weight: 400;
+    }
+
+    /* ── FINANCE ── */
+    .finance-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+    }
+    @media (max-width: 640px) {
+      .finance-grid { grid-template-columns: 1fr; }
+    }
+    .finance-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+    .finance-card.highlight {
+      background: linear-gradient(135deg, var(--orange) 0%, #D4814F 100%);
+      border-color: transparent;
+      color: white;
+    }
+    .finance-phase {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+    .finance-card.highlight .finance-phase { color: rgba(255,255,255,0.7); }
+    .finance-amount {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .finance-card.highlight .finance-amount { color: white; }
+    .finance-status {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+    .finance-card.highlight .finance-status { color: rgba(255,255,255,0.8); }
+    .finance-total {
+      background: var(--teal-light);
+      border: 1px solid var(--teal-border);
+      border-radius: var(--radius);
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .finance-total-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--teal);
+    }
+    .finance-total-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--teal);
+    }
+
+    /* ── PHASE 3 PREVIEW ── */
+    .preview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+    }
+    .preview-item {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      box-shadow: var(--shadow);
+    }
+    .preview-bullet {
+      width: 8px; height: 8px;
+      background: var(--border);
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 6px;
+    }
+    .preview-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-sub);
+      line-height: 1.4;
+    }
+    .preview-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    /* ── FOOTER ── */
+    .page-footer {
+      background: var(--teal);
+      color: rgba(255,255,255,0.7);
+      text-align: center;
+      padding: 24px;
+      font-size: 12px;
+    }
+    .page-footer strong { color: white; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .page-header { padding: 32px 20px 28px; }
+      .page-body { padding: 28px 16px 60px; }
+      .timeline-card { flex-direction: column; gap: 12px; }
+      .finance-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 480px) {
+      .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+      .finance-grid { grid-template-columns: 1fr; }
+      .checklist-grid { grid-template-columns: 1fr; }
+      .steps-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <div class="header-inner">
+      <div class="header-badge">
+        <span class="header-badge-dot"></span>
+        Phase-2-Sprint abgeschlossen
+      </div>
+      <h1>VetApp — Session-Übersicht</h1>
+      <p>Phase-2-Sprint — Produktivster Tag im Projekt</p>
+      <p class="header-date">04. April 2026</p>
+    </div>
+  </header>
+
+  <div class="page-body">
+
+    <!-- KPI LEISTE -->
+    <section>
+      <p class="section-label">Heutige Kennzahlen</p>
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <span class="kpi-number green">11</span>
+          <span class="kpi-label">QA-Findings gefixt</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-number green">8</span>
+          <span class="kpi-label">Design-Verbesserungen</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-number orange-text">4</span>
+          <span class="kpi-label">Animationen</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-number orange-text">2</span>
+          <span class="kpi-label">Neue Features</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-number green">3</span>
+          <span class="kpi-label">Deploys</span>
+        </div>
+        <div class="kpi-card accent">
+          <span class="kpi-number">0</span>
+          <span class="kpi-label">TypeScript-Fehler</span>
+        </div>
+        <div class="kpi-card">
+          <span class="kpi-number green">40+</span>
+          <span class="kpi-label">Dateien geändert</span>
+        </div>
+        <div class="kpi-card orange">
+          <span class="kpi-number">~2k</span>
+          <span class="kpi-label">Zeilen netto</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- FORTSCHRITT -->
+    <section>
+      <p class="section-label">Projektfortschritt</p>
+      <div class="progress-list">
+        <div class="progress-item">
+          <div class="progress-header">
+            <div>
+              <div class="progress-title">Phase 1 — Konzept & Planung</div>
+              <div class="progress-note">Architektur, Design-System, Tech-Stack, Angebotslegung</div>
+            </div>
+            <span class="progress-pct done">100%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill done" style="width: 100%;"></div>
+          </div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-header">
+            <div>
+              <div class="progress-title">Phase 2 — MVP-Entwicklung</div>
+              <div class="progress-note">Handy-Test und Kunden-Demo stehen noch aus</div>
+            </div>
+            <span class="progress-pct partial">95%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill partial" style="width: 95%;"></div>
+          </div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-header">
+            <div>
+              <div class="progress-title">Phase 3 — Testing & Übergabe</div>
+              <div class="progress-note">Startet nach erfolgreicher Kunden-Demo</div>
+            </div>
+            <span class="progress-pct zero">0%</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill zero" style="width: 0%;"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TIMELINE -->
+    <section>
+      <p class="section-label">Was heute passiert ist</p>
+      <div class="timeline">
+
+        <div class="timeline-card">
+          <div class="timeline-icon tl-teal">🔍</div>
+          <div class="timeline-content">
+            <div class="timeline-title">QA &amp; Fixes — Zwei Audit-Runden</div>
+            <div class="timeline-desc">
+              11 Findings identifiziert und behoben. Runde 4 (8 Findings): storagePath-Fallback, Error-Handling im Onboarding, Guard für leere petId, Dropped Promise, toter Code entfernt, Anrufen-Button nur bei vorhandener Telefonnummer. Runde 5 (3 Findings): Onboarding Foto-Upload, falscher Navigate-Parameter, verwaiste Styles.
+            </div>
+            <div class="timeline-tags">
+              <span class="tag tag-teal">F-014 bis F-025</span>
+              <span class="tag tag-gray">0 kritische Findings</span>
+              <span class="tag tag-gray">2 Runden</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-card">
+          <div class="timeline-icon tl-orange">📸</div>
+          <div class="timeline-content">
+            <div class="timeline-title">Pet-Fotos — Upload in Supabase Storage</div>
+            <div class="timeline-desc">
+              Haustiere haben jetzt ein Profilfoto. Upload beim Anlegen und Bearbeiten, Pfad in der DB gespeichert, Signed URLs on-demand generiert — bleibt nach App-Neuinstallation erreichbar. Foto wird beim Löschen des Tieres automatisch mitgelöscht.
+            </div>
+            <div class="timeline-tags">
+              <span class="tag tag-orange">F-008</span>
+              <span class="tag tag-gray">fileUpload.ts</span>
+              <span class="tag tag-gray">Signed URLs</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-card">
+          <div class="timeline-icon tl-teal">⏰</div>
+          <div class="timeline-content">
+            <div class="timeline-title">ReminderSettings — Überfällig-Regeln aktiv</div>
+            <div class="timeline-desc">
+              Der ReminderSettings-Screen war bisher nur Fassade. Jetzt greifen die eingestellten Regeln tatsächlich: ab wann eine Erinnerung als "überfällig" gilt, wird aus den Nutzereinstellungen gelesen. Optimistisches Update mit Doppel-Tap-Schutz.
+            </div>
+            <div class="timeline-tags">
+              <span class="tag tag-teal">F-022</span>
+              <span class="tag tag-gray">useOverdueSettings.ts</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-card">
+          <div class="timeline-icon tl-blue">🚀</div>
+          <div class="timeline-content">
+            <div class="timeline-title">Deploys — Datenbank, Edge Function, Storage</div>
+            <div class="timeline-desc">
+              DB-Migration: medical_events-Tabelle erstellt, Daten aus alten Tabellen (vaccinations/treatments) migriert, recurrence_check-Constraint hinzugefügt. Edge Function ai-chat mit neuem medicalHistory-Format deployed. Storage-Policy für Pet-Fotos eingerichtet.
+            </div>
+            <div class="timeline-tags">
+              <span class="tag tag-blue">DB-Migration</span>
+              <span class="tag tag-blue">Edge Function</span>
+              <span class="tag tag-blue">Storage-Policy</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-card">
+          <div class="timeline-icon tl-orange">✨</div>
+          <div class="timeline-content">
+            <div class="timeline-title">Design-Polish — 8 Verbesserungen</div>
+            <div class="timeline-desc">
+              Gradient Header im HomeScreen (expo-linear-gradient). Pet-Hero-Banner im PetDetailScreen. AI-Card als Premium-Feature mit Badge und CTA. Neue Komponenten: EmptyState (Emoji + Action-Button), SkeletonLoader (Shimmer). Card-Varianten formalisiert (default/tinted/warning/error). Display-Typografie (38px/28px). KI-Disclaimer dezenter.
+            </div>
+            <div class="timeline-tags">
+              <span class="tag tag-orange">EmptyState</span>
+              <span class="tag tag-orange">SkeletonLoader</span>
+              <span class="tag tag-orange">Card-Varianten</span>
+              <span class="tag tag-orange">Display-Type</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-card">
+          <div class="timeline-icon tl-purple">💫</div>
+          <div class="timeline-content">
+            <div class="timeline-title">Animationen — Tier 1 implementiert</div>
+            <div class="timeline-desc">
+              Vier Animationstypen mit React Native Animated API — keine neuen Packages. Fade-In: HomeScreen und AIAssistantScreen. Scale-Feedback: Pet-Cards und AI-Card. Tab-Slide: aktiver Tab-Indikator im PetDetailScreen. Pulse: Überfällig-Banner. Neue Hilfsdateien useFadeIn.ts und AnimatedPressable.tsx.
+            </div>
+            <div class="timeline-tags">
+              <span class="tag tag-purple">Fade-In</span>
+              <span class="tag tag-purple">Scale-Feedback</span>
+              <span class="tag tag-purple">Tab-Slide</span>
+              <span class="tag tag-purple">Overdue-Pulse</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-card">
+          <div class="timeline-icon tl-teal">🧠</div>
+          <div class="timeline-content">
+            <div class="timeline-title">Konzepte — KI-Assistent &amp; Design-Recherche</div>
+            <div class="timeline-desc">
+              KI-Assistent Tool Use: technische Architektur für Variante B (Confirm First) ausgearbeitet, ~2–3 Tage Aufwand. Design-Recherche mit Visualisierungen als HTML-Bericht. Animations-Showcase als interaktive HTML-Demo. Demo-Checklist erstellt.
+            </div>
+            <div class="timeline-tags">
+              <span class="tag tag-teal">Tool Use Konzept</span>
+              <span class="tag tag-teal">Animations-Showcase</span>
+              <span class="tag tag-gray">Bereit zur Umsetzung</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- DEMO-READY CHECKLIST -->
+    <section>
+      <p class="section-label">Demo-Ready Status</p>
+      <div class="checklist-card">
+        <div class="checklist-grid">
+          <div class="check-item done">
+            <span class="check-icon">✅</span>
+            DB-Migrationen deployed
+          </div>
+          <div class="check-item done">
+            <span class="check-icon">✅</span>
+            Edge Function deployed
+          </div>
+          <div class="check-item done">
+            <span class="check-icon">✅</span>
+            Storage-Policy eingerichtet
+          </div>
+          <div class="check-item done">
+            <span class="check-icon">✅</span>
+            Error-Handling flächendeckend
+          </div>
+          <div class="check-item done">
+            <span class="check-icon">✅</span>
+            Pet-Fotos in Storage
+          </div>
+          <div class="check-item done">
+            <span class="check-icon">✅</span>
+            Design-Polish (8 Punkte)
+          </div>
+          <div class="check-item done">
+            <span class="check-icon">✅</span>
+            Animationen Tier 1
+          </div>
+          <div class="check-item done">
+            <span class="check-icon">✅</span>
+            ReminderSettings funktionsfähig
+          </div>
+          <div class="check-item partial">
+            <span class="check-icon">🟡</span>
+            Handy-Test (steht aus)
+          </div>
+          <div class="check-item partial">
+            <span class="check-icon">🟡</span>
+            notification_id Migration
+          </div>
+          <div class="check-item todo">
+            <span class="check-icon">⬜</span>
+            Kunden-Demo
+          </div>
+          <div class="check-item todo">
+            <span class="check-icon">⬜</span>
+            Phase-2-Zahlung auslösen
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NÄCHSTE SCHRITTE -->
+    <section>
+      <p class="section-label">Nächste Schritte</p>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">1</div>
+          <div>
+            <div class="step-text">Handy-Test durchführen</div>
+            <div class="step-sub">Expo Go, localhost:8081 — alle Flows: Onboarding, Tier + Foto, Event, Erinnerung, KI-Chat</div>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">2</div>
+          <div>
+            <div class="step-text">Bugs fixen</div>
+            <div class="step-sub">Findings aus Handy-Test sammeln und beheben, notification_id Migration deployen</div>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">3</div>
+          <div>
+            <div class="step-text">Demo dem Kunden zeigen</div>
+            <div class="step-sub">MVP vorzeigen, Feedback einholen, Phase 3 besprechen</div>
+          </div>
+        </div>
+        <div class="step-card">
+          <div class="step-num">4</div>
+          <div>
+            <div class="step-text">Phase-2-Zahlung</div>
+            <div class="step-sub" style="color: var(--orange); font-weight: 700; font-size: 16px;">2.160 €</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FINANZ-ÜBERSICHT -->
+    <section>
+      <p class="section-label">Finanz-Übersicht</p>
+      <div class="finance-total">
+        <span class="finance-total-label">Gesamtprojekt</span>
+        <span class="finance-total-val">5.400 €</span>
+      </div>
+      <div class="finance-grid">
+        <div class="finance-card">
+          <div class="finance-phase">Phase 1 — 30%</div>
+          <div class="finance-amount">1.620 €</div>
+          <div class="finance-status">✅ Bezahlt</div>
+        </div>
+        <div class="finance-card highlight">
+          <div class="finance-phase">Phase 2 — 40%</div>
+          <div class="finance-amount">2.160 €</div>
+          <div class="finance-status">Fällig nach Demo</div>
+        </div>
+        <div class="finance-card">
+          <div class="finance-phase">Phase 3 — 30%</div>
+          <div class="finance-amount">1.620 €</div>
+          <div class="finance-status">⬜ Nach Übergabe</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PHASE 3 PREVIEW -->
+    <section>
+      <p class="section-label">Phase 3 — Vorschau</p>
+      <div class="preview-grid">
+        <div class="preview-item">
+          <div class="preview-bullet"></div>
+          <div>
+            <div class="preview-text">PDF-Export</div>
+            <div class="preview-sub">Scope mit Kunden klären</div>
+          </div>
+        </div>
+        <div class="preview-item">
+          <div class="preview-bullet"></div>
+          <div>
+            <div class="preview-text">Tierarztfinder</div>
+            <div class="preview-sub">Scope mit Kunden klären</div>
+          </div>
+        </div>
+        <div class="preview-item">
+          <div class="preview-bullet"></div>
+          <div>
+            <div class="preview-text">IAP / Kaufprozess</div>
+            <div class="preview-sub">Echter In-App-Purchase statt Dev-Toggle</div>
+          </div>
+        </div>
+        <div class="preview-item">
+          <div class="preview-bullet"></div>
+          <div>
+            <div class="preview-text">KI-Assistent mit Dateneingabe</div>
+            <div class="preview-sub">Konzept fertig — Tool Use, Variante B, ~2–3 Tage</div>
+          </div>
+        </div>
+        <div class="preview-item">
+          <div class="preview-bullet"></div>
+          <div>
+            <div class="preview-text">Weitere Animationen</div>
+            <div class="preview-sub">Showcase vorhanden, Tier 2 + 3 ausstehend</div>
+          </div>
+        </div>
+        <div class="preview-item">
+          <div class="preview-bullet"></div>
+          <div>
+            <div class="preview-text">Dark Mode</div>
+            <div class="preview-sub">Semantic Color Tokens als Voraussetzung</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="page-footer">
+    <strong>VetApp</strong> — React Native / Expo / Supabase &nbsp;|&nbsp; Stand: 04.04.2026 &nbsp;|&nbsp; Claas' Dev-Agentur
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VetApp Roadmap</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232733;
+    --border: #2e3345;
+    --text: #e4e6ef;
+    --text-muted: #8b8fa3;
+    --accent: #CC6B3D;
+    --accent-soft: rgba(204,107,61,0.15);
+    --green: #34d399;
+    --green-soft: rgba(52,211,153,0.15);
+    --red: #f87171;
+    --red-soft: rgba(248,113,113,0.12);
+    --yellow: #fbbf24;
+    --yellow-soft: rgba(251,191,36,0.12);
+    --blue: #60a5fa;
+    --blue-soft: rgba(96,165,250,0.12);
+    --purple: #a78bfa;
+    --purple-soft: rgba(167,139,250,0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    background: linear-gradient(135deg, var(--accent), #e8956a);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 2rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 2.5rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 1.5rem 0 0.75rem;
+    color: var(--accent);
+  }
+
+  .phase-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .phase-card.current {
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(204,107,61,0.1);
+  }
+
+  .phase-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+  }
+
+  .phase-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+  }
+
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+
+  .badge-active { background: var(--accent-soft); color: var(--accent); }
+  .badge-next { background: var(--blue-soft); color: var(--blue); }
+  .badge-later { background: var(--purple-soft); color: var(--purple); }
+  .badge-critical { background: var(--red-soft); color: var(--red); }
+  .badge-high { background: var(--yellow-soft); color: var(--yellow); }
+  .badge-medium { background: var(--blue-soft); color: var(--blue); }
+  .badge-low { background: var(--green-soft); color: var(--green); }
+  .badge-done { background: var(--green-soft); color: var(--green); }
+
+  .goal {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    font-style: italic;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
+  }
+
+  th {
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    background: var(--surface2);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  th:first-child { border-radius: 8px 0 0 8px; }
+  th:last-child { border-radius: 0 8px 8px 0; }
+
+  td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  .task-list {
+    list-style: none;
+    padding: 0;
+  }
+
+  .task-list li {
+    padding: 0.5rem 0;
+    padding-left: 1.75rem;
+    position: relative;
+    border-bottom: 1px solid rgba(46,51,69,0.5);
+  }
+
+  .task-list li:last-child { border-bottom: none; }
+
+  .task-list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.75rem;
+    width: 14px;
+    height: 14px;
+    border: 2px solid var(--border);
+    border-radius: 3px;
+  }
+
+  .task-list li.done::before {
+    border-color: var(--green);
+    background: var(--green);
+  }
+
+  .task-list li.done::after {
+    content: '';
+    position: absolute;
+    left: 3px;
+    top: 0.75rem;
+    width: 8px;
+    height: 5px;
+    border-left: 2px solid var(--bg);
+    border-bottom: 2px solid var(--bg);
+    transform: translateY(2px) rotate(-45deg);
+  }
+
+  .deps {
+    background: var(--surface2);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 0.85rem;
+    line-height: 1.8;
+    color: var(--text-muted);
+  }
+
+  .deps .arrow { color: var(--accent); }
+  .deps .blocker { color: var(--red); }
+
+  .decisions {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem;
+  }
+
+  .decisions ol {
+    padding-left: 1.25rem;
+  }
+
+  .decisions li {
+    padding: 0.4rem 0;
+  }
+
+  .decisions strong {
+    color: var(--accent);
+  }
+
+  .money {
+    color: var(--green);
+    font-weight: 600;
+  }
+
+  code {
+    background: var(--surface2);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.85em;
+    font-family: 'SF Mono', 'Fira Code', monospace;
+  }
+
+  .section-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 700px) {
+    .section-grid { grid-template-columns: 1fr; }
+    body { padding: 1rem; }
+  }
+
+  .progress-bar {
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    margin: 0.5rem 0 1rem;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent), #e8956a);
+  }
+
+  footer {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<h1>VetApp Roadmap</h1>
+<p class="subtitle">Stand: 04.04.2026 &mdash; Phase 2 (MVP) inhaltlich fertig. Handy-Test laeuft.</p>
+
+<!-- ============ PHASE 2 ============ -->
+<div class="phase-card current">
+  <div class="phase-header">
+    <span class="phase-title">Phase 2 &mdash; MVP abschliessen</span>
+    <span class="badge badge-active">~ 3-5 Tage</span>
+  </div>
+  <p class="goal">Vorzeigbarer MVP auf dem Handy, Kunden-Demo, Zahlung ausloesen (<span class="money">2.160 EUR</span>)</p>
+  <div class="progress-bar"><div class="progress-fill" style="width: 70%"></div></div>
+
+  <h3>Sofort &mdash; Handy-Test + Bugfixes (1-2 Tage)</h3>
+  <ul class="task-list">
+    <li>Restliche Flows testen (7 offen: Hero-Banner, Tier bearbeiten, Event CRUD, Dokument, Tierarzt, Gradient, Slide-Out)</li>
+    <li>Bugs sammeln und fixen</li>
+    <li><code>notification_id</code> Migration deployen (0,5 Tage)</li>
+    <li>Alte Tabellen <code>vaccinations</code>/<code>treatments</code> droppen (0,5 Tage)</li>
+  </ul>
+
+  <h3>Sicherheit &mdash; Release-Blocker</h3>
+  <table>
+    <tr><th>#</th><th>Finding</th><th>Schwere</th><th>Aufwand</th></tr>
+    <tr><td>S-1</td><td>Premium-Bypass &rarr; IAP/RevenueCat</td><td><span class="badge badge-critical">KRITISCH</span></td><td>3-4 Tage</td></tr>
+    <tr><td>S-2</td><td>Rate-Limit Fail-Closed</td><td><span class="badge badge-high">HOCH</span></td><td>0,5 Tage</td></tr>
+    <tr><td>S-3</td><td><code>ai_usage</code>-Tabelle + RLS im Schema</td><td><span class="badge badge-high">HOCH</span></td><td>0,5 Tage</td></tr>
+    <tr><td>S-4</td><td>Auth-Header Bearer statt <code>x-user-token</code></td><td><span class="badge badge-medium">MITTEL</span></td><td>0,5 Tage</td></tr>
+    <tr><td>S-5</td><td>Dokument-URLs on-demand (kurze TTL)</td><td><span class="badge badge-medium">MITTEL</span></td><td>0,5 Tage</td></tr>
+    <tr><td>S-6</td><td>Storage-Bucket-Policies im Schema</td><td><span class="badge badge-medium">MITTEL</span></td><td>0,25 Tage</td></tr>
+    <tr><td>S-7</td><td>E-Mail-Validierung RegisterScreen</td><td><span class="badge badge-low">NIEDRIG</span></td><td>0,25 Tage</td></tr>
+    <tr><td>S-8</td><td>Auth-Logging hinter <code>__DEV__</code></td><td><span class="badge badge-low">NIEDRIG</span></td><td>0,25 Tage</td></tr>
+  </table>
+
+  <h3>Design-Polish &mdash; MVP-Qualitaet (3 Tage)</h3>
+  <table>
+    <tr><th>Aufgabe</th><th>Aufwand</th><th>Warum</th></tr>
+    <tr><td>SafeAreaView systemisch (alle Screens)</td><td>0,5 T</td><td>Content clippt auf neueren iPhones</td></tr>
+    <tr><td>Touch-Targets fixen (Icon-Buttons &ge; 44px)</td><td>0,5 T</td><td>Accessibility-Minimum</td></tr>
+    <tr><td>Englische Error-Strings &rarr; Deutsch</td><td>0,25 T</td><td>UI-Sprache ist Deutsch</td></tr>
+    <tr><td>EventDetailScreen: Button-Hierarchie</td><td>0,5 T</td><td>UX-Klarheit</td></tr>
+    <tr><td>PaywallScreen: Gradient + emotionaler Header</td><td>0,75 T</td><td>Konversion</td></tr>
+    <tr><td>Header-Komponente extrahieren (DRY)</td><td>0,5 T</td><td>Konsistenz</td></tr>
+  </table>
+
+  <h3>Kunden-Demo + Zahlung</h3>
+  <ul class="task-list">
+    <li>MVP auf Handy vorfuehren</li>
+    <li>Phase-2-Zahlung ausloesen (<span class="money">2.160 EUR</span>)</li>
+  </ul>
+</div>
+
+<!-- ============ PHASE 3 ============ -->
+<div class="phase-card">
+  <div class="phase-header">
+    <span class="phase-title">Phase 3 &mdash; Testing & Erweiterung</span>
+    <span class="badge badge-next">~ 2-4 Wochen</span>
+  </div>
+  <p class="goal">Go-Live-ready, erweiterte Features, Kundenwuensche. Zahlung: <span class="money">1.620 EUR</span></p>
+
+  <h3>Kern-Features</h3>
+  <table>
+    <tr><th>Feature</th><th>Aufwand</th><th>Status</th></tr>
+    <tr><td>KI-Assistent Tool Use (Confirm First)</td><td>2-3 Tage</td><td><span class="badge badge-done">Konzept bereit</span></td></tr>
+    <tr><td>PDF-Export</td><td>2-4 Tage</td><td>Scope klaeren</td></tr>
+    <tr><td>Tierarztfinder</td><td>2-4 Tage</td><td>Scope klaeren</td></tr>
+    <tr><td>Premium/IAP (RevenueCat)</td><td>3-4 Tage</td><td><span class="badge badge-critical">Release-Blocker</span></td></tr>
+    <tr><td>Restliche Animationen (5/8)</td><td>1-2 Tage</td><td><span class="badge badge-done">Konzept bereit</span></td></tr>
+  </table>
+
+  <h3>Qualitaet</h3>
+  <table>
+    <tr><th>Aufgabe</th><th>Aufwand</th><th>Hinweis</th></tr>
+    <tr><td>Test-Strategie umsetzen</td><td>1 Tag</td><td>Option A empfohlen &mdash; Claas entscheidet</td></tr>
+    <tr><td>RLS-Verifikation (<code>is_premium</code>)</td><td>0,5 Tage</td><td>Nach IAP-Fix zwingend</td></tr>
+    <tr><td>Accessibility-Audit</td><td>1 Tag</td><td>Labels, Rollen, Kontraste</td></tr>
+  </table>
+
+  <h3>Design</h3>
+  <table>
+    <tr><th>Aufgabe</th><th>Aufwand</th></tr>
+    <tr><td>DatePicker-Komponente (statt Freitext)</td><td>1 Tag</td></tr>
+    <tr><td>Design-Konzept v2 (Semantic Tokens, Components)</td><td>2-3 Tage</td></tr>
+    <tr><td>Inter Custom Font</td><td>0,5 Tage</td></tr>
+  </table>
+
+  <h3>Go-Live Checklist</h3>
+  <ul class="task-list">
+    <li>Alle S-1 bis S-6 Findings gefixt</li>
+    <li>IAP funktioniert (RevenueCat)</li>
+    <li>Kunden-Feedback eingearbeitet</li>
+    <li>Finale Version, Uebergabe</li>
+    <li>Phase-3-Zahlung (<span class="money">1.620 EUR</span>)</li>
+  </ul>
+</div>
+
+<!-- ============ BACKLOG ============ -->
+<div class="phase-card">
+  <div class="phase-header">
+    <span class="phase-title">Backlog &mdash; Nach Go-Live</span>
+    <span class="badge badge-later">Irgendwann</span>
+  </div>
+  <table>
+    <tr><th>Feature</th><th>Aufwand</th><th>Notizen</th></tr>
+    <tr><td>Dark Mode</td><td>3-4 Tage</td><td>Semantic Tokens zuerst</td></tr>
+    <tr><td>Bottom Sheets</td><td>1,5 Tage</td><td>Quick-Actions</td></tr>
+    <tr><td>Chat-Historie persistent</td><td>1-2 Tage</td><td></td></tr>
+    <tr><td>Guenstigeres KI-Modell</td><td>0,5 Tage</td><td>Kosten senken</td></tr>
+    <tr><td>SelectField Tap-outside</td><td>0,5 Tage</td><td></td></tr>
+    <tr><td>Deno std aktualisieren</td><td>0,25 Tage</td><td></td></tr>
+    <tr><td>Pet-Fotos Persistenz</td><td>1 Tag</td><td>Neuinstallation</td></tr>
+  </table>
+</div>
+
+<!-- ============ DEPS ============ -->
+<h2>Abhaengigkeiten</h2>
+<div class="deps">
+  <span class="blocker">S-1 (IAP)</span> <span class="arrow">&rarr;</span> Go-Live (blockiert Release)<br>
+  S-2 + S-3 <span class="arrow">&rarr;</span> KI-Assistent sicher nutzbar<br>
+  Handy-Test <span class="arrow">&rarr;</span> Alte Tabellen droppen<br>
+  S-4 (Bearer) <span class="arrow">&rarr;</span> Client + Edge Function synchron deployen<br>
+  Test-Strategie <span class="arrow">&rarr;</span> Claas entscheidet (A/B/C)<br>
+  PDF-Export + Tierarztfinder <span class="arrow">&rarr;</span> Scope mit Kunde klaeren
+</div>
+
+<!-- ============ DECISIONS ============ -->
+<h2>Offene Entscheidungen</h2>
+<div class="decisions">
+  <ol>
+    <li><strong>Test-Strategie:</strong> Option A (Jest minimal, 1 Tag), B (Integration) oder C (spaeter)?</li>
+    <li><strong>PDF-Export Scope:</strong> Was genau exportieren? Welches Format?</li>
+    <li><strong>Tierarztfinder Scope:</strong> API-Anbindung oder manuell?</li>
+    <li><strong>Guenstigeres KI-Modell:</strong> Wann evaluieren?</li>
+    <li><strong>Pet-Fotos Persistenz:</strong> Prioritaet?</li>
+  </ol>
+</div>
+
+<footer>VetApp Roadmap &middot; Erstellt 04.04.2026 &middot; Brian + Team</footer>
+
+</body>
+</html>

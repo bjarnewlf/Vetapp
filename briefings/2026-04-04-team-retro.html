@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Team-Retrospektive — VetApp Dev-Agentur, 04.04.2026</title>
+<style>
+  :root {
+    --teal: #1B6B5A;
+    --teal-light: #E8F5F1;
+    --orange: #E8895C;
+    --orange-light: #FFF3EC;
+    --bg: #FAF6F1;
+    --surface: #FFFFFF;
+    --text: #1A1A1A;
+    --text-sec: #6B6B6B;
+    --border: #E8E0D8;
+    --red: #D94040;
+    --red-light: #FDEAEA;
+    --green: #2E8B57;
+    --green-light: #E8F5EE;
+    --yellow: #D4A020;
+    --yellow-light: #FFF8E1;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 24px;
+  }
+  .container { max-width: 960px; margin: 0 auto; }
+  header {
+    background: var(--teal);
+    color: white;
+    padding: 32px;
+    border-radius: 16px;
+    margin-bottom: 32px;
+  }
+  header h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+  header .subtitle { font-size: 16px; opacity: 0.85; }
+  header .meta { font-size: 13px; opacity: 0.65; margin-top: 12px; }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .summary-card {
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--border);
+  }
+  .summary-card .number { font-size: 32px; font-weight: 700; color: var(--teal); }
+  .summary-card .label { font-size: 13px; color: var(--text-sec); margin-top: 4px; }
+
+  .agent-section {
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .agent-header {
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+  }
+  .agent-header:hover { background: var(--bg); }
+  .agent-emoji { font-size: 24px; }
+  .agent-name { font-weight: 600; font-size: 16px; }
+  .agent-role { font-size: 13px; color: var(--text-sec); }
+  .agent-body { padding: 20px; }
+  .agent-body h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 16px;
+    margin-bottom: 6px;
+  }
+  .agent-body h4:first-child { margin-top: 0; }
+  .agent-body p { font-size: 14px; color: var(--text); margin-bottom: 8px; }
+
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-right: 4px;
+  }
+  .tag-good { background: var(--green-light); color: var(--green); }
+  .tag-bad { background: var(--red-light); color: var(--red); }
+  .tag-idea { background: var(--yellow-light); color: var(--yellow); }
+  .tag-info { background: var(--teal-light); color: var(--teal); }
+
+  .findings-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    font-size: 14px;
+  }
+  .findings-table th {
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-sec);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 8px 12px;
+    border-bottom: 2px solid var(--border);
+  }
+  .findings-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .severity-critical { color: var(--red); font-weight: 600; }
+  .severity-medium { color: var(--yellow); font-weight: 600; }
+  .severity-low { color: var(--text-sec); }
+
+  .action-items {
+    background: var(--orange-light);
+    border: 2px solid var(--orange);
+    border-radius: 12px;
+    padding: 24px;
+    margin-top: 32px;
+  }
+  .action-items h3 {
+    color: var(--orange);
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
+  .action-items ol {
+    padding-left: 20px;
+  }
+  .action-items li {
+    font-size: 14px;
+    margin-bottom: 8px;
+    line-height: 1.5;
+  }
+  .action-items li strong { color: var(--text); }
+
+  footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-sec);
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Team-Retrospektive</h1>
+  <div class="subtitle">VetApp Dev-Agentur — Sprint Tag 1 & 2</div>
+  <div class="meta">04. April 2026 &middot; 6 Team-Mitglieder &middot; Moderiert von Brian</div>
+</header>
+
+<div class="summary-grid">
+  <div class="summary-card">
+    <div class="number">55+</div>
+    <div class="label">Vault-Notizen</div>
+  </div>
+  <div class="summary-card">
+    <div class="number">15</div>
+    <div class="label">QA-Findings</div>
+  </div>
+  <div class="summary-card">
+    <div class="number">0</div>
+    <div class="label">Tests</div>
+  </div>
+  <div class="summary-card">
+    <div class="number">0</div>
+    <div class="label">TypeScript-Fehler</div>
+  </div>
+</div>
+
+<!-- ===== BRIAN ===== -->
+<div class="agent-section">
+  <div class="agent-header">
+    <span class="agent-emoji">&#129302;</span>
+    <div>
+      <div class="agent-name">Brian</div>
+      <div class="agent-role">CEO / Sidekick</div>
+    </div>
+  </div>
+  <div class="agent-body">
+    <h4>Was lief gut</h4>
+    <p>Die parallele Delegation funktioniert. Drei Developer-Auftr&auml;ge gleichzeitig, QA danach &mdash; das spart Sessions und ergibt saubere Ergebnisse. Das Handoff-System gibt Kontext &uuml;ber Session-Grenzen hinweg.</p>
+
+    <h4>Was lief schlecht</h4>
+    <p>Ich habe status.md nach der Arbeit nicht aktualisiert, obwohl genau das in meinen eigenen Learnings steht. Claas musste zweimal nachfragen. Das ist ein Prozessfehler, kein Wissensproblem &mdash; ich wusste es und hab's trotzdem nicht gemacht.</p>
+
+    <h4>Was ich &auml;ndern w&uuml;rde</h4>
+    <p>Feste Checkliste am Ende jeder Session: tasks.md, status.md, handoff.md, learnings.md. Keine Ausnahmen. Au&szlig;erdem: QA-Findings brauchen eine explizite Entscheidung statt stilles Verschieben in den Backlog.</p>
+
+    <h4>Selbstkritik</h4>
+    <p>Ich neige dazu, Findings nach Schwere zu sortieren und die "Niedrigen" zu vergessen. Der Backlog w&auml;chst, ohne dass jemand aktiv entscheidet. Das muss ich &auml;ndern.</p>
+  </div>
+</div>
+
+<!-- ===== DEVELOPER ===== -->
+<div class="agent-section">
+  <div class="agent-header">
+    <span class="agent-emoji">&#128187;</span>
+    <div>
+      <div class="agent-name">Developer</div>
+      <div class="agent-role">Senior Developer</div>
+    </div>
+  </div>
+  <div class="agent-body">
+    <h4>Was lief gut</h4>
+    <p>Parallele Quick-Win-Auftr&auml;ge mit klarem Format (Dateien, Akzeptanzkriterien). QA danach findet echte Reste &mdash; dieser Rhythmus ist solid.</p>
+
+    <h4>Was lief schlecht</h4>
+    <p>Der KI-Assistent war ein Debugging-Marathon. JWT-Workaround und veraltete Modell-IDs h&auml;tten mit besserer Vorab-Recherche vermieden werden k&ouml;nnen. Zwei Sessions f&uuml;rs Rumprobieren.</p>
+
+    <h4>Verbesserungsvorschl&auml;ge</h4>
+    <p>Vor Edge-Function-Arbeiten kurz prüfen: aktuelle Modell-IDs, bekannte Supabase-JWT-Quirks. Einmal googeln spart eine halbe Session.</p>
+
+    <h4>Technische Schulden</h4>
+    <p><span class="tag tag-bad">Sorge</span> DataContext mit ~350 Zeilen. Alles h&auml;ngt daran. M7 geh&ouml;rt h&ouml;her priorisiert &mdash; nicht Backlog, sondern Vor-Release.</p>
+
+    <h4>Was fehlt</h4>
+    <p>Kein Testrunner. Stage-Umgebung f&uuml;r Supabase w&auml;re mittelfristig sinnvoll. Bei Datenmodell-Umbauten (MedicalEvent) brauche ich upfront eine Aussage, ob Navigation, Context oder nur Screens betroffen sind.</p>
+  </div>
+</div>
+
+<!-- ===== DESIGNER ===== -->
+<div class="agent-section">
+  <div class="agent-header">
+    <span class="agent-emoji">&#127912;</span>
+    <div>
+      <div class="agent-name">Designer</div>
+      <div class="agent-role">UI/UX Designer</div>
+    </div>
+  </div>
+  <div class="agent-body">
+    <h4>Was lief gut</h4>
+    <p>D-A bis D-E waren gut strukturiert &mdash; kein Scope-Creep, klare Abnahmekriterien. Der Workflow Brian &rarr; Designer &rarr; Developer &rarr; QA hat funktioniert.</p>
+
+    <h4>Was lief schlecht</h4>
+    <p><span class="tag tag-bad">Blockiert</span> Design-Konzept v2 wartet seit 03.04. auf Freigabe. Vier offene Fragen (Dark Mode, Font, Animationen, Orange-Kontrast) blockieren tiefere Design-Arbeit. Au&szlig;erdem: Developer hat in der Vergangenheit Inline-Werte gesetzt, die der Designer nachtr&auml;glich aufraeumen musste.</p>
+
+    <h4>Design-System</h4>
+    <p>Farben und Spacing sind sauber. Es fehlt: kein <code>10</code> in Spacing (f&uuml;hrt zu <code>spacing.sm + 2</code>), kein dedizierter Interactive-Token, kein Touch-Target-Token.</p>
+
+    <h4>Accessibility</h4>
+    <p><span class="tag tag-bad">Pr&uuml;fen</span> Farbkontrast des Orange-Buttons (<code>#E8895C</code> auf Wei&szlig;) besteht WCAG AA m&ouml;glicherweise nicht. Das ist kein Backlog-Thema, das ist ein Release-Blocker.</p>
+
+    <h4>Offene Fragen an Claas</h4>
+    <p>1. Dark Mode: Phase 2 oder Backlog?<br>
+       2. Custom Font (Inter): Ja / Nein / Sp&auml;ter?<br>
+       3. Micro-Animationen: MVP oder schlank?<br>
+       4. Orange-Kontrast: Abdunkeln oder Text auf Dunkel?<br>
+       5. Spacing-Token <code>10</code>: Einf&uuml;hren oder nicht?</p>
+  </div>
+</div>
+
+<!-- ===== QA ===== -->
+<div class="agent-section">
+  <div class="agent-header">
+    <span class="agent-emoji">&#128270;</span>
+    <div>
+      <div class="agent-name">QA</div>
+      <div class="agent-role">QA Engineer</div>
+    </div>
+  </div>
+  <div class="agent-body">
+    <h4>Was lief gut</h4>
+    <p>Findings werden in tasks.md &uuml;bernommen und priorisiert. Der Routing-Workflow Brian &rarr; Developer &rarr; QA hat funktioniert.</p>
+
+    <h4>Was lief schlecht</h4>
+    <p><span class="tag tag-bad">Kritik</span> F-05 bis F-14 stehen fast alle noch offen. Der Backlog ist ein Friedhof. F-12 (Paywall-Check) und F-14 (Zukunftsdaten) h&auml;tten nie dorthin gedurft.</p>
+
+    <h4>Forderung</h4>
+    <p>Jedes QA-Finding braucht eine <strong>explizite Entscheidung</strong>: "Fix jetzt", "Fix vor Release" oder "Accepted Risk mit Begr&uuml;ndung". Stilles Verschieben z&auml;hlt nicht. QA sollte einen direkten Kanal f&uuml;r Schwere-1-Findings haben.</p>
+
+    <h4>Top-3 Release-Risiken</h4>
+    <table class="findings-table">
+      <tr><th>Finding</th><th>Risiko</th><th>Schwere</th></tr>
+      <tr>
+        <td>F-02: togglePro() ohne IAP</td>
+        <td>Premium ist manuell aktivierbar &mdash; Gesch&auml;ftsrisiko</td>
+        <td class="severity-critical">Kritisch</td>
+      </tr>
+      <tr>
+        <td>F-03: CORS Wildcard</td>
+        <td>Jede Origin kann die Edge Function aufrufen</td>
+        <td class="severity-critical">Kritisch</td>
+      </tr>
+      <tr>
+        <td>F-05/F-06: goBack() bei null</td>
+        <td>Leerer Screen ohne Zur&uuml;ck-M&ouml;glichkeit</td>
+        <td class="severity-medium">Mittel</td>
+      </tr>
+    </table>
+
+    <h4>Fehlende Absicherung</h4>
+    <p><span class="tag tag-bad">0 Tests</span> TypeScript ist das einzige Netz. Eine falsche Annahme im DataContext bricht alle Screens gleichzeitig.</p>
+  </div>
+</div>
+
+<!-- ===== WISSENSMANAGER ===== -->
+<div class="agent-section">
+  <div class="agent-header">
+    <span class="agent-emoji">&#128218;</span>
+    <div>
+      <div class="agent-name">Wissensmanager</div>
+      <div class="agent-role">Vault-Pflege &amp; Vernetzung</div>
+    </div>
+  </div>
+  <div class="agent-body">
+    <h4>Was lief gut</h4>
+    <p>Vault von null auf 55+ Notizen in zwei Tagen. VetApp.md funktioniert als Hub &mdash; alles ist von dort erreichbar. Die Inventur-Batches waren strukturell sauber.</p>
+
+    <h4>Was lief schlecht</h4>
+    <p><span class="tag tag-bad">Duplikat</span> Zwei fast identische Learnings-Notizen zum Thema "Dokumente aktualisieren" angelegt. Au&szlig;erdem: kein systematischer Vernetzungs-Check nach der gro&szlig;en Inventur &mdash; viele Notizen haben Links raus, aber keine rein.</p>
+
+    <h4>Vault-L&uuml;cken</h4>
+    <p>Noch nicht dokumentiert: DataContext (God-Object), MedicalEvent-Datenmodell (geplanter Umbau), Test-Strategie (warum 0 Tests, was geplant), Release-Checklist.</p>
+
+    <h4>Qualit&auml;t vs. Quantit&auml;t</h4>
+    <p>Der Vault ist breit, aber stellenweise flach. Technik-Notizen (React Native, TypeScript, Expo) sind d&uuml;nn und kaum vernetzt. <strong>Ab jetzt: Tiefe vor Breite.</strong></p>
+  </div>
+</div>
+
+<!-- ===== AGENCY ADMIN ===== -->
+<div class="agent-section">
+  <div class="agent-header">
+    <span class="agent-emoji">&#9881;&#65039;</span>
+    <div>
+      <div class="agent-name">Agency Admin</div>
+      <div class="agent-role">CTO / Infrastruktur</div>
+    </div>
+  </div>
+  <div class="agent-body">
+    <h4>Was lief gut</h4>
+    <p>Delegationsmodell funktioniert. Rules mit <code>paths:</code>-Globs laden Kontext automatisch. Handoff-System gibt Struktur &uuml;ber Session-Grenzen.</p>
+
+    <h4>Was lief schlecht</h4>
+    <p><span class="tag tag-bad">Fiktion</span> Scheduled Agents (Full Audit 06:00, CEO Briefing 07:00) existieren nur im Prompt &mdash; sie laufen nicht. Kein <code>reports/</code>-Ordner, keine automatischen Briefings. Das steht in der Doku als w&auml;re es Realit&auml;t.</p>
+
+    <h4>Infrastruktur-L&uuml;cken</h4>
+    <p><span class="tag tag-bad">Fehlt</span> Wissensmanager hat keine Agent-Definition in <code>.claude/agents/</code>, wird aber in drei Dokumenten referenziert. QA hat keinen Schreibzugriff &mdash; Flaschenhals &uuml;ber Brian.</p>
+
+    <h4>Skalierbarkeit</h4>
+    <p>Nicht bereit f&uuml;r ein zweites Projekt. Alles ist hart auf VetApp verdrahtet. F&uuml;r Rollout br&auml;uchte es: projekt-agnostische Agent-Templates, parametrisierte Rules, Vault-Schema pro Projekt.</p>
+
+    <h4>Rollenklarheit</h4>
+    <p>Brian und Developer sind sauber getrennt. <span class="tag tag-idea">&Uuml;berlappung</span> Designer und Developer bei Theme-&Auml;nderungen (D-D war Theme-Tokens &mdash; wer ist zust&auml;ndig?). Klare Regel n&ouml;tig.</p>
+  </div>
+</div>
+
+<!-- ===== GEMEINSAME THEMEN ===== -->
+<div class="agent-section" style="border-color: var(--teal); border-width: 2px;">
+  <div class="agent-header" style="background: var(--teal-light);">
+    <span class="agent-emoji">&#128200;</span>
+    <div>
+      <div class="agent-name">Gemeinsame Themen</div>
+      <div class="agent-role">Was alle sagen</div>
+    </div>
+  </div>
+  <div class="agent-body">
+    <h4><span class="tag tag-good">Konsens</span> Parallele Delegation funktioniert</h4>
+    <p>Alle best&auml;tigen: Unabh&auml;ngige Auftr&auml;ge parallel delegieren, QA danach &mdash; das ist der effizienteste Workflow.</p>
+
+    <h4><span class="tag tag-good">Konsens</span> QA-Review nach jeder Delegation</h4>
+    <p>Developer und Brian best&auml;tigen: QA findet zuverl&auml;ssig Reste. Immer einplanen.</p>
+
+    <h4><span class="tag tag-bad">Konsens</span> Backlog ist ein Friedhof</h4>
+    <p>QA, Developer und Brian sehen das Problem: Findings werden verschoben, nicht entschieden. Jedes Finding braucht eine explizite Entscheidung.</p>
+
+    <h4><span class="tag tag-bad">Konsens</span> DataContext ist das gr&ouml;&szlig;te Risiko</h4>
+    <p>Developer und QA fordern: M7 muss vor Release passieren, nicht im Backlog versauern.</p>
+
+    <h4><span class="tag tag-bad">Konsens</span> 0 Tests ist ein Problem</h4>
+    <p>QA warnt: TypeScript allein f&auml;ngt keine Logikfehler. Developer best&auml;tigt: sp&uuml;rbar, solange klein &mdash; aber das &auml;ndert sich.</p>
+
+    <h4><span class="tag tag-idea">Konsens</span> Design-Fragen blockieren</h4>
+    <p>Designer und Wissensmanager: Vier offene Entscheidungen seit 03.04. Claas muss ran.</p>
+  </div>
+</div>
+
+<!-- ===== ACTION ITEMS ===== -->
+<div class="action-items">
+  <h3>Beschlussvorlage f&uuml;r Claas</h3>
+  <ol>
+    <li><strong>Design-Fragen beantworten</strong> &mdash; Dark Mode, Font, Animationen, Orange-Kontrast, Spacing-Token 10. Blockiert seit 2 Tagen.</li>
+    <li><strong>Backlog-Review</strong> &mdash; Jedes Finding explizit entscheiden: Fix / Accepted Risk. Kein stilles Verschieben mehr.</li>
+    <li><strong>DataContext Refactoring (M7) hochstufen</strong> &mdash; Von Backlog auf Vor-Release. Developer und QA fordern es.</li>
+    <li><strong>Scheduled Agents ehrlich machen</strong> &mdash; Entweder einrichten oder aus der Doku entfernen. Aktuell Fiktion.</li>
+    <li><strong>Wissensmanager Agent-Definition erstellen</strong> &mdash; Rolle existiert, Agent-Datei fehlt.</li>
+    <li><strong>QA Schreibzugriff</strong> &mdash; Eigene qa-findings.md statt Flaschenhals &uuml;ber Brian.</li>
+    <li><strong>Orange-Kontrast pr&uuml;fen</strong> &mdash; WCAG AA f&uuml;r #E8895C auf Wei&szlig;. M&ouml;glicher Release-Blocker.</li>
+    <li><strong>Theme-Zust&auml;ndigkeit kl&auml;ren</strong> &mdash; Wer &auml;ndert Theme-Tokens: Designer oder Developer?</li>
+  </ol>
+</div>
+
+<footer>
+  Erstellt von Brian &middot; VetApp Dev-Agentur &middot; 04.04.2026<br>
+  Teilnehmer: Brian, Developer, Designer, QA, Wissensmanager, Agency Admin
+</footer>
+
+</div>
+</body>
+</html>

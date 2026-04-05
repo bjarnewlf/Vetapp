@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VetApp — Projektübersicht</title>
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --primary: #4A90D9;
+      --primary-dark: #2E6DB4;
+      --primary-light: #EBF4FF;
+      --teal: #3AAFA9;
+      --teal-light: #E0F5F4;
+      --bg: #F4F7FB;
+      --surface: #FFFFFF;
+      --border: #DDE5EF;
+      --text: #1A2B3C;
+      --text-muted: #6B7F94;
+      --red: #E5534B;
+      --red-light: #FFF0EF;
+      --orange: #F07B3F;
+      --orange-light: #FFF5EE;
+      --yellow: #D4A017;
+      --yellow-light: #FFFBEB;
+      --green: #2EAD6B;
+      --green-light: #EDFBF3;
+      --gray: #8896A4;
+      --gray-light: #F4F7FB;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --shadow: 0 2px 12px rgba(74, 144, 217, 0.08);
+      --shadow-md: 0 4px 24px rgba(74, 144, 217, 0.12);
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ─── Header ─── */
+    .page-header {
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--teal) 100%);
+      color: white;
+      padding: 48px 24px 40px;
+      text-align: center;
+    }
+
+    .header-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.18);
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 24px;
+      padding: 4px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    .page-header h1 {
+      font-size: clamp(26px, 5vw, 42px);
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .page-header .subtitle {
+      font-size: 16px;
+      opacity: 0.85;
+      font-weight: 400;
+    }
+
+    /* ─── Progress-Banner ─── */
+    .progress-banner {
+      max-width: 820px;
+      margin: -28px auto 0;
+      padding: 0 24px;
+      position: relative;
+      z-index: 10;
+    }
+
+    .progress-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-md);
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .progress-text {
+      flex: 1;
+      min-width: 160px;
+    }
+
+    .progress-text .label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .progress-text .value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--green);
+    }
+
+    .progress-bar-wrap {
+      flex: 3;
+      min-width: 200px;
+    }
+
+    .progress-bar-track {
+      height: 12px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, var(--teal), var(--green));
+      border-radius: 99px;
+      animation: fillBar 1.2s ease-out forwards;
+      transform-origin: left;
+    }
+
+    @keyframes fillBar {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+
+    .progress-pct {
+      font-size: 28px;
+      font-weight: 800;
+      color: var(--green);
+      white-space: nowrap;
+    }
+
+    /* ─── Layout ─── */
+    .content {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 36px 24px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* ─── Cards ─── */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 18px 24px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .card-icon.blue  { background: var(--primary-light); }
+    .card-icon.teal  { background: var(--teal-light); }
+    .card-icon.green { background: var(--green-light); }
+    .card-icon.red   { background: var(--red-light); }
+    .card-icon.gray  { background: var(--gray-light); }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .card-body {
+      padding: 20px 24px;
+    }
+
+    /* ─── Heute erledigt ─── */
+    .today-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .today-list li {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      font-size: 15px;
+    }
+
+    .today-list li .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      margin-top: 7px;
+      flex-shrink: 0;
+    }
+
+    .today-list .main {
+      font-weight: 600;
+      color: var(--text);
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .sub-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .sub-list li {
+      font-size: 14px;
+      color: var(--text-muted);
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .sub-list li::before {
+      content: "→";
+      color: var(--primary);
+      font-size: 12px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+
+    /* ─── Pakete-Tabelle ─── */
+    .pakete-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .pakete-table thead tr {
+      background: var(--bg);
+    }
+
+    .pakete-table th {
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-muted);
+      padding: 10px 16px;
+    }
+
+    .pakete-table td {
+      padding: 13px 16px;
+      font-size: 15px;
+      border-top: 1px solid var(--border);
+    }
+
+    .pakete-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .pakete-table tbody tr:hover {
+      background: var(--primary-light);
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--green-light);
+      color: var(--green);
+      border-radius: 99px;
+      padding: 3px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .status-badge.heute {
+      background: linear-gradient(135deg, var(--teal-light), var(--green-light));
+      border: 1px solid rgba(46, 173, 107, 0.25);
+    }
+
+    /* ─── Offen-Sektionen ─── */
+    .priority-section {
+      margin-bottom: 20px;
+    }
+
+    .priority-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .priority-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      padding: 4px 12px;
+      border-radius: 99px;
+      margin-bottom: 12px;
+    }
+
+    .priority-label.muss {
+      background: var(--red-light);
+      color: var(--red);
+    }
+
+    .priority-label.sollte {
+      background: var(--yellow-light);
+      color: var(--yellow);
+    }
+
+    .priority-label.kann {
+      background: var(--gray-light);
+      color: var(--gray);
+    }
+
+    .offen-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .offen-item {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      border-left: 3px solid transparent;
+    }
+
+    .offen-item.muss  { border-left-color: var(--red); }
+    .offen-item.sollte { border-left-color: var(--yellow); }
+    .offen-item.kann  { border-left-color: var(--gray); }
+
+    .offen-item .offen-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+
+    .offen-item .offen-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ─── Architektur-Grid ─── */
+    .arch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+    }
+
+    .arch-item {
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+    }
+
+    .arch-item .arch-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+
+    .arch-item .arch-value {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1.4;
+    }
+
+    /* ─── Erkenntnisse ─── */
+    .erkenntnis-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .erkenntnis-item {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .erkenntnis-item .icon {
+      width: 28px;
+      height: 28px;
+      background: var(--primary-light);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .erkenntnis-item .text {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .erkenntnis-item .text strong {
+      color: var(--primary-dark);
+    }
+
+    /* ─── Footer ─── */
+    .page-footer {
+      text-align: center;
+      padding: 16px 24px 32px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 560px) {
+      .progress-card {
+        flex-direction: column;
+        gap: 16px;
+      }
+      .progress-text, .progress-bar-wrap {
+        width: 100%;
+      }
+      .card-body {
+        padding: 16px;
+      }
+      .pakete-table th,
+      .pakete-table td {
+        padding: 10px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Header ─── -->
+  <header class="page-header">
+    <div class="header-badge">Internes Projektdokument</div>
+    <h1>VetApp — Projektübersicht</h1>
+    <p class="subtitle">Stand: 04.04.2026</p>
+  </header>
+
+  <!-- ─── Fortschritts-Banner ─── -->
+  <div class="progress-banner">
+    <div class="progress-card">
+      <div class="progress-text">
+        <div class="label">Pakete abgeschlossen</div>
+        <div class="value">7 von 7</div>
+      </div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-track">
+          <div class="progress-bar-fill"></div>
+        </div>
+      </div>
+      <div class="progress-pct">100 %</div>
+    </div>
+  </div>
+
+  <!-- ─── Hauptinhalt ─── -->
+  <main class="content">
+
+    <!-- Heute erledigt -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon blue">&#128197;</div>
+        <span class="card-title">Heute erledigt — 04.04.2026</span>
+      </div>
+      <div class="card-body">
+        <ul class="today-list">
+          <li>
+            <span class="dot"></span>
+            <div>
+              <span class="main">KI-Assistent zum Laufen gebracht</span>
+              <ul class="sub-list">
+                <li>502 &rarr; Modell-Fix: Anthropic-Modell von veraltetem <code>claude-3-haiku</code> auf <code>claude-sonnet-4-6</code> aktualisiert</li>
+                <li>401 Invalid JWT &rarr; Workaround: Anon Key als Bearer + User-Token im Custom Header <code>x-user-token</code></li>
+                <li>Dashboard-Setting: "Verify JWT with legacy secret" auf OFF</li>
+                <li>Edge Function 3&times; neu deployed, committed und gepusht</li>
+              </ul>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Pakete Status -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon green">&#9989;</div>
+        <span class="card-title">Pakete — Status</span>
+      </div>
+      <div class="card-body" style="padding: 0;">
+        <table class="pakete-table">
+          <thead>
+            <tr>
+              <th>Paket</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Paket 1 — Haustier bearbeiten</td>
+              <td><span class="status-badge">&#10003; Fertig</span></td>
+            </tr>
+            <tr>
+              <td>Paket 2 — Überfällig-Regeln</td>
+              <td><span class="status-badge">&#10003; Fertig</span></td>
+            </tr>
+            <tr>
+              <td>Paket 3 — KI-Assistent</td>
+              <td><span class="status-badge heute">&#10003; Fertig (heute!)</span></td>
+            </tr>
+            <tr>
+              <td>Paket 4 — Tote Buttons fixen</td>
+              <td><span class="status-badge">&#10003; Fertig</span></td>
+            </tr>
+            <tr>
+              <td>Paket 5 — Loading/Error-States</td>
+              <td><span class="status-badge">&#10003; Fertig</span></td>
+            </tr>
+            <tr>
+              <td>QA-Findings behoben</td>
+              <td><span class="status-badge">&#10003; Fertig</span></td>
+            </tr>
+            <tr>
+              <td>Navigation umgebaut</td>
+              <td><span class="status-badge">&#10003; Fertig</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Noch offen -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon red">&#128338;</div>
+        <span class="card-title">Noch offen bis zur Abgabe</span>
+      </div>
+      <div class="card-body">
+
+        <!-- MUSS -->
+        <div class="priority-section">
+          <div class="priority-label muss">&#9679; Muss</div>
+          <ul class="offen-list">
+            <li class="offen-item muss">
+              <div class="offen-title">Gesundheits-UX Quick Fixes</div>
+              <div class="offen-desc">Tab umbenennen, Sektionen labeln, Button-Bug beheben &mdash; ca. 2&ndash;3 h</div>
+            </li>
+            <li class="offen-item muss">
+              <div class="offen-title">Accessibility Basics</div>
+              <div class="offen-desc">Labels setzen, Touch-Targets min. 44 px &mdash; ca. 2 h</div>
+            </li>
+            <li class="offen-item muss">
+              <div class="offen-title">Inkonsistente Farben</div>
+              <div class="offen-desc">Theme konsequent nutzen, Hardcoded-Werte ersetzen &mdash; ca. 2 h</div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- SOLLTE -->
+        <div class="priority-section">
+          <div class="priority-label sollte">&#9679; Sollte</div>
+          <ul class="offen-list">
+            <li class="offen-item sollte">
+              <div class="offen-title">Gesundheits-UX Datenmodell</div>
+              <div class="offen-desc">MedicalEvent vereinheitlichen + DataContext/Screens umbauen &mdash; ca. 6&ndash;8 h</div>
+            </li>
+            <li class="offen-item sollte">
+              <div class="offen-title">Günstigeres KI-Modell</div>
+              <div class="offen-desc">Sonnet 4 ist teuer &mdash; Haiku-Alternative evaluieren &mdash; ca. 1 h</div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- KANN -->
+        <div class="priority-section">
+          <div class="priority-label kann">&#9679; Kann</div>
+          <ul class="offen-list">
+            <li class="offen-item kann">
+              <div class="offen-title">DataContext refactoren</div>
+              <div class="offen-desc">God-Object (~350 Zeilen) aufteilen</div>
+            </li>
+            <li class="offen-item kann">
+              <div class="offen-title">Chat-Historie persistent machen</div>
+              <div class="offen-desc">Nach MVP, Supabase-Tabelle oder AsyncStorage</div>
+            </li>
+            <li class="offen-item kann">
+              <div class="offen-title">SelectField: Tap-outside schließen</div>
+              <div class="offen-desc">QA-Finding, niedrige Priorität</div>
+            </li>
+            <li class="offen-item kann">
+              <div class="offen-title">ProfileScreen: Datenschutz + Hilfe Handler</div>
+              <div class="offen-desc">Buttons existieren, aber noch ohne Funktion</div>
+            </li>
+            <li class="offen-item kann">
+              <div class="offen-title">Demo für Kunden vorbereiten</div>
+              <div class="offen-desc">Expo Go / EAS Build / Web-Build</div>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Architektur -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon teal">&#9881;</div>
+        <span class="card-title">Architektur-Überblick</span>
+      </div>
+      <div class="card-body">
+        <div class="arch-grid">
+          <div class="arch-item">
+            <div class="arch-label">Framework</div>
+            <div class="arch-value">React Native / Expo, TypeScript strict</div>
+          </div>
+          <div class="arch-item">
+            <div class="arch-label">Backend</div>
+            <div class="arch-value">Supabase (Auth, DB, Storage, Edge Functions)</div>
+          </div>
+          <div class="arch-item">
+            <div class="arch-label">KI</div>
+            <div class="arch-value">Claude Sonnet 4 via Supabase Edge Function (API-Key nur serverseitig)</div>
+          </div>
+          <div class="arch-item">
+            <div class="arch-label">UI-Sprache</div>
+            <div class="arch-value">Deutsch durchgehend</div>
+          </div>
+          <div class="arch-item">
+            <div class="arch-label">Premium</div>
+            <div class="arch-value">SubscriptionContext mit isPro + isLoading</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Technische Erkenntnisse -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon gray">&#128161;</div>
+        <span class="card-title">Technische Erkenntnisse</span>
+      </div>
+      <div class="card-body">
+        <ul class="erkenntnis-list">
+          <li class="erkenntnis-item">
+            <div class="icon">&#128272;</div>
+            <div class="text">
+              <strong>Supabase Edge Functions: JWT-Workaround nötig</strong> &mdash;
+              Anon Key als Bearer, User-Token in <code>x-user-token</code> Header.
+              Dashboard-Setting "Verify JWT with legacy secret" muss OFF sein.
+            </div>
+          </li>
+          <li class="erkenntnis-item">
+            <div class="icon">&#129302;</div>
+            <div class="text">
+              <strong>Alte Claude-Modelle nicht mehr verfügbar</strong> &mdash;
+              <code>claude-3-haiku</code> und <code>claude-3-5-haiku</code> liefern 502-Fehler.
+              Aktuell: <code>claude-sonnet-4-6</code>.
+            </div>
+          </li>
+          <li class="erkenntnis-item">
+            <div class="icon">&#128187;</div>
+            <div class="text">
+              <strong>Supabase CLI auf Windows</strong> &mdash;
+              Globale Installation funktioniert nicht. Immer <code>npx supabase</code> verwenden.
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="page-footer">
+    VetApp &mdash; Internes Projektdokument &mdash; Stand 04.04.2026
+  </footer>
+
+</body>
+</html>
