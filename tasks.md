@@ -50,19 +50,34 @@
 
 ---
 
-## SICHERHEIT — Vor Go-Live abarbeiten
+## SICHERHEIT — Vor Go-Live abarbeiten (~1h Developer + S-1 separat)
 
-- [ ] **[KRITISCH] S-1: Premium-Bypass fixen**
-- [ ] **[HOCH] S-2: Rate-Limit Fail-Closed**
-- [ ] **[HOCH] S-3: `ai_usage`-Tabelle im Schema**
-- [ ] **[MITTEL] S-4 bis S-6**
-- [ ] **[NIEDRIG] S-7, S-8**
+> Vollstaendiger Bericht: `sicherheitsbericht-2026-04-04.html`
+> Analyse vom 05.04.: S-5 bereits erledigt, S-2 bis S-8 ca. 1h Aufwand
+
+### Quick Wins (10 Min gesamt)
+- [ ] **S-2: Rate-Limit Fail-Closed** (5 Min) — `supabase/functions/ai-chat/index.ts` Z.131-134: bei `usageError` mit 503 ablehnen statt Request durchlassen
+- [ ] **S-7: E-Mail-Validierung** (5 Min) — `RegisterScreen.tsx` Z.19-28: Regex-Check `/^[^\s@]+@[^\s@]+\.[^\s@]+$/` vor `signUp()`
+
+### Hygiene (20 Min gesamt)
+- [ ] **S-8: Auth-Logging** (10 Min) — `src/services/aiService.ts` Z.29-56: alle `console.log/warn/error` hinter `if (__DEV__)` Guard
+- [ ] **S-3: ai_usage Schema-Doku** (10 Min) — Tabellen-Definition + RLS aus Migration in `supabase-schema.sql` nachtragen
+
+### Architektur (35 Min gesamt)
+- [ ] **S-4: Authorization-Header** (20 Min) — `aiService.ts` Z.48 + `ai-chat/index.ts` Z.12/93-99: `x-user-token` durch Standard `Authorization: Bearer <access_token>` ersetzen, CORS anpassen
+- [ ] **S-6: Storage-Bucket-Policies** (15 Min) — `supabase-schema.sql`: INSERT/SELECT Policies fuer `pet-documents` Bucket ergaenzen
+
+### Bereits erledigt
+- [x] **S-5: Dokument-URLs** — bereits auf 1h begrenzt (3600s in `fileUpload.ts`)
+
+### Separates Projekt (1-2 Tage)
+- [ ] **S-1: Premium-Bypass** — `togglePro()` durch echtes IAP ersetzen (RevenueCat), RLS fuer `profiles.is_premium` sperren. Pre-Release-Blocker, aber nicht pre-Demo.
 
 ---
 
 ## PHASE 3 — Testing & Uebergabe
 
-- [ ] togglePro() absichern (= S-1)
+- [ ] S-1: RevenueCat IAP Integration (= Premium-Bypass fixen)
 - [ ] KI-Assistent mit Tool Use (~2-3 Tage)
 - [ ] Weitere Animationen
 - [ ] Feinschliff, Uebergabe
@@ -89,6 +104,11 @@
 ---
 
 ## ERLEDIGT
+
+### 2026-04-05 — Session 7 (Security-Analyse)
+- [x] Security-Findings S-2 bis S-8 analysiert: Dateien, Zeilen, konkrete Fixes, Aufwand
+- [x] S-5 als bereits erledigt identifiziert
+- [x] Security-Plan erstellt und in Tasks eingearbeitet
 
 ### 2026-04-05 — Session 6 (Quick Wins)
 - [x] SafeArea: paddingTop:60 durch useSafeAreaInsets() in 12 Screens
