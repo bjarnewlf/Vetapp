@@ -13,11 +13,14 @@
 
 ---
 
-## Offene Migrationen
+## Offene Migrationen / Deployments
 
-| Migration | Status | Ziel | Notizen |
-|---|---|---|---|
-| notification_id fuer reminders | SQL BEREIT | Production | `supabase/migrations/20260405_...sql` — muss noch deployed werden |
+| Was | Status | Befehl |
+|---|---|---|
+| notification_id fuer reminders | SQL BEREIT | `npx supabase db push` oder SQL Editor |
+| Edge Function ai-chat | REDEPLOYMENT NOETIG | `npx supabase functions deploy ai-chat` |
+
+**Wichtig:** S-2 (Rate-Limit) und S-4 (Auth-Header) greifen erst nach Redeployment der Edge Function!
 
 ---
 
@@ -25,46 +28,51 @@
 
 **Agent:** Brian
 **Zeitpunkt:** 2026-04-05 Abend (Feierabend)
-**Session:** Autonomer Arbeitsblock + Quick Wins + Claas-Feedback
+**Session:** Mega-Tag — Crash-Recovery bis Security-Fixes
 
-### Erledigt (heute gesamt)
+### Erledigt (heute, 11 Commits)
 
-**Crash-Recovery + Commits:**
-- PC-Absturz geprueft — keine Schaeden
-- Sammel-Commit (60 Dateien) fuer 4 Sessions nachgeholt
+**Morgens:**
+- PC-Crash-Recovery — keine Schaeden
+- Sammel-Commit (60 Dateien, 4 Sessions nachgeholt)
+- Erinnerungen Slide-Out Fix V2 (completedIds Ref)
 
-**Code-Qualitaet:**
-- QA-Runde: 6 Findings (F-027 bis F-032), 5 gefixt
-- Jest Setup: 11 Tests in 3 Suites, alle gruen. medicalHelpers.ts extrahiert
-- API-Key Hygiene: settings.local.json aus Git, .gitignore ergaenzt
+**Autonom (ohne Claas):**
+- QA-Runde: 6 Findings, 5 gefixt (F-027 bis F-032)
+- Jest Setup: 11 Tests, medicalHelpers.ts extrahiert
+- API-Key Hygiene: settings.local.json aus Git
+- notification_id Migration SQL erstellt
 
-**Erinnerungen:**
-- Slide-Out Fix V2 (completedIds Ref) — einmalige Erinnerungen funktionieren auf Handy
-- 30-Tage-Horizont-Filter — jaehrliche Erinnerungen poppen nicht mehr sofort auf nach Abhaken
-- Beides wartet auf Claas-Test fuer jaehrliche Erinnerungen
+**Mit Claas:**
+- Erinnerungen einmalig auf Handy getestet — funktioniert
+- 30-Tage-Horizont-Filter fuer jaehrliche Erinnerungen
+- Falsche Premium-Features aus ProfileScreen entfernt
 
-**Design Quick Wins:**
-- SafeArea: paddingTop:60 durch useSafeAreaInsets() in 12 Screens ersetzt
-- ProfileScreen: nicht existierende Premium-Features entfernt (Fotoanalyse, Gesundheitstrends)
-- Design-Review vom Designer als design-review.md hinzugefuegt
+**Quick Wins:**
+- SafeArea: paddingTop:60 durch useSafeAreaInsets() in 12 Screens
+- Design-Review als design-review.md
 
-**Infrastruktur:**
-- notification_id Migration SQL erstellt (nicht deployed)
+**Security (S-2 bis S-8):**
+- S-2: Rate-Limit Fail-Closed (503 bei DB-Fehler)
+- S-3: ai_usage Schema-Doku
+- S-4: Authorization Bearer statt x-user-token
+- S-5: Bereits erledigt (1h signed URLs)
+- S-6: Storage-Bucket-Policies dokumentiert
+- S-7: E-Mail-Validierung vor signUp()
+- S-8: Auth-Logging hinter __DEV__
 
 ### Wartet auf Claas (Handy-Tests)
 
 - Erinnerungen abhaken (jaehrlich) — 30-Tage-Filter testen
 - Tierarzt-Kontakt (ST-07)
-- SafeArea-Aenderungen auf iPhone pruefen
+- SafeArea auf iPhone pruefen
 
 ### Offen
 
+- Edge Function ai-chat deployen (S-2 + S-4)
 - notification_id Migration deployen
-- Sicherheits-Findings S-1, S-5 (noch offen)
-- S-4 erledigt (Developer, 2026-04-05) — Authorization-Header; Edge Function ai-chat muss neu deployed werden
-- S-2, S-7, S-8 erledigt (Developer, 2026-04-05)
-- S-3, S-6 erledigt (Developer, 2026-04-05) — ai_usage + Storage-Policies in supabase-schema.sql
-- Changelog-Automation (DevOps)
+- **S-1: Premium-Bypass** — RevenueCat IAP (1-2 Tage, Phase 3)
+- Changelog-Automation
 - F-030 Accessibility (Backlog)
 
 ---
@@ -72,11 +80,10 @@
 ## Vorherige Uebergaben (zusammengefasst)
 
 ### 2026-04-05 Session 1+2
-- 10 Entscheidungen mit Claas geklaert, Autonomie Level 3
-- Erinnerungen-Bug Fix V1 (Nested Touchables + Race Condition)
+- 10 Entscheidungen, Autonomie Level 3, Erinnerungen Fix V1
 
 ### 2026-04-04
-- Health-Check, Stitch, Agency Meeting, Dashboard-Redesign, Roadmaps, QA
+- Health-Check, Stitch, Meeting, Dashboard, Roadmaps, QA
 
 ### 2026-04-03
 - Sprint Tag 1: Alle Basis-Features, Design-System, erste QA
