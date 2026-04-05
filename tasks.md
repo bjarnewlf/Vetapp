@@ -19,10 +19,9 @@
 
 ---
 
-## SOFORT — Infrastruktur
+## SOFORT — Deployment noetig
 
-- [x] ~~API-Key aus settings.local.json entfernen~~ — erledigt
-- [x] ~~Jest minimal Setup~~ — 11 Tests, alle gruen
+- [ ] **Edge Function `ai-chat` deployen** — S-2 (Rate-Limit) + S-4 (Auth-Header) erfordern Redeployment: `npx supabase functions deploy ai-chat`
 - [ ] **notification_id Migration deployen** — SQL bereit (`supabase/migrations/`)
 
 ---
@@ -37,47 +36,39 @@
 
 ## VOR PHASE-2-ABSCHLUSS
 
-- [x] Erinnerungen-abhaken-Bug fixen — Fix V2 implementiert
+- [x] Erinnerungen-abhaken-Bug fixen — Fix V2
 - [x] QA-Runde + Findings fixen
 - [x] Jest Setup
 - [x] SafeArea — useSafeAreaInsets() in 12 Screens
 - [x] Falsche Premium-Features entfernt
+- [x] Security S-2 bis S-8 gefixt
 - [ ] Handy-Test: Erinnerungen jaehrlich + Tierarzt + SafeArea
-- [ ] notification_id Migration deployen
+- [ ] Edge Function + Migration deployen
 - [ ] Bugs aus Handy-Test fixen
 - [ ] Dem Kunden vorzeigbaren MVP praesentieren
 - [ ] Phase-2-Zahlung ausloesen (2.160 EUR)
 
 ---
 
-## SICHERHEIT — Vor Go-Live abarbeiten (~1h Developer + S-1 separat)
+## SICHERHEIT — Status
 
-> Vollstaendiger Bericht: `sicherheitsbericht-2026-04-04.html`
-> Analyse vom 05.04.: S-5 bereits erledigt, S-2 bis S-8 ca. 1h Aufwand
+### Erledigt
+- [x] **S-2: Rate-Limit Fail-Closed** — 503 bei DB-Fehler (Edge Function Redeployment noetig!)
+- [x] **S-3: ai_usage Schema-Doku** — in supabase-schema.sql
+- [x] **S-4: Authorization-Header** — Bearer statt x-user-token (Edge Function Redeployment noetig!)
+- [x] **S-5: Dokument-URLs** — bereits auf 1h begrenzt
+- [x] **S-6: Storage-Bucket-Policies** — in supabase-schema.sql
+- [x] **S-7: E-Mail-Validierung** — Regex vor signUp()
+- [x] **S-8: Auth-Logging** — hinter __DEV__-Flag
 
-### Quick Wins (10 Min gesamt)
-- [ ] **S-2: Rate-Limit Fail-Closed** (5 Min) — `supabase/functions/ai-chat/index.ts` Z.131-134: bei `usageError` mit 503 ablehnen statt Request durchlassen
-- [ ] **S-7: E-Mail-Validierung** (5 Min) — `RegisterScreen.tsx` Z.19-28: Regex-Check `/^[^\s@]+@[^\s@]+\.[^\s@]+$/` vor `signUp()`
-
-### Hygiene (20 Min gesamt)
-- [ ] **S-8: Auth-Logging** (10 Min) — `src/services/aiService.ts` Z.29-56: alle `console.log/warn/error` hinter `if (__DEV__)` Guard
-- [ ] **S-3: ai_usage Schema-Doku** (10 Min) — Tabellen-Definition + RLS aus Migration in `supabase-schema.sql` nachtragen
-
-### Architektur (35 Min gesamt)
-- [ ] **S-4: Authorization-Header** (20 Min) — `aiService.ts` Z.48 + `ai-chat/index.ts` Z.12/93-99: `x-user-token` durch Standard `Authorization: Bearer <access_token>` ersetzen, CORS anpassen
-- [ ] **S-6: Storage-Bucket-Policies** (15 Min) — `supabase-schema.sql`: INSERT/SELECT Policies fuer `pet-documents` Bucket ergaenzen
-
-### Bereits erledigt
-- [x] **S-5: Dokument-URLs** — bereits auf 1h begrenzt (3600s in `fileUpload.ts`)
-
-### Separates Projekt (1-2 Tage)
-- [ ] **S-1: Premium-Bypass** — `togglePro()` durch echtes IAP ersetzen (RevenueCat), RLS fuer `profiles.is_premium` sperren. Pre-Release-Blocker, aber nicht pre-Demo.
+### Offen (separates Projekt)
+- [ ] **S-1: Premium-Bypass** (1-2 Tage) — `togglePro()` durch RevenueCat IAP ersetzen. Pre-Release-Blocker.
 
 ---
 
 ## PHASE 3 — Testing & Uebergabe
 
-- [ ] S-1: RevenueCat IAP Integration (= Premium-Bypass fixen)
+- [ ] S-1: RevenueCat IAP Integration
 - [ ] KI-Assistent mit Tool Use (~2-3 Tage)
 - [ ] Weitere Animationen
 - [ ] Feinschliff, Uebergabe
@@ -105,28 +96,27 @@
 
 ## ERLEDIGT
 
+### 2026-04-05 — Session 8 (Security-Fixes)
+- [x] S-2, S-3, S-4, S-6, S-7, S-8 gefixt (parallel, 3 Developer-Agents)
+- [x] S-5 als bereits erledigt bestätigt
+
 ### 2026-04-05 — Session 7 (Security-Analyse)
-- [x] Security-Findings S-2 bis S-8 analysiert: Dateien, Zeilen, konkrete Fixes, Aufwand
-- [x] S-5 als bereits erledigt identifiziert
-- [x] Security-Plan erstellt und in Tasks eingearbeitet
+- [x] Alle Findings analysiert: Dateien, Zeilen, Fixes, Aufwand
 
 ### 2026-04-05 — Session 6 (Quick Wins)
-- [x] SafeArea: paddingTop:60 durch useSafeAreaInsets() in 12 Screens
-- [x] ProfileScreen: Fotoanalyse + Gesundheitstrends entfernt
-- [x] Design-Review als design-review.md
+- [x] SafeArea, falsche Premium-Features, Design-Review
 
 ### 2026-04-05 — Session 5 (Handy-Test + Fix)
-- [x] Erinnerungen einmalig — funktioniert
-- [x] 30-Tage-Horizont-Filter eingebaut
+- [x] Erinnerungen einmalig OK, 30-Tage-Filter
 
 ### 2026-04-05 — Session 4 (autonom)
-- [x] API-Key Hygiene, QA-Runde (6 Findings), Jest Setup, Migration SQL
+- [x] API-Key, QA-Runde, Jest, Migration SQL
 
 ### 2026-04-05 — Session 3 (Crash-Recovery)
-- [x] Sammel-Commit (60 Dateien), Slide-Out Fix V2
+- [x] Sammel-Commit, Slide-Out Fix V2
 
 ### 2026-04-05 — Session 1+2
-- [x] 10 Entscheidungen, Autonomie Level 3, Erinnerungen Fix V1
+- [x] Entscheidungen, Autonomie, Erinnerungen Fix V1
 
 ### 2026-04-04
 - [x] Health-Check, Stitch, Meeting, Dashboard, Roadmaps, QA
