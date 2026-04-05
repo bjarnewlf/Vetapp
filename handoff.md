@@ -5,34 +5,9 @@
 
 ---
 
-## Aktuelle Uebergabe (2026-04-05 — Developer)
-
-**Agent:** Developer
-**Auftrag:** SafeArea — hardcodiertes `paddingTop: 60` durch `useSafeAreaInsets()` ersetzen
-
-### Erledigt
-
-- **`App.tsx`** — `SafeAreaProvider` aus `react-native-safe-area-context` hinzugefuegt, wrappt alle Provider
-- **12 Screens** — `paddingTop: 60` entfernt, `useSafeAreaInsets()` Hook eingebaut, inline `paddingTop: insets.top + 12` gesetzt:
-  - `HomeScreen.tsx`, `MyPetsScreen.tsx`, `RemindersScreen.tsx`, `VetContactScreen.tsx`
-  - `ProfileScreen.tsx`, `PaywallScreen.tsx`, `AddPetScreen.tsx`, `AddEventScreen.tsx`
-  - `AddReminderScreen.tsx`, `AddVetContactScreen.tsx`, `EventDetailScreen.tsx`, `ReminderSettingsScreen.tsx`
-
-### Offene Punkte
-
-- Kein `paddingTop: 60` mehr in den genannten Dateien (geprueft)
-- PetDetailScreen und AIAssistantScreen wurden nicht angefasst (Auftrag)
-
-### Naechster Schritt
-
-QA-Durchlauf auf echtem Geraet (iPhone 15+) empfohlen — besonders Header-Abstaende auf Dynamic Island pruefen.
-
----
-
 ## Erinnerungen von Claas
 
 - **Duplikat loeschen:** `D:\Agency-Vault\Learnings\Alle Dokumente nach Arbeit aktualisieren.md` — Claas manuell loeschen
-- **Stitch:** MCP eingerichtet, 3 Screens generiert, Designer-Rule + Vault-Doku erstellt
 - **Projekt 2:** Laeuft parallel in zweiter Claude-Instanz — Doku kommt spaeter in den Vault
 - **Brian Autonomie:** Level 3 freigeschaltet — Standard-Features ohne Rueckfrage
 
@@ -49,66 +24,56 @@ QA-Durchlauf auf echtem Geraet (iPhone 15+) empfohlen — besonders Header-Absta
 ## Aktuelle Uebergabe
 
 **Agent:** Brian
-**Zeitpunkt:** 2026-04-05 Nachmittag
-**Session:** Autonomer Arbeitsblock — QA, Bugfixes, Infra
+**Zeitpunkt:** 2026-04-05 Abend (Feierabend)
+**Session:** Autonomer Arbeitsblock + Quick Wins + Claas-Feedback
 
-### Erledigt (autonom, ohne Claas)
+### Erledigt (heute gesamt)
 
-- **API-Key Hygiene:** settings.local.json aus Git-Tracking entfernt, .gitignore ergaenzt, API-Key aus erlaubten Bash-Zeilen entfernt
-- **QA-Runde:** 6 Findings (F-027 bis F-032), keines kritisch
-- **5 QA-Findings gefixt:**
-  - F-027: PetVetTab leere Felder mit Guard geschuetzt
-  - F-028: HomeScreen KI-Card auf Theme-Tokens umgestellt
-  - F-029: PetDocumentsTab storagePath-Guard mit Alert
-  - F-031: ESLint-Kommentar in AppNavigator ergaenzt
-  - F-032: completedIds BY-DESIGN Kommentar in RemindersScreen
-- **notification_id Migration:** SQL-Datei erstellt (nicht deployed)
-- **Jest Setup:** 11 Tests in 3 Suites, alle gruen. Pure Funktionen in medicalHelpers.ts extrahiert
-- **3 Commits:** `cbaa3be`, `5b68e05` + Sammel-Commit von vorhin
+**Crash-Recovery + Commits:**
+- PC-Absturz geprueft — keine Schaeden
+- Sammel-Commit (60 Dateien) fuer 4 Sessions nachgeholt
+
+**Code-Qualitaet:**
+- QA-Runde: 6 Findings (F-027 bis F-032), 5 gefixt
+- Jest Setup: 11 Tests in 3 Suites, alle gruen. medicalHelpers.ts extrahiert
+- API-Key Hygiene: settings.local.json aus Git, .gitignore ergaenzt
+
+**Erinnerungen:**
+- Slide-Out Fix V2 (completedIds Ref) — einmalige Erinnerungen funktionieren auf Handy
+- 30-Tage-Horizont-Filter — jaehrliche Erinnerungen poppen nicht mehr sofort auf nach Abhaken
+- Beides wartet auf Claas-Test fuer jaehrliche Erinnerungen
+
+**Design Quick Wins:**
+- SafeArea: paddingTop:60 durch useSafeAreaInsets() in 12 Screens ersetzt
+- ProfileScreen: nicht existierende Premium-Features entfernt (Fotoanalyse, Gesundheitstrends)
+- Design-Review vom Designer als design-review.md hinzugefuegt
+
+**Infrastruktur:**
+- notification_id Migration SQL erstellt (nicht deployed)
 
 ### Wartet auf Claas (Handy-Tests)
 
-- **Erinnerungen Fix V2 testen (ST-04)** — Slide-Out ohne Zurueck-Poppen?
-- **Tierarzt-Kontakt testen (ST-07)** — Anlegen, Bearbeiten, Telefon-Link
+- Erinnerungen abhaken (jaehrlich) — 30-Tage-Filter testen
+- Tierarzt-Kontakt (ST-07)
+- SafeArea-Aenderungen auf iPhone pruefen
 
 ### Offen
 
-- notification_id Migration deployen (`npx supabase db push` oder SQL Editor)
-- Sicherheits-Findings S-1 bis S-8 (Pre-Go-Live, nicht Pre-Demo)
+- notification_id Migration deployen
+- Sicherheits-Findings S-1 bis S-8 (Pre-Go-Live)
 - Changelog-Automation (DevOps)
 - F-030 Accessibility (Backlog)
-- Stitch API-Key in Git-History — bei Bedarf rotieren
-
-### Wichtig
-
-- **settings.local.json** ist jetzt in .gitignore — wird nicht mehr committed
-- **Jest:** `npm test` laeuft, `npm run test:watch` fuer Entwicklung
-- **Autonomie Level 3** aktiv
 
 ---
 
 ## Vorherige Uebergaben (zusammengefasst)
 
-### 2026-04-05 Session 3 (Nachmittag frueh)
-- Crash-Recovery, Sammel-Commit (60 Dateien), Erinnerungen Slide-Out Fix V2
+### 2026-04-05 Session 1+2
+- 10 Entscheidungen mit Claas geklaert, Autonomie Level 3
+- Erinnerungen-Bug Fix V1 (Nested Touchables + Race Condition)
 
-### 2026-04-05 Session 2 (Vormittag)
-- Erinnerungen-abhaken-Bug gefixt (Nested Touchables + Race Condition), QA-Findings gefixt
-
-### 2026-04-05 Session 1 (frueh)
-- 10 Entscheidungen mit Claas geklaert, Autonomie Level 3 freigeschaltet
-
-### 2026-04-04 Session 5+6
-- Health-Check: alle 5 Empfehlungen umgesetzt, Stitch evaluiert + eingerichtet
-
-### 2026-04-04 Session 4
-- Agency Meeting, Dashboard-Redesign V2, Slide-Out-Bug gefixt
-
-### 2026-04-04 Session 2+3
-- Roadmaps, Agency-Infrastruktur, QA-Findings, Meeting-Massnahmen
-
-### 2026-04-04 Session 1
-- Handy-Test, Package-Fixes, Foto-Upload-Fix
+### 2026-04-04
+- Health-Check, Stitch, Agency Meeting, Dashboard-Redesign, Roadmaps, QA
 
 ### 2026-04-03
 - Sprint Tag 1: Alle Basis-Features, Design-System, erste QA
