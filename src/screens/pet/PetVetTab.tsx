@@ -19,19 +19,25 @@ export function PetVetTab({ vet }: PetVetTabProps) {
         ) : (
           <>
             <Text style={styles.vetName}>{vet.name}</Text>
-            <Text style={styles.vetClinic}>{vet.clinic}</Text>
-            <View style={styles.vetInfoRow}>
-              <Ionicons name="call-outline" size={16} color={colors.primary} />
-              <Text style={styles.vetInfoText}>{vet.phone}</Text>
-            </View>
-            <View style={styles.vetInfoRow}>
-              <Ionicons name="mail-outline" size={16} color={colors.primary} />
-              <Text style={styles.vetInfoText}>{vet.email}</Text>
-            </View>
-            <View style={styles.vetInfoRow}>
-              <Ionicons name="location-outline" size={16} color={colors.primary} />
-              <Text style={styles.vetInfoText}>{vet.address}</Text>
-            </View>
+            {!!vet.clinic && <Text style={styles.vetClinic}>{vet.clinic}</Text>}
+            {!!vet.phone && (
+              <View style={styles.vetInfoRow}>
+                <Ionicons name="call-outline" size={16} color={colors.primary} />
+                <Text style={styles.vetInfoText}>{vet.phone}</Text>
+              </View>
+            )}
+            {!!vet.email && (
+              <View style={styles.vetInfoRow}>
+                <Ionicons name="mail-outline" size={16} color={colors.primary} />
+                <Text style={styles.vetInfoText}>{vet.email}</Text>
+              </View>
+            )}
+            {!!vet.address && (
+              <View style={styles.vetInfoRow}>
+                <Ionicons name="location-outline" size={16} color={colors.primary} />
+                <Text style={styles.vetInfoText}>{vet.address}</Text>
+              </View>
+            )}
           </>
         )}
       </Card>

@@ -5,6 +5,7 @@
 
 ## 2026-04-05
 
+- FlatList Slide-Out Race Condition: zwei separate Refs brauchen — `pendingIds` (Doppel-Tap-Guard, wird geleert) + `completedIds` (permanente Blacklist, nie geleert) — nur so ist das Item unabhaengig vom Context-Timing dauerhaft raus
 - Autonomie Level 3 freigeschaltet — Brian delegiert Standard-Features eigenstaendig, nur bei Architektur/neuen Features Rueckfrage bei Claas
 - Entscheidungen gebuendelt abarbeiten ist effizient — 10 Punkte in einer Runde statt ueber Wochen verteilt
 

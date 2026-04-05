@@ -58,3 +58,6 @@ supabase/.temp/
 
 # Generated HTML previews
 docs/*.html
+
+# Claude local settings (may contain API keys)
+.claude/settings.local.json

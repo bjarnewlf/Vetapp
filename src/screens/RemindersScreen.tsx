@@ -17,6 +17,8 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
   const { reminders, completeReminder, error: medicalError, refresh: refreshMedical } = useMedical();
   const { rule: overdueRule, loaded: settingsLoaded } = useOverdueSettings();
   const pendingIds = useRef<Set<string>>(new Set());
+  // Permanente Blacklist: verhindert dass abgehakte Items nach Context-Refresh
+  // kurz wieder auftauchen. Wird bewusst nie geleert (Screen-Lebensdauer).
   const completedIds = useRef<Set<string>>(new Set());
 
   // Animations-State pro Karte: opacity + translateX für slide-out

@@ -44,32 +44,32 @@ Alle 10 offenen Entscheidungen mit Claas geklaert:
 
 ## Aktuelle Uebergabe
 
-**Agent:** Brian
-**Zeitpunkt:** 2026-04-05 Nachmittag (Feierabend)
-**Session:** Crash-Recovery + Sammel-Commit + Erinnerungen-Slide-Out-Fix V2
+**Agent:** Developer
+**Zeitpunkt:** 2026-04-05
+**Session:** QA-Findings F-027 bis F-032 fixen (ausser F-030)
 
 ### Erledigt
 
-- **Crash-Recovery:** PC-Absturz von Claas — alle Dateien und Git-Zustand geprueft, keine Schaeden gefunden
-- **Sammel-Commit** (`da90b83`): 60 Dateien committed — Code, Rules, Berichte, Stitch, Doku
-- **Erinnerungen Slide-Out Fix V2:** Race Condition behoben — `completedIds` Ref als permanente Blacklist eingefuehrt, Items koennen nach Animation nicht mehr zurueck-poppen
+- **F-027:** `PetVetTab.tsx` — leere Felder (phone, email, address, clinic) werden jetzt per truthy-Check nur gerendert wenn vorhanden
+- **F-028:** `HomeScreen.tsx` — KI-Card nutzt jetzt Theme-Tokens (`colors.primaryLight`, `colors.primaryBorder`, `colors.primary`, `colors.primaryDark`, `colors.textOnPrimary`, `typography.label`, `typography.bodySmall`). Einzige Ausnahme: `fontSize: 9` fuer PRO-Badge (kein passender Token, TODO-Kommentar gesetzt)
+- **F-029:** `PetDocumentsTab.tsx` — Guard vor `onOpenDocument`-Aufruf: wenn `storagePath` fehlt, Alert "Dokument nicht verfuegbar" statt leerem String
+- **F-031:** `AppNavigator.tsx` — ESLint-Suppression mit erklarendem Kommentar versehen
+- **F-032:** `RemindersScreen.tsx` — Kommentar ueber `completedIds`-Deklaration erklaert BY DESIGN-Verhalten
 - **TypeScript:** 0 Fehler
 
 ### Offen / Naechste Session
 
-- **Erinnerungen-Fix V2 testen (ST-04)** — Claas muss auf Handy bestaetigen: Slide-Out ohne Zurueck-Poppen
-- **API-Key in settings.local.json** — Stitch API-Key im Klartext. Datei in `.gitignore` aufnehmen oder Key entfernen
-- Tierarzt-Kontakt testen
+- **F-030 (Accessibility)** — bewusst zurueckgestellt (Backlog)
+- **Erinnerungen-Fix V2 testen (ST-04)** — Claas muss auf Handy bestaetigen
+- **API-Key in settings.local.json** — Datei in `.gitignore` aufnehmen
 - notification_id Migration deployen (SQL-Datei fehlt)
 - Sicherheits-Findings S-1 bis S-8
-- Changelog-Automation (DevOps), Jest Setup (Developer), Vault-Report (Wissensmanager)
+- Changelog-Automation, Jest Setup, Vault-Report
 
 ### Wichtig fuer naechste Session
 
-- **Erinnerungen-Fix:** Alter Ansatz (pendingIds im Filter) war fragil. Neuer Ansatz: `completedIds` Ref die NIE geleert wird. Wenn der Fix immer noch nicht greift, liegt das Problem tiefer (evtl. im MedicalContext oder Supabase-Update)
 - **settings.local.json NICHT committen** — enthaelt API-Key
 - **Autonomie Level 3** aktiv
-- **Expo Server** wurde gestartet, ist nach PC-Neustart weg
 
 ---
 

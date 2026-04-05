@@ -99,7 +99,8 @@ export function AppNavigator() {
     if (session && !dataLoading && !initialDataLoaded) {
       setInitialDataLoaded(true);
     }
-  }, [session, dataLoading]); // eslint-disable-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- initialDataLoaded bewusst ausgelassen: Effect soll nur einmal feuern wenn Daten erstmals geladen sind, nicht bei jedem Reset
+  }, [session, dataLoading]);
 
   if (loading || (session && !initialDataLoaded)) {
     return (

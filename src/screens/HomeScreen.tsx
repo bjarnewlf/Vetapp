@@ -164,7 +164,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
               </View>
               <View style={styles.aiCtaAction}>
                 <Text style={styles.aiCtaText}>Frage stellen</Text>
-                <Ionicons name="arrow-forward-outline" size={18} color="#1B6B5A" />
+                <Ionicons name="arrow-forward-outline" size={18} color={colors.primary} />
               </View>
             </View>
           </AnimatedPressable>
@@ -227,9 +227,9 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
   },
   aiCardNew: {
-    backgroundColor: '#E8F5F1',
+    backgroundColor: colors.primaryLight,
     borderWidth: 1.5,
-    borderColor: '#B8DDD4',
+    borderColor: colors.primaryBorder,
     borderRadius: borderRadius.lg,
     padding: spacing.md,
     marginBottom: spacing.md,
@@ -243,7 +243,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: borderRadius.md,
-    backgroundColor: '#1B6B5A',
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.smd,
@@ -252,13 +252,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   aiTitle: {
+    ...typography.label,
     fontSize: 16,
-    fontWeight: '600',
-    color: '#145244',
+    color: colors.primaryDark,
   },
   aiSubtitle: {
-    fontSize: 13,
-    color: '#1B6B5A',
+    ...typography.bodySmall,
+    color: colors.primary,
     marginTop: 2,
   },
   aiCtaRow: {
@@ -267,25 +267,24 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   aiProBadge: {
-    backgroundColor: '#1B6B5A',
-    borderRadius: 999,
+    backgroundColor: colors.primary,
+    borderRadius: borderRadius.full,
     paddingVertical: 3,
     paddingHorizontal: 8,
   },
   aiProBadgeText: {
-    fontSize: 9,
+    fontSize: 9, // TODO: Theme-Token (kein passender Token für 9px vorhanden)
     fontWeight: '800',
     letterSpacing: 1,
-    color: '#FFFFFF',
+    color: colors.textOnPrimary,
   },
   aiCtaAction: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   aiCtaText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#145244',
+    ...typography.label,
+    color: colors.primaryDark,
     marginRight: 4,
   },
 });

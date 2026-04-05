@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../../theme';
 import { Card } from '../../components';
@@ -34,7 +34,13 @@ export function PetDocumentsTab({
               <TouchableOpacity
                 key={doc.id}
                 style={styles.documentRow}
-                onPress={() => onOpenDocument(doc.id, doc.storagePath ?? '')}
+                onPress={() => {
+                  if (!doc.storagePath) {
+                    Alert.alert('Fehler', 'Dokument nicht verfügbar.');
+                    return;
+                  }
+                  onOpenDocument(doc.id, doc.storagePath);
+                }}
                 disabled={openingDocId === doc.id}
               >
                 {openingDocId === doc.id ? (

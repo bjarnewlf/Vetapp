@@ -5,6 +5,85 @@
 
 ---
 
+## Review 6: Code-Review nach Dashboard-Redesign und Tab-Refactoring — 2026-04-05
+
+**TypeScript-Check:** `npx tsc --noEmit` — 0 Fehler. Sauber.
+
+**Geprueft:** RemindersScreen.tsx, HomeScreen.tsx, PetDetailScreen.tsx, PetHealthTab.tsx, PetDocumentsTab.tsx, PetVetTab.tsx, PetListRow.tsx, TimelineItem.tsx, AppNavigator.tsx, MedicalContext.tsx
+
+---
+
+### F-027: PetVetTab — optionale VetContact-Felder werden ohne Guard gerendert — Schwere: Mittel
+
+- **Beschreibung:** `PetVetTab.tsx` rendert `vet.phone`, `vet.email`, `vet.address` und `vet.clinic` direkt ohne zu pruefen ob diese leer sind. Im Type `VetContact` sind alle vier Felder als `string` (nicht-optional) deklariert — in `VetContactContext.tsx` werden sie jedoch mit `v.phone || ''` gemappt, d.h. leere Felder kommen als leere Strings an. Ergebnis: Rows mit Icon aber leerem Text werden angezeigt, sobald ein Feld nicht ausgefuellt wurde. Betrifft den realen Fall, dass User nur Name und Telefonnummer speichern.
+- **Wo:** `src/screens/pet/PetVetTab.tsx` Z.22-34; `src/context/VetContactContext.tsx` Z.39-42; `src/types/index.ts` Z.50-53
+- **Fix:** Felder einzeln pruefen und nur rendern wenn nicht leer: `{vet.phone && vet.phone.trim() !== '' && (<View>...</View>)}` — identisches Muster wie in `VetContactScreen.tsx` (F-020, bereits gefixt dort). Alternativ VetContact-Felder im Type auf optional stellen (`phone?: string`) um die Typsicherheit zu verbessern.
+- **Entscheidung:** Offen
+
+---
+
+### F-028: HomeScreen KI-Card — hardcodierte Farben statt Theme-Tokens — Schwere: Niedrig
+
+- **Beschreibung:** `HomeScreen.tsx` Z.230-289 (Styles `aiCardNew`, `aiIconContainer`, `aiProBadge`, `aiTitle`, `aiSubtitle`, `aiCtaText`) verwendet ausschliesslich hardcodierte Hex-Werte (`#E8F5F1`, `#B8DDD4`, `#1B6B5A`, `#145244`, `#FFFFFF`) sowie literale `fontSize`/`fontWeight`-Werte statt `typography.*`-Tokens. Ebenso der LinearGradient-Header Z.71 mit `['#1B6B5A', '#2D8A73', '#3AA08A']` und das Sparkles-Icon Z.154 mit `color="#FFFFFF"` und der Arrow-Icon Z.167 mit `color="#1B6B5A"`. Das ist der einzige Screen mit dieser Dichte an Inline-Farben — alle anderen Screens nutzen `colors.*` konsequent.
+- **Wo:** `src/screens/HomeScreen.tsx` Z.71, Z.154, Z.167, Z.230-289
+- **Fix:** KI-Card-Farben auf `colors.primaryLight`, `colors.primary`, `colors.primaryDark` (falls vorhanden) und `colors.textOnPrimary` mappen. Typografie-Werte durch `typography.label`, `typography.bodySmall` etc. ersetzen. Gradient-Farben sind ein Grenzfall (kein direktes Token), koennen als Kommentar-Konstante im File bleiben wenn kein `colors.primaryDark` existiert.
+- **Entscheidung:** Offen
+
+---
+
+### F-029: PetDocumentsTab — storagePath undefined wird als leerer String an getSignedUrl uebergeben — Schwere: Mittel
+
+- **Beschreibung:** `PetDocumentsTab.tsx` Z.37 ruft `onOpenDocument(doc.id, doc.storagePath ?? '')` auf. Wenn `doc.storagePath` undefined ist (kein Upload ueber Storage, oder aelterer Datensatz), wird ein leerer String `''` als `storagePath` an `getSignedUrl` in `PetDetailScreen.tsx` Z.104-112 weitergereicht. `supabase.storage.createSignedUrl('pet-documents', '')` schlaegt fehl — der Fehler wird zwar gecatcht und ein Alert gezeigt (Z.119-121), aber der User erhaelt nur eine generische Fehlermeldung ohne Erklaerung. Aeltere Dokument-Eintraege ohne Storage-Pfad koennen nie geoeffnet werden.
+- **Wo:** `src/screens/pet/PetDocumentsTab.tsx` Z.37; `src/screens/PetDetailScreen.tsx` Z.104-121; `src/types/index.ts` Z.61
+- **Fix:** Vor dem Aufruf von `onOpenDocument` pruefen: `if (!doc.storagePath) { Alert.alert('Fehler', 'Kein Speicherpfad fuer dieses Dokument vorhanden.'); return; }`. Zusaetzlich den Upload-Button bei fehlendem storagePath deaktivieren oder die betroffenen Docs als defekt markieren.
+- **Entscheidung:** Offen
+
+---
+
+### F-030: PetListRow und TimelineItem — keine Accessibility-Labels — Schwere: Niedrig
+
+- **Beschreibung:** `PetListRow.tsx` (Z.39) und `TimelineItem.tsx` (Z.45) verwenden `AnimatedPressable` ohne `accessibilityLabel` oder `accessibilityRole`. Screen-Reader-Nutzer hoeren nur den generischen Pressable-Namen, nicht "Bella, Hund, 3 Jahre" oder "Impftermin Bella, 12. April". Im Gegensatz dazu hat die Checkbox in `RemindersScreen.tsx` korrekte Labels (Z.130-133).
+- **Wo:** `src/components/PetListRow.tsx` Z.39; `src/components/TimelineItem.tsx` Z.45
+- **Fix:** `accessibilityLabel` und `accessibilityRole="button"` auf dem `AnimatedPressable` setzen. Beispiel PetListRow: `accessibilityLabel={`${pet.name}, ${subtitle}`}`. Beispiel TimelineItem: `accessibilityLabel={`${TYPE_LABELS[type]}: ${title}${petName ? ', ' + petName : ''}, ${day}. ${month}`}`.
+- **Entscheidung:** Offen
+
+---
+
+### F-031: AppNavigator — useEffect-Dependency-Suppression versteckt moegliche Race Condition — Schwere: Niedrig
+
+- **Beschreibung:** `AppNavigator.tsx` Z.98-103 unterdrückt den `react-hooks/exhaustive-deps`-Warning mit einem ESLint-Disable-Kommentar. Der fehlende Dep ist `initialDataLoaded` — intentional, da der Effekt nur beim Uebergang `dataLoading: true -> false` feuern soll. Beim aktuellen Verhalten koennte ein schneller Logout waehrend des Ladens `initialDataLoaded` auf `true` setzen, da der Session-Reset-Effekt (Z.90-95) async und der Lade-Effekt quasi-sync ist. Kein reproduzierbarer Bug bekannt, aber die Suppression verbirgt die Absicht.
+- **Wo:** `src/navigation/AppNavigator.tsx` Z.98-103
+- **Fix:** Kommentar ersetzen durch erklaerenden Inline-Kommentar der das intentionale Weglassen begruendet: `// intentionally omitted: initialDataLoaded darf nicht als Dep stehen, da sonst Endlosloop`. Kein Code-Fix noetig, aber Lesbarkeit verbessert sich.
+- **Entscheidung:** Offen
+
+---
+
+### F-032: RemindersScreen — completedIds Ref wird nie geleert — Schwere: Niedrig
+
+- **Beschreibung:** `RemindersScreen.tsx` Z.20 initialisiert `completedIds` als persistentes Ref. Eintraege werden bei erfolgreichem `completeReminder` hinzugefuegt (Z.78), aber nie entfernt. Wenn `refresh()` in `MedicalContext` nach dem DB-Update gefeuert wird (Z.223), kehren abgeschlossene Reminders nicht mehr in die `reminders`-Liste zurueck (Status 'completed' wird gefiltert, Z.42). In der aktuellen Implementierung ist das kein Bug — es ist die Absicht des Fixes aus Review 4. Aber: Wenn ein User dieselbe Erinnerung (selbe ID, z.B. nach einem Rollback der DB) wieder in der Liste sieht, wuerde sie durch den completedIds-Filter dauerhaft ausgeblendet, weil das Ref den Mount-Zustand ueberdauert. Praktisch unwahrscheinlich, aber der Ref-State ist permanent fuer die Lebensdauer des Screens.
+- **Wo:** `src/screens/RemindersScreen.tsx` Z.20, Z.42, Z.78
+- **Fix:** Akzeptables Risk bei aktuellem Datenmodell. Als Dokumentation: Kommentar an Z.20 erganzen: `// Lokal gecachte IDs die nach Animation aus der Liste geblendet wurden — nie geleert (Absicht: verhindert Reappearance nach refresh())`.
+- **Entscheidung:** Offen
+
+---
+
+### Zusammenfassung Review 6
+
+| ID | Schwere | Beschreibung | Status |
+|---|---|---|---|
+| F-027 | Mittel | PetVetTab: leere VetContact-Felder werden ohne Guard gerendert | NEU — Fix empfohlen |
+| F-028 | Niedrig | HomeScreen KI-Card: Farbwerte und Typografie hardcodiert statt Theme-Tokens | NEU |
+| F-029 | Mittel | PetDocumentsTab: storagePath undefined -> leerer String an getSignedUrl | NEU — Fix empfohlen |
+| F-030 | Niedrig | PetListRow + TimelineItem: keine Accessibility-Labels | NEU |
+| F-031 | Niedrig | AppNavigator: useEffect-Dep-Suppression ohne erklaerenden Kommentar | NEU |
+| F-032 | Niedrig | RemindersScreen: completedIds Ref wird nie geleert | NEU — Accepted Risk wahrscheinlich |
+
+**TypeScript-Check:** Bestanden — 0 Fehler.
+
+**Naechster Schritt:** F-027 und F-029 sind Mittel-Findings mit sichtbarem User-Impact — empfehle Fix vor naechstem Handy-Test. F-028 sollte vor Release behoben werden (Theme-Konsistenz). F-030 bis F-032 koennen nach Release folgen.
+
+---
+
 ## Roadmap-Bericht: Qualitaets- und Sicherheitsstatus — 2026-04-04
 
 ### A) Qualitaets-Status
