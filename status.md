@@ -6,9 +6,7 @@
 
 **VetApp** — React Native / Expo (SDK 54), TypeScript strict, Supabase Backend. UI-Sprache Deutsch.
 
-Phase 2 (MVP-Entwicklung) ist inhaltlich abgeschlossen. Handy-Test laeuft — erste Flows erfolgreich, restliche noch offen.
-
-**Mehrere Brian-Instanzen aktiv** — tasks.md ist die Koordinationsdatei.
+Phase 2 (MVP-Entwicklung) ist inhaltlich abgeschlossen. **Alle Deployments sind durch.** Handy-Test laeuft — erste Flows erfolgreich, 3 Tests noch offen.
 
 ### Was funktioniert (auf echtem iPhone verifiziert)
 
@@ -24,6 +22,12 @@ Phase 2 (MVP-Entwicklung) ist inhaltlich abgeschlossen. Handy-Test laeuft — er
 - KI-Gesundheitsassistent — Eigener Tab, Edge Function deployed, Rate Limiting
 - Error-Banner-Komponente — sichtbares Feedback bei DB-Fehlern
 - **Navigation** zwischen Tabs fluessig
+
+### Deployed (live auf Supabase)
+
+- Edge Function `ai-chat` — S-2 (Rate-Limit fail-closed) + S-4 (Authorization Bearer)
+- Migration `notification_id` fuer reminders
+- Migration CLI synchronisiert (14-stellige Timestamps, repair applied)
 
 ### Design-System
 
@@ -48,34 +52,27 @@ Phase 2 (MVP-Entwicklung) ist inhaltlich abgeschlossen. Handy-Test laeuft — er
 
 ---
 
-## Letzte Aenderungen (05.04.2026 Vormittag)
-
-- **Erinnerungen abhaken Bug gefixt:** Nested TouchableOpacity aufgeloest (View + 2x Pressable), activeReminders-Filter beruecksichtigt pendingIds fuer saubere Animation, accessibilityState ergaenzt
-- **QA-Findings gefixt:** QA-026, QA-029, QA-031
-- **TypeScript:** 0 Fehler
-
----
-
 ## Offene Punkte
 
-### Handy-Test (fortsetzen)
-- Erinnerungen-Fix auf Handy bestaetigen (ST-04)
-- Tierarzt-Kontakt testen
-- Bugs sammeln und fixen
-- Alte Tabellen `vaccinations`/`treatments` nach Test droppen
+### Handy-Test (wartet auf Claas)
+- Erinnerungen abhaken (jaehrlich) — 30-Tage-Filter testen
+- Tierarzt-Kontakt testen (ST-07)
+- SafeArea auf iPhone pruefen (jetzt inkl. OnboardingScreen)
+
+### Vor Go-Live (nicht dringend)
+- F-034: console.error/warn ohne __DEV__-Guard in Contexts
+- F-035: ai_usage Insert-Reihenfolge
+- F-036: UTC/Lokal-Mix im 30-Tage-Horizont
+- S-1 KRITISCH: Premium-Bypass (togglePro) — IAP noetig
 
 ### Vor Phase-2-Abschluss
-- notification_id Migration fuer reminders deployen
-- Demo dem Kunden zeigen, Phase-2-Zahlung ausloesen (2.160 EUR)
-
-### Sicherheit (vor Go-Live)
-- S-1 KRITISCH: Premium-Bypass (togglePro) — IAP noetig
-- S-2 bis S-8: Details in `sicherheitsbericht-2026-04-04.html`
+- Handy-Tests gruen → Dem Kunden MVP praesentieren → Phase-2-Zahlung (2.160 EUR)
 
 ### Phase 3
-- PDF-Export, Tierarztfinder (Scope mit Kunde klaeren)
+- RevenueCat IAP (S-1, Go-Live-Blocker)
 - KI-Assistent mit Tool Use (Konzept liegt vor)
 - Weitere Animationen (Konzept + Showcase vorhanden)
+- PDF-Export, Tierarztfinder (Scope mit Kunde klaeren)
 
 ---
 
@@ -89,8 +86,8 @@ Phase 2 (MVP-Entwicklung) ist inhaltlich abgeschlossen. Handy-Test laeuft — er
 - **Pet-Fotos**: storagePath in DB, **FormData-Upload** via fileUpload.ts, Bucket `pet-documents`
 - **Storage-Policy**: `(storage.foldername(name))[2]` fuer pet-photos (wegen `pet-photos/` Prefix)
 - Premium-Gates via SubscriptionContext.isPro + isLoading
-- Supabase CLI: `npx supabase` (Windows)
-- KI-Assistent: Custom Header x-user-token (JWT-Workaround), Edge Function heisst `ai-chat`
+- Supabase CLI: `npx supabase` (Windows), **14-stellige Timestamps** fuer Migrationen
+- KI-Assistent: Authorization Bearer Header, Edge Function heisst `ai-chat`
 - Accent-Farbe: #CC6B3D (WCAG AA)
 - Theme: 5 neue Color-Tokens, 2 neue Typography-Styles
 - MedicalEvent-Edit: route.params.editMedicalEvent (nicht editEvent)
@@ -105,12 +102,13 @@ Phase 2 (MVP-Entwicklung) ist inhaltlich abgeschlossen. Handy-Test laeuft — er
 
 - **KI-Assistent mit Tool Use** — Variante B (Confirm First), ~2-3 Tage
 - **Animations-Konzept** — 8 Animationen, priorisiert, Showcase als HTML
+- **Maestro E2E-Tests** — Recherche im Vault archiviert, Setup ~halber Tag
 
 ---
 
 ## Vault
 
-Agency-Vault in `D:\Agency-Vault\` — ~85+ vernetzte Notizen. Agency.md ist zentraler Hub.
+Agency-Vault in `D:\Agency-Vault\` — ~187+ vernetzte Notizen. Agency.md ist zentraler Hub.
 
 ---
-Zuletzt aktualisiert: 2026-04-05 Vormittag
+Zuletzt aktualisiert: 2026-04-05

@@ -2,7 +2,7 @@
 
 > Ziel: Phase 2 (Entwicklung MVP) abschliessen — vorzeigbar auf dem Handy.
 > PDF-Export und Tierarztfinder sind bewusst ausgeklammert (Scope noch undefiniert).
-> Stand: 2026-04-05 Abend
+> Stand: 2026-04-05
 >
 > Status-Konvention: `[ ]` = offen, `[~]` = in Arbeit, `[x]` = erledigt
 
@@ -13,24 +13,24 @@
 - [x] **Erinnerungen abhaken (einmalig)** — funktioniert, Slide-Out OK
 - [ ] **Erinnerungen abhaken (jaehrlich)** — 30-Tage-Horizont-Filter eingebaut, Claas testet spaeter
 - [ ] **Tierarzt-Kontakt** testen (ST-07: Anlegen, Bearbeiten, Telefon-Link)
-- [ ] **SafeArea pruefen** — paddingTop:60 durch useSafeAreaInsets() ersetzt, auf iPhone testen
+- [ ] **SafeArea pruefen** — useSafeAreaInsets() in allen Screens (inkl. OnboardingScreen), auf iPhone testen
 - [ ] Bugs sammeln und fixen
-- [ ] Alte Tabellen `vaccinations`/`treatments` droppen (nach erfolgreichem Test)
 
 ---
 
-## SOFORT — Deployment noetig
+## SOFORT — Deployment
 
-- [ ] **Edge Function `ai-chat` deployen** — S-2 (Rate-Limit) + S-4 (Auth-Header) erfordern Redeployment: `npx supabase functions deploy ai-chat`
-- [ ] **notification_id Migration deployen** — SQL bereit (`supabase/migrations/`)
+- [x] **Edge Function `ai-chat` deployed** — S-2 (Rate-Limit) + S-4 (Auth-Header) live
+- [x] **notification_id Migration deployed** — CLI synchronisiert, 14-stellige Timestamps
+- [x] ~~Alte Tabellen `vaccinations`/`treatments` droppen~~ — GESTRICHEN: sind nur Variablennamen, keine DB-Tabellen
 
 ---
 
-## DIESE WOCHE
+## VOR GO-LIVE (nicht dringend)
 
-- [ ] **Changelog-Automation** — DevOps setzt Option C um
-- [ ] **Taeglicher Vault-Report** — Wissensmanager als Scheduled Agent
-- [ ] **Link-Annotationen** — nach und nach
+- [ ] **F-034:** console.error/warn in Contexts ohne __DEV__-Guard (10 Stellen, Batch)
+- [ ] **F-035:** ai_usage Insert-Reihenfolge optimieren
+- [ ] **F-036:** UTC/Lokal-Mix im 30-Tage-Horizont (kosmetisch, max 2h)
 
 ---
 
@@ -39,27 +39,34 @@
 - [x] Erinnerungen-abhaken-Bug fixen — Fix V2
 - [x] QA-Runde + Findings fixen
 - [x] Jest Setup
-- [x] SafeArea — useSafeAreaInsets() in 12 Screens
+- [x] SafeArea — useSafeAreaInsets() in allen Screens (inkl. F-033 OnboardingScreen)
 - [x] Falsche Premium-Features entfernt
 - [x] Security S-2 bis S-8 gefixt
+- [x] Edge Function + Migration deployed
 - [ ] Handy-Test: Erinnerungen jaehrlich + Tierarzt + SafeArea
-- [ ] Edge Function + Migration deployen
 - [ ] Bugs aus Handy-Test fixen
 - [ ] Dem Kunden vorzeigbaren MVP praesentieren
 - [ ] Phase-2-Zahlung ausloesen (2.160 EUR)
 
 ---
 
+## DIESE WOCHE
+
+- [ ] **Changelog-Automation** — DevOps setzt Option C um
+- [ ] **Taeglicher Vault-Report** — Wissensmanager als Scheduled Agent
+
+---
+
 ## SICHERHEIT — Status
 
-### Erledigt
-- [x] **S-2: Rate-Limit Fail-Closed** — 503 bei DB-Fehler (Edge Function Redeployment noetig!)
-- [x] **S-3: ai_usage Schema-Doku** — in supabase-schema.sql
-- [x] **S-4: Authorization-Header** — Bearer statt x-user-token (Edge Function Redeployment noetig!)
+### Erledigt + Deployed
+- [x] **S-2: Rate-Limit Fail-Closed** — deployed
+- [x] **S-3: ai_usage Schema-Doku**
+- [x] **S-4: Authorization-Header** — deployed
 - [x] **S-5: Dokument-URLs** — bereits auf 1h begrenzt
-- [x] **S-6: Storage-Bucket-Policies** — in supabase-schema.sql
-- [x] **S-7: E-Mail-Validierung** — Regex vor signUp()
-- [x] **S-8: Auth-Logging** — hinter __DEV__-Flag
+- [x] **S-6: Storage-Bucket-Policies**
+- [x] **S-7: E-Mail-Validierung**
+- [x] **S-8: Auth-Logging** — hinter __DEV__ (aiService, Contexts noch offen → F-034)
 
 ### Offen (separates Projekt)
 - [ ] **S-1: Premium-Bypass** (1-2 Tage) — `togglePro()` durch RevenueCat IAP ersetzen. Pre-Release-Blocker.
@@ -79,6 +86,7 @@
 ## BACKLOG (nach MVP)
 
 - [ ] **Stretch-Header PetDetail** — Pull-to-Reveal Parallax-Effekt (Idee Claas 05.04.)
+- [ ] **Maestro E2E-Tests** — Setup evaluiert, Konzept im Vault archiviert
 - [ ] Chat-Historie persistent
 - [ ] Custom Font (Inter)
 - [ ] Dark Mode
@@ -96,9 +104,17 @@
 
 ## ERLEDIGT
 
+### 2026-04-05 — Session 9 (Deployments + QA)
+- [x] Edge Function ai-chat deployed (S-2 + S-4 live)
+- [x] Migration-Dateien umbenannt (14-stellig), CLI synchronisiert
+- [x] notification_id Migration deployed
+- [x] QA-Runde 7: F-033 gefixt (OnboardingScreen SafeArea)
+- [x] "Alte Tabellen droppen" als ungueltig gestrichen
+- [x] Maestro-Recherche archiviert, Black-Hole-Idee im Vault
+
 ### 2026-04-05 — Session 8 (Security-Fixes)
 - [x] S-2, S-3, S-4, S-6, S-7, S-8 gefixt (parallel, 3 Developer-Agents)
-- [x] S-5 als bereits erledigt bestätigt
+- [x] S-5 als bereits erledigt bestaetigt
 
 ### 2026-04-05 — Session 7 (Security-Analyse)
 - [x] Alle Findings analysiert: Dateien, Zeilen, Fixes, Aufwand
@@ -125,4 +141,4 @@
 - [x] Sprint Tag 1: Alle Basis-Features
 
 ---
-Zuletzt aktualisiert: 2026-04-05 Abend
+Zuletzt aktualisiert: 2026-04-05

@@ -10,77 +10,59 @@
 - **Duplikat loeschen:** `D:\Agency-Vault\Learnings\Alle Dokumente nach Arbeit aktualisieren.md` — Claas manuell loeschen
 - **Projekt 2:** Laeuft parallel in zweiter Claude-Instanz — Doku kommt spaeter in den Vault
 - **Brian Autonomie:** Level 3 freigeschaltet — Standard-Features ohne Rueckfrage
+- **Immer sauber arbeiten:** Claas will keine Quick-Fixes oder technische Schulden — immer den sauberen Weg
 
 ---
 
 ## Offene Migrationen / Deployments
 
-| Was | Status | Befehl |
+| Was | Status | Datum |
 |---|---|---|
-| notification_id fuer reminders | SQL BEREIT | `npx supabase db push` oder SQL Editor |
-| Edge Function ai-chat | REDEPLOYMENT NOETIG | `npx supabase functions deploy ai-chat` |
+| notification_id fuer reminders | **DEPLOYED** | 2026-04-05 |
+| Edge Function ai-chat (S-2 + S-4) | **DEPLOYED** | 2026-04-05 |
+| Migration-Dateien auf 14-stellige Timestamps | **ERLEDIGT** | 2026-04-05 |
+| Migration CLI synchronisiert (repair) | **ERLEDIGT** | 2026-04-05 |
 
-**Wichtig:** S-2 (Rate-Limit) und S-4 (Auth-Header) greifen erst nach Redeployment der Edge Function!
+Keine offenen Deployments.
 
 ---
 
 ## Aktuelle Uebergabe
 
 **Agent:** Brian
-**Zeitpunkt:** 2026-04-05 Abend (Feierabend)
-**Session:** Mega-Tag — Crash-Recovery bis Security-Fixes
+**Zeitpunkt:** 2026-04-05
+**Session:** Deployments + QA-Runde 7
 
-### Erledigt (heute, 11 Commits)
+### Erledigt (diese Session)
 
-**Morgens:**
-- PC-Crash-Recovery — keine Schaeden
-- Sammel-Commit (60 Dateien, 4 Sessions nachgeholt)
-- Erinnerungen Slide-Out Fix V2 (completedIds Ref)
-
-**Autonom (ohne Claas):**
-- QA-Runde: 6 Findings, 5 gefixt (F-027 bis F-032)
-- Jest Setup: 11 Tests, medicalHelpers.ts extrahiert
-- API-Key Hygiene: settings.local.json aus Git
-- notification_id Migration SQL erstellt
-
-**Mit Claas:**
-- Erinnerungen einmalig auf Handy getestet — funktioniert
-- 30-Tage-Horizont-Filter fuer jaehrliche Erinnerungen
-- Falsche Premium-Features aus ProfileScreen entfernt
-
-**Quick Wins:**
-- SafeArea: paddingTop:60 durch useSafeAreaInsets() in 12 Screens
-- Design-Review als design-review.md
-
-**Security (S-2 bis S-8):**
-- S-2: Rate-Limit Fail-Closed (503 bei DB-Fehler)
-- S-3: ai_usage Schema-Doku
-- S-4: Authorization Bearer statt x-user-token
-- S-5: Bereits erledigt (1h signed URLs)
-- S-6: Storage-Bucket-Policies dokumentiert
-- S-7: E-Mail-Validierung vor signUp()
-- S-8: Auth-Logging hinter __DEV__
+- **Edge Function `ai-chat` deployed** — S-2 (Rate-Limit fail-closed) + S-4 (Authorization Bearer) live
+- **Migration-Dateien umbenannt** — 8-stellig auf 14-stellig (Supabase CLI Format)
+- **3 alte Migrationen repariert** — `migration repair --status applied`, CLI synchron
+- **`notification_id` Migration deployed** — Spalte existierte bereits, kein Problem
+- **QA-Runde 7** — 4 Findings (1 Mittel, 3 Niedrig)
+- **F-033 gefixt** — OnboardingScreen SafeArea (beim Umbau uebersehen)
+- **Recherche archiviert** — AI Computer Use / Maestro fuer Mobile Testing (Vault)
+- **Idee archiviert** — Agency-Website Black-Hole-Hover-Effekt (Vault/Kopf/Ideen)
 
 ### Wartet auf Claas (Handy-Tests)
 
 - Erinnerungen abhaken (jaehrlich) — 30-Tage-Filter testen
 - Tierarzt-Kontakt (ST-07)
-- SafeArea auf iPhone pruefen
+- SafeArea auf iPhone pruefen (jetzt inkl. OnboardingScreen)
 
-### Offen
+### Offen (vor Go-Live, nicht dringend)
 
-- Edge Function ai-chat deployen (S-2 + S-4)
-- notification_id Migration deployen
+- F-034: console.error/warn in Contexts ohne __DEV__-Guard (Batch)
+- F-035: ai_usage Insert-Reihenfolge (Rate-Limit-Zaehler)
+- F-036: UTC/Lokal-Mix im 30-Tage-Horizont (max 2h Abweichung)
 - **S-1: Premium-Bypass** — RevenueCat IAP (1-2 Tage, Phase 3)
-- Changelog-Automation
-- F-030 Accessibility (Backlog)
 
 ---
 
 ## Vorherige Uebergaben (zusammengefasst)
 
-### 2026-04-05 Session 1+2
-- 10 Entscheidungen, Autonomie Level 3, Erinnerungen Fix V1
+### 2026-04-05 Abend (Feierabend)
+- Mega-Tag: Crash-Recovery, QA, Jest, Security S-2-S-8, SafeArea, 30-Tage-Horizont
 
 ### 2026-04-04
 - Health-Check, Stitch, Meeting, Dashboard, Roadmaps, QA

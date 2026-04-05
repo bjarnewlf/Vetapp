@@ -636,3 +636,84 @@ Empfehlung: F-011 (docs) und F-010 (toter Import) vor Release als 5-Minuten-Fix 
 | F-006 | MITTEL | GEFIXT — Loading-Spinner in PetDetailScreen |
 | F-007 | NIEDRIG | GEFIXT (Review 3) |
 | F-008 | NIEDRIG | TEILWEISE (Rules-Datei noch nicht vollstandig aktualisiert) |
+
+---
+
+## Review 7: Security-Fixes und SafeArea-Umbau — 2026-04-05
+
+**TypeScript-Check:** `npx tsc --noEmit` — 0 Fehler. Sauber.
+
+**Geprueft:** supabase/functions/ai-chat/index.ts, src/services/aiService.ts, src/screens/RemindersScreen.tsx, src/screens/RegisterScreen.tsx, src/screens/OnboardingScreen.tsx, src/context/AuthContext.tsx, src/context/PetContext.tsx, src/context/MedicalContext.tsx, src/context/VetContactContext.tsx, src/utils/fileUpload.ts — alle Screens auf hardcodierte paddingTop-Werte
+
+---
+
+### Verifikation der Security-Fixes (S-2 bis S-8)
+
+#### S-2: Rate-Limit Fail-Closed
+**Status: GEFIXT und korrekt.**
+`ai-chat/index.ts` Z.132-138: Bei `usageError` wird 503 zurueckgegeben — kein Request durchgelassen. Fail-Closed ist implementiert.
+
+#### S-4: Authorization Bearer statt Anon-Key
+**Status: GEFIXT und korrekt.**
+`aiService.ts` Z.44-49: Header sendet `Authorization: Bearer ${session.access_token}` und `apikey: EXPO_PUBLIC_SUPABASE_ANON_KEY`. Edge Function Z.93-94 liest `authorization`-Header und extrahiert Bearer-Token. JWT-Verifikation via `supabase.auth.getUser()` (Z.116-121) — korrekt.
+
+#### S-7: E-Mail-Validierung
+**Status: GEFIXT und korrekt.**
+`RegisterScreen.tsx` Z.24-28: Regex `/^[^\s@]+@[^\s@]+\.[^\s@]+$/` vor `signUp()`-Aufruf. Alert bei ungueltiger E-Mail. Passwort-Mindestlaenge (6 Zeichen) ebenfalls geprueft (Z.29-32).
+
+#### S-8: Auth-Logging hinter __DEV__
+**Status: GEFIXT in aiService.ts.**
+Alle console-Aufrufe in `aiService.ts` sind hinter `__DEV__` (Z.29, 31, 34, 56, 82). ABER: neue Findings unten.
+
+---
+
+### F-033: OnboardingScreen — hardcodiertes paddingTop: 80 ohne useSafeAreaInsets — Schwere: Mittel
+
+- **Beschreibung:** `OnboardingScreen.tsx` Z.230 verwendet `paddingTop: 80` als statischen Wert im Header-Style. Alle anderen Screens wurden auf `insets.top + 12` per `useSafeAreaInsets()` umgestellt — OnboardingScreen wurde beim SafeArea-Umbau uebergangen. Auf Geraeten mit kleiner Notch (z.B. iPhone SE) ist der Wert zu gross; auf Geraeten mit grosser Dynamic Island (iPhone 16 Pro, insets.top ca. 59px) koennte der Header oben abgeschnitten werden wenn `insets.top > 68`.
+- **Wo:** `src/screens/OnboardingScreen.tsx` Z.1-15 (kein Import von `useSafeAreaInsets`), Z.230 (`paddingTop: 80`)
+- **Fix:** `useSafeAreaInsets` importieren, `insets = useSafeAreaInsets()`, Style auf `paddingTop: insets.top + 12` aendern. Identisches Muster wie alle anderen Screens.
+- **Entscheidung:** Offen
+
+---
+
+### F-034: PetContext, MedicalContext, VetContactContext — console.error/warn ohne __DEV__-Guard in Production-Code — Schwere: Niedrig
+
+- **Beschreibung:** Mehrere console-Aufrufe in Context-Dateien und fileUpload.ts landen in Production-Logs ohne `__DEV__`-Check. Konkret: `PetContext.tsx` Z.106, 143, 180, 202, 229, 241; `MedicalContext.tsx` Z.55; `VetContactContext.tsx` Z.49; `fileUpload.ts` Z.59, 99. Im Gegensatz dazu sind alle Logs in `aiService.ts` korrekt hinter `__DEV__` — das ist die Linie die S-8 vorgegeben hat, aber nur fuer aiService durchgezogen wurde.
+- **Wo:** `src/context/PetContext.tsx` (6 Stellen), `src/context/MedicalContext.tsx` Z.55, `src/context/VetContactContext.tsx` Z.49, `src/utils/fileUpload.ts` Z.59 und Z.99
+- **Fix:** Alle console-Aufrufe in diesen Dateien mit `if (__DEV__)` wrappen oder ersatzlos entfernen (die Fehler werden ohnehin im setError()-State sichtbar). Beispiel: `if (__DEV__) console.error('Haustierdaten konnten nicht geladen werden:', e);`
+- **Entscheidung:** Offen
+
+---
+
+### F-035: ai-chat Edge Function — Usage-Insert nach Anthropic-Response, nicht davor — Schwere: Niedrig
+
+- **Beschreibung:** `ai-chat/index.ts` Z.295-302: Der `ai_usage`-Insert erfolgt NACH dem erfolgreichen Anthropic-API-Aufruf. Das Rate-Limit-Tracking ist damit locker: Ein User der genau bei 19 Anfragen steht kann bei Netzwerkproblemen oder Insert-Fehlern theoretisch mehr als 20 Anfragen pro Stunde absetzen, da der Zaehler erst nach erfolgreicher Antwort erhoeht wird. Der Insert-Fehler wird nur geloggt (Z.301), nicht als Fatal behandelt. Kein kritisches Sicherheitsproblem (Anthropic hat eigene Rate-Limits), aber das Rate-Limiting ist nicht wasserdicht.
+- **Wo:** `supabase/functions/ai-chat/index.ts` Z.295-302
+- **Fix:** Usage-Insert VOR dem Anthropic-API-Aufruf platzieren. Bei Insert-Fehler: Request abweisen (503) statt fortfahren. Das stellt sicher dass jede versuchte Anfrage gezaehlt wird, unabhaengig ob Anthropic antwortet.
+- **Entscheidung:** Offen
+
+---
+
+### F-036: RemindersScreen — 30-Tage-Horizont filtert keine Reminders ohne Datum-Normalisierung — Schwere: Niedrig
+
+- **Beschreibung:** `RemindersScreen.tsx` Z.52-56: Der Horizont-Filter vergleicht `reminderDate` (aus `new Date(r.date)`) mit `horizon`. Das `r.date`-Feld kommt aus der DB als ISO-String (z.B. `2026-05-01`). `new Date('2026-05-01')` gibt Mitternacht UTC zurueck. `horizon` ist hingegen `new Date()` (lokale Zeit) + 30 Tage. Bei User in UTC+2 und einem Reminder auf genau `horizon.date` kann der Reminder je nach Tageszeit erscheinen oder verschwinden — ein Off-by-one-Fehler um bis zu 2 Stunden. Kein kritischer Bug, aber der Grenzwert-Vergleich ist nicht konsistent (UTC vs. lokal gemischt).
+- **Wo:** `src/screens/RemindersScreen.tsx` Z.52-56
+- **Fix:** Datum-Vergleich normalisieren: `reminderDate.setHours(0,0,0,0)` und `horizon.setHours(23,59,59,999)` vor dem Vergleich setzen. Damit ist "innerhalb von 30 Tagen" eindeutig definiert unabhaengig von Zeitzone.
+- **Entscheidung:** Offen
+
+---
+
+### Zusammenfassung Review 7
+
+| ID | Schwere | Beschreibung | Status |
+|---|---|---|---|
+| F-033 | Mittel | OnboardingScreen: paddingTop: 80 hardcodiert, kein useSafeAreaInsets | NEU — Fix empfohlen |
+| F-034 | Niedrig | PetContext/MedicalContext/VetContactContext/fileUpload: console ohne __DEV__ | NEU |
+| F-035 | Niedrig | ai-chat: Usage-Insert nach Anthropic-Call — Rate-Limit locker | NEU |
+| F-036 | Niedrig | RemindersScreen: Horizont-Filter UTC vs. lokal inkonsistent | NEU |
+
+**Security-Fixes S-2 bis S-8:** Alle verifizierten Fixes sind korrekt implementiert. Keine Regressionen.
+
+**TypeScript-Check:** Bestanden — 0 Fehler.
+
+**Naechster Schritt:** F-033 ist der einzige Mittel-Fund — OnboardingScreen-SafeArea-Fix ist ein 3-Zeilen-Patch. F-034 (console-Guards) sollte vor Go-Live als Batch-Fix erledigt werden. F-035 und F-036 sind akzeptierbare Niedrig-Risiken.

@@ -5,6 +5,7 @@
 
 ## 2026-04-05
 
+- Supabase Migration Repair: Migrationen die ausserhalb der CLI deployed wurden (z.B. im SQL Editor) sind der CLI unbekannt — `npx supabase migration repair --status applied [timestamp]` synchronisiert den Stand; Grundsatz: immer den sauberen Weg, keine Quick & Dirty-Deployments
 - Erinnerungen 30-Tage-Horizont: bei wiederkehrenden Erinnerungen Folge-Eintrag sofort sichtbar — Fix: `REMINDER_HORIZON_DAYS = 30`, nur Eintraege <=30 Tage + ueberfaellige zeigen; allgemeines Prinzip fuer alle Auto-generierten Folge-Eintraege
 - Security-Audit VetApp 8 Findings: Rate-Limiting muss fail-closed sein (bei DB-Fehler ablehnen); Custom Auth-Header vermeiden, Standard Authorization Bearer nutzen; Console.logs mit Auth hinter __DEV__; S-1 (IAP-Bypass) einziger Go-Live-Blocker, S-2-S-8 zusammen ~1h Arbeit — Security frueh machen lohnt sich
 - SafeAreaInsets statt hardcodiertem Padding: `paddingTop: 60` bricht auf iPhone 15+ mit Dynamic Island — Fix: `useSafeAreaInsets()` aus react-native-safe-area-context + `SafeAreaProvider` in App.tsx, Pattern: `paddingTop: insets.top + 12`

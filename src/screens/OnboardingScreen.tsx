@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { InputField, Button, SelectField } from '../components';
 import type { SelectFieldOption } from '../components';
@@ -31,6 +32,7 @@ interface OnboardingScreenProps {
 export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
   const { user } = useAuth();
   const { addPet } = usePets();
+  const insets = useSafeAreaInsets();
   const [step, setStep] = useState<'welcome' | 'addPet'>('welcome');
   const [name, setName] = useState('');
   const [animalType, setAnimalType] = useState<AnimalType | ''>('');
@@ -114,7 +116,7 @@ export function OnboardingScreen({ onComplete }: OnboardingScreenProps) {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <Text style={styles.headerTitle}>Dein erstes Tier</Text>
         <Text style={styles.headerSubtitle}>
           Erzähl uns etwas über deinen Liebling
@@ -227,7 +229,6 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: colors.primary,
-    paddingTop: 80,
     paddingBottom: spacing.xl,
     paddingHorizontal: spacing.lg,
   },
