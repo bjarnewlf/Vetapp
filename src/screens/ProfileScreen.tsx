@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card, Button } from '../components';
 import { useAuth } from '../context/AuthContext';
@@ -12,6 +13,7 @@ interface ProfileScreenProps {
 
 export function ProfileScreen({ navigation }: ProfileScreenProps) {
   const { user: authUser, signOut } = useAuth();
+  const insets = useSafeAreaInsets();
   const user = {
     name: authUser?.user_metadata?.name || 'User',
     email: authUser?.email || '',
@@ -20,8 +22,6 @@ export function ProfileScreen({ navigation }: ProfileScreenProps) {
 
   const premiumFeatures = [
     { icon: 'globe-outline' as const, label: 'KI-Gesundheitsassistent' },
-    { icon: 'camera-outline' as const, label: 'Symptom-Fotoanalyse' },
-    { icon: 'trending-up-outline' as const, label: 'Gesundheitstrends & Berichte' },
     { icon: 'notifications-outline' as const, label: 'Intelligente Erinnerungen' },
   ];
 
@@ -33,7 +33,7 @@ export function ProfileScreen({ navigation }: ProfileScreenProps) {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
@@ -143,7 +143,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 60,
     paddingBottom: spacing.md,
   },
   backButton: {

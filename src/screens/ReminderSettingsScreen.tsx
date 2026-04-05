@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card } from '../components';
 import { OverdueRule, OVERDUE_RULE_KEY, DEFAULT_OVERDUE_RULE } from '../hooks/useOverdueSettings';
@@ -19,6 +20,7 @@ const overdueOptions: { id: OverdueRule; label: string; description: string }[] 
 ];
 
 export function ReminderSettingsScreen({ navigation }: ReminderSettingsScreenProps) {
+  const insets = useSafeAreaInsets();
   const [selectedRule, setSelectedRule] = useState<OverdueRule>(DEFAULT_OVERDUE_RULE);
 
   useEffect(() => {
@@ -36,7 +38,7 @@ export function ReminderSettingsScreen({ navigation }: ReminderSettingsScreenPro
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
@@ -99,7 +101,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 60,
     paddingBottom: spacing.md,
   },
   backButton: {

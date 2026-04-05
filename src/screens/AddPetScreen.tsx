@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { InputField, Button, SelectField } from '../components';
 import type { SelectFieldOption } from '../components';
@@ -29,6 +30,7 @@ interface AddPetScreenProps {
 }
 
 export function AddPetScreen({ navigation, route }: AddPetScreenProps) {
+  const insets = useSafeAreaInsets();
   const editPet: Pet | undefined = route?.params?.pet;
   const isEditMode = !!editPet;
 
@@ -124,7 +126,7 @@ export function AddPetScreen({ navigation, route }: AddPetScreenProps) {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
@@ -198,7 +200,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   header: {
     flexDirection: 'row', alignItems: 'center',
-    paddingTop: 60, paddingHorizontal: spacing.md, paddingBottom: spacing.md,
+    paddingHorizontal: spacing.md, paddingBottom: spacing.md,
   },
   backButton: { marginRight: spacing.md },
   title: { ...typography.h2, color: colors.text },

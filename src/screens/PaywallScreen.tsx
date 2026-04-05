@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Button } from '../components';
 import { useSubscription } from '../context/SubscriptionContext';
@@ -22,6 +23,7 @@ const proFeatures = [
 export function PaywallScreen({ navigation, route }: PaywallScreenProps) {
   const { togglePro } = useSubscription();
   const feature = route.params?.feature || '';
+  const insets = useSafeAreaInsets();
 
   const handleUpgrade = () => {
     // In production: trigger in-app purchase
@@ -30,7 +32,7 @@ export function PaywallScreen({ navigation, route }: PaywallScreenProps) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top + 12 }]}>
       <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
         <Ionicons name="close" size={28} color={colors.text} />
       </TouchableOpacity>
@@ -77,7 +79,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
     paddingHorizontal: spacing.lg,
-    paddingTop: 60,
   },
   closeButton: {
     alignSelf: 'flex-end',

@@ -3,6 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { InputField, Button } from '../components';
 import { useVetContact } from '../context/VetContactContext';
@@ -14,6 +15,7 @@ interface AddVetContactScreenProps {
 }
 
 export function AddVetContactScreen({ navigation, route }: AddVetContactScreenProps) {
+  const insets = useSafeAreaInsets();
   const { vetContact, saveVetContact } = useVetContact();
   const isEditing = !!vetContact && !route?.params?.forceNew;
   const existing = isEditing ? vetContact : null;
@@ -51,7 +53,7 @@ export function AddVetContactScreen({ navigation, route }: AddVetContactScreenPr
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
@@ -115,7 +117,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 60,
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.md,
   },

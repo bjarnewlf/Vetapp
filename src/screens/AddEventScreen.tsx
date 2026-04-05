@@ -3,6 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { InputField, Button, Card, SelectField } from '../components';
 import type { SelectFieldOption } from '../components';
@@ -30,6 +31,7 @@ const eventTypes = [
 const recurrenceOptions: RecurrenceType[] = ['Once', 'Weekly', 'Monthly', 'Yearly', 'Custom'];
 
 export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
+  const insets = useSafeAreaInsets();
   const { isPro } = useSubscription();
   const { pets } = usePets();
   const { addMedicalEvent, addReminder, updateReminder, updateMedicalEvent } = useMedical();
@@ -239,7 +241,7 @@ export function AddEventScreen({ navigation, route }: AddEventScreenProps) {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity onPress={handleBack} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
@@ -376,7 +378,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 60,
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.sm,
   },

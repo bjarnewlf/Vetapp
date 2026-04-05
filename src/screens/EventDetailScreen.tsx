@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, TextInput } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card, Button, StatusBadge } from '../components';
 import { usePets } from '../context/PetContext';
@@ -21,6 +22,7 @@ function formatDate(dateStr: string): string {
 }
 
 export function EventDetailScreen({ navigation, route }: EventDetailScreenProps) {
+  const insets = useSafeAreaInsets();
   const { eventId } = route.params;
   const { pets } = usePets();
   const { reminders, completeReminder, updateReminder } = useMedical();
@@ -32,7 +34,7 @@ export function EventDetailScreen({ navigation, route }: EventDetailScreenProps)
   if (!event) {
     return (
       <View style={styles.container}>
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
             <Ionicons name="arrow-back" size={24} color={colors.text} />
           </TouchableOpacity>
@@ -185,7 +187,6 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingTop: 60,
     paddingBottom: spacing.md,
   },
   backButton: {

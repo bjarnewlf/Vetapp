@@ -5,6 +5,30 @@
 
 ---
 
+## Aktuelle Uebergabe (2026-04-05 — Developer)
+
+**Agent:** Developer
+**Auftrag:** SafeArea — hardcodiertes `paddingTop: 60` durch `useSafeAreaInsets()` ersetzen
+
+### Erledigt
+
+- **`App.tsx`** — `SafeAreaProvider` aus `react-native-safe-area-context` hinzugefuegt, wrappt alle Provider
+- **12 Screens** — `paddingTop: 60` entfernt, `useSafeAreaInsets()` Hook eingebaut, inline `paddingTop: insets.top + 12` gesetzt:
+  - `HomeScreen.tsx`, `MyPetsScreen.tsx`, `RemindersScreen.tsx`, `VetContactScreen.tsx`
+  - `ProfileScreen.tsx`, `PaywallScreen.tsx`, `AddPetScreen.tsx`, `AddEventScreen.tsx`
+  - `AddReminderScreen.tsx`, `AddVetContactScreen.tsx`, `EventDetailScreen.tsx`, `ReminderSettingsScreen.tsx`
+
+### Offene Punkte
+
+- Kein `paddingTop: 60` mehr in den genannten Dateien (geprueft)
+- PetDetailScreen und AIAssistantScreen wurden nicht angefasst (Auftrag)
+
+### Naechster Schritt
+
+QA-Durchlauf auf echtem Geraet (iPhone 15+) empfohlen — besonders Header-Abstaende auf Dynamic Island pruefen.
+
+---
+
 ## Erinnerungen von Claas
 
 - **Duplikat loeschen:** `D:\Agency-Vault\Learnings\Alle Dokumente nach Arbeit aktualisieren.md` — Claas manuell loeschen

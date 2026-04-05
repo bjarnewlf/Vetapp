@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { AuthProvider } from './src/context/AuthContext';
 import { PetProvider } from './src/context/PetContext';
 import { MedicalProvider } from './src/context/MedicalContext';
@@ -16,6 +17,7 @@ export default function App() {
   }, []);
 
   return (
+    <SafeAreaProvider>
     <AuthProvider>
       <PetProvider>
         <MedicalProvider>
@@ -28,5 +30,6 @@ export default function App() {
         </MedicalProvider>
       </PetProvider>
     </AuthProvider>
+    </SafeAreaProvider>
   );
 }

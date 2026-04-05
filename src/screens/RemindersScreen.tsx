@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable, Alert, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Button, StatusBadge, ErrorBanner, EmptyState } from '../components';
 import { useMedical } from '../context/MedicalContext';
@@ -18,6 +19,7 @@ const REMINDER_HORIZON_DAYS = 30;
 export function RemindersScreen({ navigation }: RemindersScreenProps) {
   const { reminders, completeReminder, error: medicalError, refresh: refreshMedical } = useMedical();
   const { rule: overdueRule, loaded: settingsLoaded } = useOverdueSettings();
+  const insets = useSafeAreaInsets();
   const pendingIds = useRef<Set<string>>(new Set());
   // Permanente Blacklist: verhindert dass abgehakte Items nach Context-Refresh
   // kurz wieder auftauchen. Wird bewusst nie geleert (Screen-Lebensdauer).
@@ -153,7 +155,7 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Erinnerungen</Text>
+      <Text style={[styles.title, { paddingTop: insets.top + 12 }]}>Erinnerungen</Text>
       {medicalError && <ErrorBanner onRetry={refreshMedical} />}
       <View style={styles.content}>
         <Button
@@ -193,7 +195,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   title: {
     ...typography.h1, color: colors.text,
-    paddingHorizontal: spacing.md, paddingTop: 60, paddingBottom: spacing.md,
+    paddingHorizontal: spacing.md, paddingBottom: spacing.md,
   },
   content: { flex: 1, paddingHorizontal: spacing.md },
   addButton: { marginBottom: spacing.md },

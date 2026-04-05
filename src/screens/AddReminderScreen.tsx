@@ -3,6 +3,7 @@ import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity, Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing } from '../theme';
 import { InputField, Button, SelectField } from '../components';
 import type { SelectFieldOption } from '../components';
@@ -19,6 +20,7 @@ interface AddReminderScreenProps {
 }
 
 export function AddReminderScreen({ navigation }: AddReminderScreenProps) {
+  const insets = useSafeAreaInsets();
   const { pets } = usePets();
   const { addReminder } = useMedical();
   const [petId, setPetId] = useState('');
@@ -70,7 +72,7 @@ export function AddReminderScreen({ navigation }: AddReminderScreenProps) {
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 12 }]}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color={colors.text} />
         </TouchableOpacity>
@@ -129,7 +131,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   header: {
     flexDirection: 'row', alignItems: 'center',
-    paddingTop: 60, paddingHorizontal: spacing.md, paddingBottom: spacing.md,
+    paddingHorizontal: spacing.md, paddingBottom: spacing.md,
   },
   backButton: { marginRight: spacing.md },
   headerTitle: { ...typography.h2, color: colors.text },

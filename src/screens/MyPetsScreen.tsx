@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Button } from '../components';
 import { usePets } from '../context/PetContext';
@@ -14,6 +15,7 @@ interface MyPetsScreenProps {
 
 export function MyPetsScreen({ navigation }: MyPetsScreenProps) {
   const { pets } = usePets();
+  const insets = useSafeAreaInsets();
 
   const renderPet = ({ item }: { item: Pet }) => (
     <TouchableOpacity
@@ -39,7 +41,7 @@ export function MyPetsScreen({ navigation }: MyPetsScreenProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Meine Tiere</Text>
+      <Text style={[styles.title, { paddingTop: insets.top + 12 }]}>Meine Tiere</Text>
       <View style={styles.content}>
         <Button
           title="+ Tier hinzufügen"
@@ -70,7 +72,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   title: {
     ...typography.h1, color: colors.primary,
-    paddingHorizontal: spacing.md, paddingTop: 60, paddingBottom: spacing.md,
+    paddingHorizontal: spacing.md, paddingBottom: spacing.md,
   },
   content: { flex: 1, paddingHorizontal: spacing.md },
   addButton: { marginBottom: spacing.md },

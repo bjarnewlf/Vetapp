@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Linking, Alert, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card, Button } from '../components';
 import { useVetContact } from '../context/VetContactContext';
@@ -12,11 +13,12 @@ interface VetContactScreenProps {
 
 export function VetContactScreen({ navigation }: VetContactScreenProps) {
   const { vetContact: vet } = useVetContact();
+  const insets = useSafeAreaInsets();
 
   if (!vet) {
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>Tierarzt</Text>
+        <Text style={[styles.title, { paddingTop: insets.top + 12 }]}>Tierarzt</Text>
         <Card style={{ alignItems: 'center' as const, marginTop: 32 }}>
           <Ionicons name="medkit-outline" size={48} color={colors.textLight} />
           <Text style={{ ...typography.body, color: colors.textLight, marginTop: 8 }}>
@@ -40,7 +42,7 @@ export function VetContactScreen({ navigation }: VetContactScreenProps) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.titleRow}>
+      <View style={[styles.titleRow, { paddingTop: insets.top + 12 }]}>
         <Text style={styles.title}>Tierarzt</Text>
         <TouchableOpacity onPress={() => navigation?.navigate('AddVetContact')}>
           <Ionicons name="create-outline" size={24} color={colors.primary} />
@@ -108,7 +110,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 60,
     paddingBottom: spacing.md,
   },
   title: {

@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { ErrorBanner, EmptyState, AnimatedPressable, PetListRow, TimelineItem } from '../components';
 import { usePets } from '../context/PetContext';
@@ -19,6 +20,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
   const { medicalEvents, reminders, error: medicalError, refresh: refreshMedical } = useMedical();
   const { user } = useAuth();
   const userName = user?.user_metadata?.name;
+  const insets = useSafeAreaInsets();
 
   const fadeIn = useFadeIn(300);
 
@@ -71,7 +73,7 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
         colors={['#1B6B5A', '#2D8A73', '#3AA08A']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
-        style={styles.header}
+        style={[styles.header, { paddingTop: insets.top + 12 }]}
       >
         <View style={styles.headerTopRow}>
           <View style={styles.headerTextGroup}>
@@ -178,7 +180,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   header: {
     paddingHorizontal: spacing.lg,
-    paddingTop: 60, paddingBottom: spacing.lg,
+    paddingBottom: spacing.lg,
     borderBottomLeftRadius: borderRadius.xl, borderBottomRightRadius: borderRadius.xl,
   },
   headerTopRow: {
