@@ -9,7 +9,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 // Für rein-native Deployments kann der CORS-Block vollständig entfernt werden.
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-user-token',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
@@ -90,7 +90,8 @@ serve(async (req: Request) => {
   }
 
   // JWT verifizieren
-  const userToken = req.headers.get('x-user-token');
+  const authHeader = req.headers.get('authorization');
+  const userToken = authHeader?.replace('Bearer ', '') ?? null;
   if (!userToken) {
     return new Response(
       JSON.stringify({ error: 'Nicht autorisiert.' }),
@@ -129,8 +130,11 @@ serve(async (req: Request) => {
     .gte('created_at', oneHourAgo);
 
   if (usageError) {
-    // Fail-open: Bei DB-Fehler Request durchlassen, nur loggen
     console.error('[ai-chat] Rate-Limit-Abfrage fehlgeschlagen:', usageError.message);
+    return new Response(
+      JSON.stringify({ error: 'Rate-Limit-Prüfung fehlgeschlagen. Bitte später erneut versuchen.' }),
+      { status: 503, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   }
 
   if ((usageCount ?? 0) >= 20) {

@@ -88,6 +88,16 @@ create table public.medical_events (
   created_at timestamptz default now()
 );
 
+-- ai_usage: Rate-Limiting für KI-Assistent
+create table public.ai_usage (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references auth.users(id) not null,
+  created_at timestamptz default now() not null
+);
+
+-- Index fuer schnelle Abfragen (user_id + created_at)
+create index if not exists idx_ai_usage_user_created on public.ai_usage(user_id, created_at);
+
 -- Documents table (Pro feature)
 create table public.documents (
   id uuid default gen_random_uuid() primary key,
@@ -101,6 +111,7 @@ create table public.documents (
 );
 
 -- Enable Row Level Security on all tables
+alter table public.ai_usage enable row level security;
 alter table public.profiles enable row level security;
 alter table public.pets enable row level security;
 alter table public.reminders enable row level security;
@@ -150,6 +161,9 @@ create policy "Users can insert own vet contacts" on public.vet_contacts for ins
 create policy "Users can update own vet contacts" on public.vet_contacts for update using (auth.uid() = user_id);
 create policy "Users can delete own vet contacts" on public.vet_contacts for delete using (auth.uid() = user_id);
 
+create policy "Users can insert own usage" on public.ai_usage for insert with check (auth.uid() = user_id);
+create policy "Users can read own usage" on public.ai_usage for select using (auth.uid() = user_id);
+
 -- Function to auto-create profile on signup
 create or replace function public.handle_new_user()
 returns trigger as $$
@@ -164,3 +178,35 @@ $$ language plpgsql security definer;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+-- ============================================
+-- Storage: Bucket pet-documents
+-- ============================================
+-- Bucket muss in Supabase-Konsole als PRIVATE erstellt sein
+-- Pfad-Struktur fuer Dokumente: {userId}/{petId}/{timestamp}_{filename}
+-- Pfad-Struktur fuer Fotos:     pet-photos/{userId}/{petId}.jpg
+-- (storage.foldername(name))[1] ist der erste Pfad-Abschnitt = userId (bei Dokumenten)
+
+-- Users duerfen nur in ihrem eigenen Ordner hochladen
+create policy "Users can upload own documents"
+on storage.objects for insert
+with check (
+  bucket_id = 'pet-documents'
+  and auth.uid()::text = (storage.foldername(name))[1]
+);
+
+-- Users duerfen nur eigene Dokumente lesen
+create policy "Users can read own documents"
+on storage.objects for select
+using (
+  bucket_id = 'pet-documents'
+  and auth.uid()::text = (storage.foldername(name))[1]
+);
+
+-- Users duerfen eigene Dokumente loeschen
+create policy "Users can delete own documents"
+on storage.objects for delete
+using (
+  bucket_id = 'pet-documents'
+  and auth.uid()::text = (storage.foldername(name))[1]
+);

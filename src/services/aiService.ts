@@ -26,12 +26,12 @@ export async function sendChatMessage(
   const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
   if (refreshData?.session) {
     session = refreshData.session;
-    console.log('[aiService] Token refreshed erfolgreich');
+    if (__DEV__) console.log('[aiService] Token refreshed erfolgreich');
   } else {
-    console.warn('[aiService] Refresh fehlgeschlagen:', refreshError?.message, '— versuche getSession()');
+    if (__DEV__) console.warn('[aiService] Refresh fehlgeschlagen:', refreshError?.message, '— versuche getSession()');
     const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
     if (sessionError || !sessionData.session) {
-      console.error('[aiService] Keine aktive Session:', sessionError?.message);
+      if (__DEV__) console.error('[aiService] Keine aktive Session:', sessionError?.message);
       throw new Error('Bitte melde dich erneut an.');
     }
     session = sessionData.session;
@@ -44,8 +44,8 @@ export async function sendChatMessage(
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!}`,
-          'x-user-token': session.access_token,
+          'apikey': process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!,
+          'Authorization': `Bearer ${session.access_token}`,
         },
         body: JSON.stringify({ messages, petContext }),
       }
@@ -53,7 +53,7 @@ export async function sendChatMessage(
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('[aiService] Edge Function Fehler:', response.status, errorText);
+      if (__DEV__) console.error('[aiService] Edge Function Fehler:', response.status, errorText);
       if (response.status === 401) {
         throw new Error('Sitzung abgelaufen. Bitte melde dich erneut an.');
       }
@@ -79,7 +79,7 @@ export async function sendChatMessage(
     if (fetchError instanceof Error && fetchError.message.includes('Fehler ist aufgetreten')) {
       throw fetchError;
     }
-    console.error('[aiService] Netzwerkfehler:', fetchError);
+    if (__DEV__) console.error('[aiService] Netzwerkfehler:', fetchError);
     throw new Error('Keine Internetverbindung. Bitte prüfe deine Verbindung.');
   }
 }

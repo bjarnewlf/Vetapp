@@ -60,7 +60,10 @@
 ### Offen
 
 - notification_id Migration deployen
-- Sicherheits-Findings S-1 bis S-8 (Pre-Go-Live)
+- Sicherheits-Findings S-1, S-5 (noch offen)
+- S-4 erledigt (Developer, 2026-04-05) — Authorization-Header; Edge Function ai-chat muss neu deployed werden
+- S-2, S-7, S-8 erledigt (Developer, 2026-04-05)
+- S-3, S-6 erledigt (Developer, 2026-04-05) — ai_usage + Storage-Policies in supabase-schema.sql
 - Changelog-Automation (DevOps)
 - F-030 Accessibility (Backlog)
 

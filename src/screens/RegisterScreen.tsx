@@ -21,6 +21,11 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
       Alert.alert('Fehlende Angaben', 'Bitte alle Felder ausfüllen.');
       return;
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      Alert.alert('Ungültige E-Mail', 'Bitte gib eine gültige E-Mail-Adresse ein.');
+      return;
+    }
     if (password.length < 6) {
       Alert.alert('Passwort zu kurz', 'Bitte mindestens 6 Zeichen verwenden.');
       return;
