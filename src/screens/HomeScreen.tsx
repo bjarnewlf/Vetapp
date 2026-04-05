@@ -1,17 +1,17 @@
-import React, { useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Animated } from 'react-native';
+import React, { useMemo } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, typography, spacing, borderRadius } from '../theme';
-import { Card, ErrorBanner, EmptyState, AnimatedPressable } from '../components';
+import { ErrorBanner, EmptyState, AnimatedPressable, PetListRow, TimelineItem } from '../components';
 import { usePets } from '../context/PetContext';
 import { useMedical } from '../context/MedicalContext';
 import { useAuth } from '../context/AuthContext';
-import { animalTypeDisplayLabels } from '../types';
 import { useFadeIn } from '../hooks/useFadeIn';
+import type { CompositeTabStackNavProp } from '../types/navigation';
 
 interface HomeScreenProps {
-  navigation: any;
+  navigation: CompositeTabStackNavProp<'Home'>;
 }
 
 export function HomeScreen({ navigation }: HomeScreenProps) {
@@ -19,20 +19,51 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
   const { medicalEvents, reminders, error: medicalError, refresh: refreshMedical } = useMedical();
   const { user } = useAuth();
   const userName = user?.user_metadata?.name;
-  const overdueReminders = reminders.filter(r => r.status === 'overdue');
-  const nextReminder = reminders.find(r => r.status === 'upcoming');
 
   const fadeIn = useFadeIn(300);
 
-  const pulseScale = useRef(new Animated.Value(1)).current;
-  useEffect(() => {
-    if (overdueReminders.length > 0) {
-      Animated.sequence([
-        Animated.timing(pulseScale, { toValue: 1.03, duration: 200, useNativeDriver: true }),
-        Animated.spring(pulseScale, { toValue: 1, useNativeDriver: true, speed: 14, bounciness: 10 }),
-      ]).start();
-    }
-  }, [overdueReminders.length]);
+  const timelineItems = useMemo(() => {
+    const items: {
+      id: string;
+      date: string;
+      title: string;
+      petId?: string;
+      type: 'reminder' | 'vaccination' | 'deworming' | 'checkup' | 'custom';
+      isOverdue: boolean;
+    }[] = [];
+
+    reminders
+      .filter(r => r.status !== 'completed')
+      .forEach(r => items.push({
+        id: r.id,
+        date: r.date,
+        title: r.title,
+        petId: r.petId,
+        type: 'reminder' as const,
+        isOverdue: r.status === 'overdue',
+      }));
+
+    medicalEvents
+      .filter(e => e.nextDate)
+      .forEach(e => items.push({
+        id: e.id,
+        date: e.nextDate!,
+        title: e.name,
+        petId: e.petId,
+        type: e.type,
+        isOverdue: false,
+      }));
+
+    return items
+      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .slice(0, 3);
+  }, [reminders, medicalEvents]);
+
+  const petNameMap = useMemo(() => {
+    const map = new Map<string, string>();
+    pets.forEach(p => map.set(p.id, p.name));
+    return map;
+  }, [pets]);
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -58,126 +89,66 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
       </LinearGradient>
 
       <Animated.View style={{ opacity: fadeIn, flex: 1 }}>
-      <View style={styles.body}>
-        {petsError && <ErrorBanner onRetry={refreshPets} />}
-        {medicalError && <ErrorBanner onRetry={refreshMedical} />}
-        {overdueReminders.length > 0 && (
-          <Animated.View style={{ transform: [{ scale: pulseScale }] }}>
-          <Card style={styles.overdueCard}>
-            <View style={styles.overdueHeader}>
-              <Ionicons name="alert-circle" size={22} color={colors.error} />
-              <Text style={styles.overdueTitle}>
-                {overdueReminders.length} überfällige Erinnerung{overdueReminders.length !== 1 ? 'en' : ''}
-              </Text>
+        <View style={styles.body}>
+          {petsError && <ErrorBanner onRetry={refreshPets} />}
+          {medicalError && <ErrorBanner onRetry={refreshMedical} />}
+
+          {/* Pet-Sektion */}
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Meine Tiere</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('AddPet')}>
+              <Text style={styles.addLink}>+ Tier hinzufügen</Text>
+            </TouchableOpacity>
+          </View>
+
+          {pets.length === 0 ? (
+            <EmptyState
+              emoji="🐾"
+              title="Noch keine Haustiere"
+              subtitle="Füge dein erstes Tier hinzu und behalte die Gesundheit im Blick."
+              actionLabel="Tier hinzufügen"
+              onAction={() => navigation.navigate('AddPet')}
+            />
+          ) : (
+            <View style={styles.petList}>
+              {pets.map(pet => (
+                <PetListRow
+                  key={pet.id}
+                  pet={pet}
+                  onPress={() => navigation.navigate('PetDetail', { petId: pet.id })}
+                />
+              ))}
             </View>
-            {overdueReminders.slice(0, 3).map(r => (
-              <TouchableOpacity
-                key={r.id}
-                style={styles.overdueItem}
-                onPress={() => navigation.navigate('EventDetail', { eventId: r.id })}
-                activeOpacity={0.7}
-              >
-                <Text style={styles.overdueItemTitle}>{r.title}</Text>
-                <Text style={styles.overdueItemDate}>
-                  {new Date(r.date).toLocaleDateString('de-DE', { day: 'numeric', month: 'short' })}
-                </Text>
+          )}
+
+          {/* Timeline-Sektion */}
+          <View style={styles.timelineSection}>
+            <View style={styles.timelineHeader}>
+              <Text style={styles.sectionTitle}>Nächste Termine</Text>
+              <TouchableOpacity onPress={() => navigation.navigate('Reminders')}>
+                <Text style={styles.addLink}>Alle</Text>
               </TouchableOpacity>
-            ))}
-            {overdueReminders.length > 3 && (
-              <Text style={styles.overdueMore}>+{overdueReminders.length - 3} weitere</Text>
+            </View>
+
+            {timelineItems.length === 0 ? (
+              <Text style={styles.timelineEmpty}>Keine anstehenden Termine</Text>
+            ) : (
+              timelineItems.map(item => (
+                <TimelineItem
+                  key={item.id}
+                  date={item.date}
+                  title={item.title}
+                  petName={item.petId ? petNameMap.get(item.petId) : undefined}
+                  type={item.type}
+                  isOverdue={item.isOverdue}
+                  onPress={() => navigation.navigate('Reminders')}
+                />
+              ))
             )}
-          </Card>
-          </Animated.View>
-        )}
-
-        {nextReminder && (
-          <Card style={styles.reminderCard}>
-            <View style={styles.reminderRow}>
-              <View style={styles.reminderIcon}>
-                <Ionicons name="notifications-outline" size={22} color={colors.warning} />
-              </View>
-              <View style={styles.reminderContent}>
-                <Text style={styles.reminderLabel}>Nächste Erinnerung</Text>
-                <Text style={styles.reminderTitle}>{nextReminder.title}</Text>
-                <View style={styles.dateRow}>
-                  <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
-                  <Text style={styles.reminderDate}>
-                    {new Date(nextReminder.date).toLocaleDateString('de-DE', {
-                      day: 'numeric', month: 'short', year: 'numeric',
-                    })}
-                  </Text>
-                </View>
-              </View>
-            </View>
-          </Card>
-        )}
-
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Meine Tiere</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('AddPet')}>
-            <Text style={styles.addLink}>+ Tier hinzufügen</Text>
-          </TouchableOpacity>
-        </View>
-
-        {pets.length === 0 ? (
-          <EmptyState
-            emoji="🐾"
-            title="Noch keine Haustiere"
-            subtitle="Füge dein erstes Tier hinzu und behalte die Gesundheit im Blick."
-            actionLabel="Tier hinzufügen"
-            onAction={() => navigation.navigate('AddPet')}
-          />
-        ) : (
-          <View style={styles.petsGrid}>
-            {pets.map(pet => (
-              <AnimatedPressable
-                key={pet.id}
-                style={styles.petCard}
-                onPress={() => navigation.navigate('PetDetail', { petId: pet.id })}
-              >
-                {pet.photo ? (
-                  <Image source={{ uri: pet.photo }} style={styles.petImage} />
-                ) : (
-                  <View style={styles.petImagePlaceholder}>
-                    <Ionicons
-                      name={pet.type === 'Dog' ? 'paw' : 'paw-outline'}
-                      size={40}
-                      color={colors.primary}
-                    />
-                  </View>
-                )}
-                <Text style={styles.petName}>{pet.name}</Text>
-                <Text style={styles.petType}>{animalTypeDisplayLabels[pet.type]}</Text>
-              </AnimatedPressable>
-            ))}
           </View>
-        )}
 
-        <Card style={styles.statsCard}>
-          <Text style={styles.statsTitle}>Übersicht</Text>
-          <View style={styles.statsRow}>
-            <View style={styles.statItem}>
-              <Text style={[styles.statNumber, { color: colors.primary }]}>{pets.length}</Text>
-              <Text style={styles.statLabel}>Tiere</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={[styles.statNumber, { color: colors.primary }]}>{medicalEvents.filter(e => e.type === 'vaccination').length}</Text>
-              <Text style={styles.statLabel}>Impfungen</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={[styles.statNumber, { color: colors.primary }]}>{medicalEvents.filter(e => e.type !== 'vaccination').length}</Text>
-              <Text style={styles.statLabel}>Behandlungen</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={[styles.statNumber, { color: colors.primary }]}>
-                {reminders.filter(r => r.status !== 'completed').length}
-              </Text>
-              <Text style={styles.statLabel}>Erinnerungen</Text>
-            </View>
-          </View>
-        </Card>
-
-        <AnimatedPressable onPress={() => navigation.navigate('AI')} style={styles.aiCardNew}>
+          {/* KI-Card */}
+          <AnimatedPressable onPress={() => navigation.navigate('AI')} style={styles.aiCardNew}>
             <View style={styles.aiTopRow}>
               <View style={styles.aiIconContainer}>
                 <Ionicons name="sparkles" size={22} color="#FFFFFF" />
@@ -196,8 +167,8 @@ export function HomeScreen({ navigation }: HomeScreenProps) {
                 <Ionicons name="arrow-forward-outline" size={18} color="#1B6B5A" />
               </View>
             </View>
-        </AnimatedPressable>
-      </View>
+          </AnimatedPressable>
+        </View>
       </Animated.View>
     </ScrollView>
   );
@@ -228,55 +199,33 @@ const styles = StyleSheet.create({
   greeting: { ...typography.h1, color: colors.textOnPrimary },
   welcomeText: { ...typography.bodySmall, color: colors.textOnPrimary, opacity: 0.85, marginTop: 4 },
   body: { padding: spacing.md },
-  overdueCard: { marginBottom: spacing.md, backgroundColor: colors.errorLight },
-  overdueHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.sm },
-  overdueTitle: { ...typography.label, color: colors.error, flex: 1 },
-  overdueItem: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingVertical: 6, borderTopWidth: 1, borderTopColor: colors.errorLight,
-  },
-  overdueItemTitle: { ...typography.bodySmall, color: colors.text, flex: 1 },
-  overdueItemDate: { ...typography.caption, color: colors.error },
-  overdueMore: { ...typography.caption, color: colors.error, marginTop: spacing.sm },
-  reminderCard: { marginBottom: spacing.md },
-  reminderRow: { flexDirection: 'row', alignItems: 'center' },
-  reminderIcon: {
-    width: 44, height: 44, borderRadius: 22, backgroundColor: colors.warningLight,
-    alignItems: 'center', justifyContent: 'center', marginRight: spacing.md,
-  },
-  reminderContent: { flex: 1 },
-  reminderLabel: { ...typography.caption, color: colors.textSecondary },
-  reminderTitle: { ...typography.label, color: colors.text, marginTop: 2 },
-  dateRow: { flexDirection: 'row', alignItems: 'center', marginTop: 4, gap: 4 },
-  reminderDate: { ...typography.caption, color: colors.textSecondary },
   sectionHeader: {
-    flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    marginBottom: spacing.md, marginTop: spacing.sm,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.md,
+    marginTop: spacing.sm,
   },
   sectionTitle: { ...typography.h2, color: colors.text },
   addLink: { ...typography.label, color: colors.primary },
-  petsGrid: { flexDirection: 'row', gap: spacing.md, marginBottom: spacing.lg, flexWrap: 'wrap' },
-  petCard: {
-    flex: 1, minWidth: 140, backgroundColor: colors.surface, borderRadius: borderRadius.lg,
-    padding: spacing.md, shadowColor: colors.cardShadow, shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1, shadowRadius: 8, elevation: 2,
+  petList: {
+    marginBottom: spacing.lg,
   },
-  petImage: {
-    width: '100%', aspectRatio: 1.3, borderRadius: borderRadius.md, marginBottom: spacing.sm,
+  timelineSection: {
+    marginBottom: spacing.lg,
   },
-  petImagePlaceholder: {
-    width: '100%', aspectRatio: 1.3, backgroundColor: colors.primaryLight,
-    borderRadius: borderRadius.md, alignItems: 'center', justifyContent: 'center',
-    marginBottom: spacing.sm,
+  timelineHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: spacing.md,
   },
-  petName: { ...typography.h3, color: colors.text },
-  petType: { ...typography.bodySmall, color: colors.textSecondary },
-  statsCard: { marginBottom: spacing.lg },
-  statsTitle: { ...typography.h3, color: colors.text, marginBottom: spacing.md },
-  statsRow: { flexDirection: 'row', justifyContent: 'space-around' },
-  statItem: { alignItems: 'center' },
-  statNumber: { ...typography.stat },
-  statLabel: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
+  timelineEmpty: {
+    ...typography.caption,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    paddingVertical: spacing.md,
+  },
   aiCardNew: {
     backgroundColor: '#E8F5F1',
     borderWidth: 1.5,

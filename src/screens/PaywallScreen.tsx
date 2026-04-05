@@ -4,10 +4,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Button } from '../components';
 import { useSubscription } from '../context/SubscriptionContext';
+import type { RootStackNavProp, RootStackRouteProp } from '../types/navigation';
 
 interface PaywallScreenProps {
-  navigation: any;
-  route: any;
+  navigation: RootStackNavProp<'Paywall'>;
+  route: RootStackRouteProp<'Paywall'>;
 }
 
 const proFeatures = [

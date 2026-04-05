@@ -11,10 +11,11 @@ import { useMedical } from '../context/MedicalContext';
 import { parseGermanDate } from '../utils/petHelpers';
 import { useSubscription } from '../context/SubscriptionContext';
 import { RecurrenceType, MedicalEventType, recurrenceDisplayLabels } from '../types';
+import type { RootStackNavProp, RootStackRouteProp } from '../types/navigation';
 
 interface AddEventScreenProps {
-  navigation: any;
-  route: any;
+  navigation: RootStackNavProp<'AddEvent'>;
+  route: RootStackRouteProp<'AddEvent'>;
 }
 
 type Step = 'select-pet' | 'select-type' | 'config';

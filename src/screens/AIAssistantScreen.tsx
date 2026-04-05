@@ -22,9 +22,10 @@ import { sendChatMessage, buildPetContext, ChatMessage } from '../services/aiSer
 import { usePets } from '../context/PetContext';
 import { useMedical } from '../context/MedicalContext';
 import { useSubscription } from '../context/SubscriptionContext';
+import type { CompositeTabStackNavProp } from '../types/navigation';
 
 interface AIAssistantScreenProps {
-  navigation: any;
+  navigation: CompositeTabStackNavProp<'AI'>;
 }
 
 interface LocalMessage extends ChatMessage {

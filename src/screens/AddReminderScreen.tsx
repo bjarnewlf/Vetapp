@@ -10,11 +10,12 @@ import { RecurrenceType, recurrenceDisplayLabels } from '../types';
 import { usePets } from '../context/PetContext';
 import { useMedical } from '../context/MedicalContext';
 import { parseGermanDate } from '../utils/petHelpers';
+import type { RootStackNavProp } from '../types/navigation';
 
 const recurrenceOptions: RecurrenceType[] = ['Once', 'Weekly', 'Monthly', 'Yearly', 'Custom'];
 
 interface AddReminderScreenProps {
-  navigation: any;
+  navigation: RootStackNavProp<'AddReminder'>;
 }
 
 export function AddReminderScreen({ navigation }: AddReminderScreenProps) {

@@ -8,20 +8,22 @@
 
 Phase 2 (MVP-Entwicklung) ist inhaltlich abgeschlossen. Handy-Test laeuft — erste Flows erfolgreich, restliche noch offen.
 
-### Was funktioniert (auf echtem iPhone verifiziert ✅)
+**Mehrere Brian-Instanzen aktiv** — tasks.md ist die Koordinationsdatei.
 
-- Auth (Supabase) ✅
-- Haustier-CRUD inkl. Bearbeiten und **Foto-Upload** ✅ (FormData, Storage-Policy korrigiert)
-- Gesundheits-Events (MedicalEvent-Modell) — Impfungen, Entwurmungen, Checkups, freie Eintraege ✅
+### Was funktioniert (auf echtem iPhone verifiziert)
+
+- Auth (Supabase)
+- Haustier-CRUD inkl. Bearbeiten und **Foto-Upload** (FormData, Storage-Policy korrigiert)
+- Gesundheits-Events (MedicalEvent-Modell) — Impfungen, Entwurmungen, Checkups, freie Eintraege
 - MedicalEvent-Editing — alle Events editierbar
 - **Error-Handling** — CRUD-Methoden geben boolean zurueck, Screens pruefen vor goBack()
-- Erinnerungen mit Ueberfaellig-Erkennung + **einstellbare Regeln** ✅
-- **Erinnerung abhaken** mit Slide-Out-Animation + Optimistic Update ✅
+- Erinnerungen mit Ueberfaellig-Erkennung + **einstellbare Regeln**
+- **Erinnerung abhaken** — Fix implementiert (Nested Touchables + Race Condition), in Test auf Handy
 - Dokumente mit Storage (Pro-Funktion)
 - Tierarzt-Kontakte, Profil-Screen, Paywall-Screen
-- KI-Gesundheitsassistent ✅ — Eigener Tab, Edge Function deployed, Rate Limiting
+- KI-Gesundheitsassistent — Eigener Tab, Edge Function deployed, Rate Limiting
 - Error-Banner-Komponente — sichtbares Feedback bei DB-Fehlern
-- **Navigation** zwischen Tabs fluessig ✅
+- **Navigation** zwischen Tabs fluessig
 
 ### Design-System
 
@@ -41,24 +43,24 @@ Phase 2 (MVP-Entwicklung) ist inhaltlich abgeschlossen. Handy-Test laeuft — er
 - Scale-Feedback auf Pet-Cards und AI-Card
 - Tab-Slide-Indikator in PetDetailScreen
 - Pulse auf Ueberfaellig-Banner
-- **Slide-Out + Fade** beim Erinnerung-Abhaken (neu)
+- **Slide-Out + Fade** beim Erinnerung-Abhaken (gefixt: separate Pressables statt nested Touchables)
 - Hilfsdateien: `useFadeIn.ts`, `AnimatedPressable.tsx`
 
 ---
 
-## Letzte Aenderungen (04.04.2026 Abend)
+## Letzte Aenderungen (05.04.2026 Vormittag)
 
-- **Package-Versionen** auf Expo 54 kompatibel (AsyncStorage v2.2.0, etc.)
-- **Foto-Upload** gefixt: FormData statt fetch+blob, Storage-Policy [2] statt [1]
-- **Slide-Out-Animation** beim Erinnerung-Abhaken
-- Sicherheitsanalyse: 8 Findings dokumentiert
+- **Erinnerungen abhaken Bug gefixt:** Nested TouchableOpacity aufgeloest (View + 2x Pressable), activeReminders-Filter beruecksichtigt pendingIds fuer saubere Animation, accessibilityState ergaenzt
+- **QA-Findings gefixt:** QA-026, QA-029, QA-031
+- **TypeScript:** 0 Fehler
 
 ---
 
 ## Offene Punkte
 
 ### Handy-Test (fortsetzen)
-- Restliche Flows: Hero-Banner, Tier bearbeiten, Event bearbeiten/loeschen, Dokument, Tierarzt, Gradient
+- Erinnerungen-Fix auf Handy bestaetigen (ST-04)
+- Tierarzt-Kontakt testen
 - Bugs sammeln und fixen
 - Alte Tabellen `vaccinations`/`treatments` nach Test droppen
 
@@ -95,6 +97,7 @@ Phase 2 (MVP-Entwicklung) ist inhaltlich abgeschlossen. Handy-Test laeuft — er
 - Animationen: `useFadeIn`, `AnimatedPressable`, Slide-Out in RemindersScreen
 - `useNativeDriver: true` — nur opacity und transform, kein backgroundColor
 - **Package-Versionen**: Immer `npx expo install --check` vor Handy-Test
+- **RemindersScreen:** Karte = View, Content = Pressable, Checkbox = Pressable (keine nested Touchables!)
 
 ---
 
@@ -110,4 +113,4 @@ Phase 2 (MVP-Entwicklung) ist inhaltlich abgeschlossen. Handy-Test laeuft — er
 Agency-Vault in `D:\Agency-Vault\` — ~85+ vernetzte Notizen. Agency.md ist zentraler Hub.
 
 ---
-Zuletzt aktualisiert: 2026-04-04 Abend
+Zuletzt aktualisiert: 2026-04-05 Vormittag

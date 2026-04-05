@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VetApp Sicherheitsbericht — 04.04.2026</title>
+<style>
+  :root {
+    --teal: #2A9D8F;
+    --teal-light: #E8F5F3;
+    --orange: #CC6B3D;
+    --orange-light: #FFF3ED;
+    --red: #D94F4F;
+    --red-light: #FFF0F0;
+    --yellow: #C49B2E;
+    --yellow-light: #FFFBE6;
+    --green: #4CAF50;
+    --green-light: #F0FAF0;
+    --bg: #FAFAF8;
+    --text: #1A1A1A;
+    --text-muted: #6B7280;
+    --border: #E5E7EB;
+    --card: #FFFFFF;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    border-bottom: 3px solid var(--red);
+    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  header h1 {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--red);
+  }
+
+  header .meta {
+    text-align: right;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+
+  .summary {
+    background: var(--red-light);
+    border-left: 4px solid var(--red);
+    padding: 1.25rem 1.5rem;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 2rem;
+    font-size: 0.95rem;
+  }
+
+  .summary strong { color: var(--red); }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    text-align: center;
+  }
+
+  .stat-card .number {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .stat-card .label {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 0.25rem;
+  }
+
+  .stat-card.red .number { color: var(--red); }
+  .stat-card.orange .number { color: var(--orange); }
+  .stat-card.yellow .number { color: var(--yellow); }
+  .stat-card.teal .number { color: var(--teal); }
+
+  h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  .section {
+    margin-bottom: 2.5rem;
+  }
+
+  .finding {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem;
+    border-left: 5px solid transparent;
+  }
+
+  .finding:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+
+  .finding.critical { border-left-color: var(--red); background: var(--red-light); }
+  .finding.high     { border-left-color: var(--orange); background: var(--orange-light); }
+  .finding.medium   { border-left-color: var(--yellow); background: var(--yellow-light); }
+  .finding.low      { border-left-color: var(--teal); background: var(--teal-light); }
+
+  .finding-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .finding-title {
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .badge {
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .badge-critical { background: var(--red); color: white; }
+  .badge-high     { background: var(--orange); color: white; }
+  .badge-medium   { background: var(--yellow); color: white; }
+  .badge-low      { background: var(--teal); color: white; }
+
+  .finding-file {
+    font-size: 0.78rem;
+    font-family: 'Consolas', 'Monaco', monospace;
+    color: var(--text-muted);
+    background: rgba(0,0,0,0.05);
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    margin-bottom: 0.75rem;
+  }
+
+  .finding-body {
+    font-size: 0.88rem;
+    color: var(--text);
+    line-height: 1.65;
+  }
+
+  .finding-body p {
+    margin-bottom: 0.5rem;
+  }
+
+  .finding-body p:last-child {
+    margin-bottom: 0;
+  }
+
+  pre {
+    background: rgba(0,0,0,0.06);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    font-size: 0.8rem;
+    font-family: 'Consolas', 'Monaco', monospace;
+    overflow-x: auto;
+    margin: 0.75rem 0;
+    line-height: 1.5;
+  }
+
+  .fix-box {
+    background: rgba(42, 157, 143, 0.1);
+    border: 1px solid rgba(42, 157, 143, 0.3);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin-top: 0.75rem;
+    font-size: 0.85rem;
+  }
+
+  .fix-box strong {
+    color: var(--teal);
+    display: block;
+    margin-bottom: 0.3rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .matrix {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+    background: var(--card);
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-bottom: 2rem;
+  }
+
+  .matrix th {
+    background: #F3F4F6;
+    font-weight: 600;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .matrix td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+
+  .matrix tr:last-child td { border-bottom: none; }
+  .matrix tr:hover td { background: var(--bg); }
+
+  .matrix td:first-child { font-weight: 600; font-size: 0.85rem; }
+
+  .matrix td code {
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.78rem;
+    background: rgba(0,0,0,0.05);
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  .decisions {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .decisions h3 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    color: var(--orange);
+    font-weight: 700;
+  }
+
+  .decisions ul {
+    list-style: none;
+    font-size: 0.9rem;
+  }
+
+  .decisions li {
+    padding: 0.45rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .decisions li:last-child { border-bottom: none; }
+
+  .decisions li::before {
+    content: "→";
+    color: var(--orange);
+    flex-shrink: 0;
+    font-weight: 700;
+  }
+
+  footer {
+    margin-top: 3rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 1rem; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    header { flex-direction: column; gap: 0.25rem; }
+    .finding-header { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔐 VetApp — Sicherheitsbericht</h1>
+  <div class="meta">
+    <div>04. April 2026</div>
+    <div>Erstellt von: Claas' Dev-Agentur</div>
+  </div>
+</header>
+
+<div class="summary">
+  <strong>Zusammenfassung:</strong> Die statische Codeanalyse der VetApp hat <strong>8 Sicherheitslücken</strong> identifiziert — darunter eine kritische, die vor dem Production-Release zwingend behoben werden muss: Jeder eingeloggte User kann sich selbst ohne Bezahlvorgang auf den Pro-Status setzen. Alle weiteren Findings betreffen Backend-Konfiguration, Rate-Limiting und kleinere Frontend-Validierungen.
+</div>
+
+<div class="stats">
+  <div class="stat-card red">
+    <div class="number">1</div>
+    <div class="label">Kritisch</div>
+  </div>
+  <div class="stat-card orange">
+    <div class="number">2</div>
+    <div class="label">Hoch</div>
+  </div>
+  <div class="stat-card yellow">
+    <div class="number">3</div>
+    <div class="label">Mittel</div>
+  </div>
+  <div class="stat-card teal">
+    <div class="number">2</div>
+    <div class="label">Niedrig</div>
+  </div>
+</div>
+
+<!-- ÜBERSICHTS-TABELLE -->
+<div class="section">
+  <h2>Übersicht</h2>
+  <table class="matrix">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Schwere</th>
+        <th>Problem</th>
+        <th>Datei(en)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>1</td>
+        <td><span class="badge badge-critical">Kritisch</span></td>
+        <td>Premium-Bypass ohne Kaufverifizierung</td>
+        <td><code>SubscriptionContext.tsx</code>, <code>PaywallScreen.tsx</code></td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td><span class="badge badge-high">Hoch</span></td>
+        <td>Rate-Limit Fail-Open in Edge Function</td>
+        <td><code>ai-chat/index.ts</code></td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td><span class="badge badge-high">Hoch</span></td>
+        <td><code>ai_usage</code>-Tabelle fehlt im Schema (keine RLS)</td>
+        <td><code>supabase-schema.sql</code></td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td><span class="badge badge-medium">Mittel</span></td>
+        <td>Anon Key als Authorization-Header</td>
+        <td><code>aiService.ts</code></td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td><span class="badge badge-medium">Mittel</span></td>
+        <td>Signed URLs für Dokumente 1 Jahr gültig</td>
+        <td><code>fileUpload.ts</code></td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td><span class="badge badge-medium">Mittel</span></td>
+        <td>Storage-Bucket-Policies nicht im Schema</td>
+        <td><code>supabase-schema.sql</code></td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td><span class="badge badge-low">Niedrig</span></td>
+        <td>Keine E-Mail-Validierung clientseitig</td>
+        <td><code>RegisterScreen.tsx</code></td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td><span class="badge badge-low">Niedrig</span></td>
+        <td>Auth-Logging in Production</td>
+        <td><code>aiService.ts</code></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- KRITISCH -->
+<div class="section">
+  <h2>🔴 Kritisch</h2>
+
+  <div class="finding critical">
+    <div class="finding-header">
+      <div class="finding-title">1 — Premium-Bypass ohne Kaufverifizierung</div>
+      <span class="badge badge-critical">Kritisch</span>
+    </div>
+    <div class="finding-file">src/context/SubscriptionContext.tsx · src/screens/PaywallScreen.tsx</div>
+    <div class="finding-body">
+      <p>Die Funktion <code>togglePro()</code> schreibt <code>is_premium = true</code> direkt in die Datenbank — ohne jeden Bezahlnachweis. Die PaywallScreen ruft diese Funktion unmittelbar beim Tap auf "Jetzt upgraden" auf, ohne eine echte In-App-Purchase-Transaktion auszulösen oder einen Receipt zu validieren.</p>
+      <pre>// SubscriptionContext.tsx
+const togglePro = async () => {
+  const newValue = !isPro;
+  setIsPro(newValue);
+  await supabase.from('profiles')
+    .update({ is_premium: newValue }) // ← direkt in DB schreiben
+    .eq('id', user.id);
+};
+
+// PaywallScreen.tsx
+const handleUpgrade = () => {
+  togglePro(); // ← kein IAP, kein Receipt
+  navigation.goBack();
+};</pre>
+      <p>Da die RLS-Policy für <code>profiles</code> dem User erlaubt, sein eigenes Profil zu updaten, kann jeder eingeloggte User sich kostenlos auf Pro setzen — entweder über die UI oder direkt per API-Call.</p>
+      <div class="fix-box">
+        <strong>Empfohlener Fix</strong>
+        Echtes In-App-Purchase über <code>expo-iap</code> (oder RevenueCat) integrieren. <code>is_premium</code> darf nur serverseitig (Edge Function) nach erfolgreicher Purchase-Verification gesetzt werden — nie direkt vom Client. Die RLS-Policy für <code>profiles UPDATE</code> sollte das Schreiben von <code>is_premium</code> explizit verbieten.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HOCH -->
+<div class="section">
+  <h2>🟠 Hoch</h2>
+
+  <div class="finding high">
+    <div class="finding-header">
+      <div class="finding-title">2 — Rate-Limit Fail-Open in Edge Function</div>
+      <span class="badge badge-high">Hoch</span>
+    </div>
+    <div class="finding-file">supabase/functions/ai-chat/index.ts · Z. 131–133</div>
+    <div class="finding-body">
+      <p>Wenn die Rate-Limit-Abfrage gegen <code>ai_usage</code> einen DB-Fehler wirft, wird der Request bewusst durchgelassen statt geblockt ("Fail-open").</p>
+      <pre>if (usageError) {
+  // Fail-open: Bei DB-Fehler Request durchlassen, nur loggen
+  console.error('[ai-chat] Rate-Limit-Abfrage fehlgeschlagen:', usageError.message);
+}
+// → weiter ohne Limit-Check</pre>
+      <p>Ein Angreifer kann das Rate-Limit systematisch umgehen, wenn er einen Zustand erzeugt, in dem die DB-Abfrage konstant fehlschlägt (z.B. Tabelle nicht vorhanden, Timeout, falsche RLS). Das öffnet die Tür für unkontrollierte Kosten über die Anthropic API.</p>
+      <div class="fix-box">
+        <strong>Empfohlener Fix</strong>
+        Auf Fail-closed wechseln: Bei <code>usageError</code> den Request mit HTTP 429 oder 503 ablehnen, nicht durchlassen. Alternativ: In-Memory-Fallback-Counter als zweite Absicherung.
+      </div>
+    </div>
+  </div>
+
+  <div class="finding high">
+    <div class="finding-header">
+      <div class="finding-title">3 — <code>ai_usage</code>-Tabelle fehlt im Schema</div>
+      <span class="badge badge-high">Hoch</span>
+    </div>
+    <div class="finding-file">supabase-schema.sql</div>
+    <div class="finding-body">
+      <p>Die Edge Function setzt eine Tabelle <code>ai_usage</code> voraus (für Rate-Limiting und Usage-Tracking), die jedoch komplett fehlt in <code>supabase-schema.sql</code>. Ohne Tabellendefinition gibt es auch keine Row Level Security-Policies dafür.</p>
+      <p>Mögliche Konsequenzen: Die Tabelle existiert in der Produktionsdatenbank ohne RLS → alle User können gegenseitig Rate-Limit-Einträge lesen und manipulieren. Oder sie existiert gar nicht → Rate-Limiting greift nie (Fail-open, siehe Finding 2).</p>
+      <div class="fix-box">
+        <strong>Empfohlener Fix</strong>
+        Tabellendefinition und RLS-Policies in <code>supabase-schema.sql</code> ergänzen:<br><br>
+        <code>CREATE TABLE public.ai_usage (id uuid DEFAULT gen_random_uuid() PRIMARY KEY, user_id uuid REFERENCES auth.users ON DELETE CASCADE NOT NULL, created_at timestamptz DEFAULT now());</code><br><br>
+        RLS aktivieren + Policy: User kann nur eigene Zeilen sehen/einfügen.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MITTEL -->
+<div class="section">
+  <h2>🟡 Mittel</h2>
+
+  <div class="finding medium">
+    <div class="finding-header">
+      <div class="finding-title">4 — Anon Key als Authorization-Header</div>
+      <span class="badge badge-medium">Mittel</span>
+    </div>
+    <div class="finding-file">src/services/aiService.ts · Z. 46–48</div>
+    <div class="finding-body">
+      <p>Der HTTP-Call an die Edge Function schickt den öffentlichen Supabase Anon Key im <code>Authorization</code>-Header, während der echte User-JWT als Custom-Header <code>x-user-token</code> mitgeliefert wird.</p>
+      <pre>headers: {
+  'Authorization': `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!}`, // ← Anon Key
+  'x-user-token': session.access_token,  // ← User-JWT als Custom-Header
+}</pre>
+      <p>Das ist unkonventionell. Standard bei Supabase Edge Functions ist, den User-JWT direkt als Bearer Token zu verwenden. Das aktuelle Pattern macht den Code schwerer verständlich und könnte bei zukünftigen Änderungen zu Fehlkonfigurationen führen.</p>
+      <div class="fix-box">
+        <strong>Empfohlener Fix</strong>
+        <code>Authorization: Bearer &lt;session.access_token&gt;</code> verwenden und den <code>x-user-token</code>-Custom-Header entfernen. Die Edge Function dann über <code>req.headers.get('authorization')</code> den JWT holen.
+      </div>
+    </div>
+  </div>
+
+  <div class="finding medium">
+    <div class="finding-header">
+      <div class="finding-title">5 — Signed URLs für Dokumente mit 1-Jahr-Gültigkeit</div>
+      <span class="badge badge-medium">Mittel</span>
+    </div>
+    <div class="finding-file">src/utils/fileUpload.ts · Z. 84–87</div>
+    <div class="finding-body">
+      <p>Beim Upload eines Dokuments wird direkt eine Signed URL mit 365-Tage-Gültigkeit generiert und in der Datenbank gespeichert. Zum Vergleich: Pet-Fotos bekommen 1 Stunde.</p>
+      <pre>createSignedUrl(path, 60 * 60 * 24 * 365); // ← 365 Tage</pre>
+      <p>Eine einmal geleakte URL (Clipboard, Screenshot, Log) bleibt ein Jahr lang gültig — ohne Authentifizierung, direkt abrufbar. Gerade bei medizinischen Dokumenten (Befunde, Impfpässe) ist das ein erhöhtes Risiko.</p>
+      <div class="fix-box">
+        <strong>Empfohlener Fix</strong>
+        Signed URLs nicht persistieren, sondern on-demand generieren (wie bereits bei Pet-Fotos gemacht). Gültigkeitsdauer auf max. 24–48 Stunden reduzieren.
+      </div>
+    </div>
+  </div>
+
+  <div class="finding medium">
+    <div class="finding-header">
+      <div class="finding-title">6 — Storage-Bucket-Policies nicht im Schema definiert</div>
+      <span class="badge badge-medium">Mittel</span>
+    </div>
+    <div class="finding-file">supabase-schema.sql</div>
+    <div class="finding-body">
+      <p>Das Schema definiert RLS für alle Datenbanktabellen, aber keine Bucket-Policies für den <code>pet-documents</code>-Storage-Bucket. Wenn dieser Bucket in der Supabase-Konsole auf "Public" gesetzt ist, sind alle hochgeladenen Dokumente und Fotos öffentlich per direkter URL zugänglich — unabhängig von der Datenbankzugriffskontrolle.</p>
+      <div class="fix-box">
+        <strong>Empfohlener Fix</strong>
+        Bucket als <strong>privat</strong> konfigurieren und Storage-Policies im Schema dokumentieren (z.B. als Kommentar-Block mit den SQL-Statements). Bucket-Policy: User darf nur Dateien unter seinem eigenen <code>userId/</code>-Pfad lesen/schreiben.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NIEDRIG -->
+<div class="section">
+  <h2>🔵 Niedrig</h2>
+
+  <div class="finding low">
+    <div class="finding-header">
+      <div class="finding-title">7 — Keine E-Mail-Validierung clientseitig</div>
+      <span class="badge badge-low">Niedrig</span>
+    </div>
+    <div class="finding-file">src/screens/RegisterScreen.tsx · Z. 20–27</div>
+    <div class="finding-body">
+      <p>Die Registrierung prüft nur ob die Felder nicht leer sind und das Passwort ≥ 6 Zeichen hat. Ein Regex-Check auf das E-Mail-Format fehlt — Supabase fängt das zwar serverseitig ab, aber der Fehler kommt erst nach dem API-Call zurück.</p>
+      <div class="fix-box">
+        <strong>Empfohlener Fix</strong>
+        Einfachen E-Mail-Check vor dem API-Call ergänzen: <code>/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)</code>
+      </div>
+    </div>
+  </div>
+
+  <div class="finding low">
+    <div class="finding-header">
+      <div class="finding-title">8 — Auth-Aktivitäten in Production-Logs</div>
+      <span class="badge badge-low">Niedrig</span>
+    </div>
+    <div class="finding-file">src/services/aiService.ts · Z. 29, 31</div>
+    <div class="finding-body">
+      <p>Token-Refresh-Aktivitäten werden geloggt, was in Production-Crash-Logs (z.B. Sentry) sensitiven Kontext erzeugen kann.</p>
+      <pre>console.log('[aiService] Token refreshed erfolgreich');
+console.warn('[aiService] Refresh fehlgeschlagen:', refreshError?.message);</pre>
+      <div class="fix-box">
+        <strong>Empfohlener Fix</strong>
+        Logs in Production-Builds entfernen oder hinter ein <code>__DEV__</code>-Flag setzen.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OFFENE FRAGEN FÜR BRIAN -->
+<div class="decisions">
+  <h3>Offene Fragen / Entscheidungsbedarf</h3>
+  <ul>
+    <li>IAP-Integration: Welcher Anbieter? <strong>expo-iap</strong> (nativ) oder <strong>RevenueCat</strong> (managed)? RevenueCat wäre einfacher zu implementieren und zu warten.</li>
+    <li>Soll <code>is_premium</code> in der RLS-Policy explizit gegen Client-Writes gesperrt werden, oder reicht es, den togglePro-Flow zu ersetzen?</li>
+    <li>Signed URLs für Dokumente: Werden diese URLs irgendwo außerhalb des App-States persistiert (Push Notifications, E-Mails)? Das beeinflusst die Strategie.</li>
+    <li>Ist der <code>pet-documents</code>-Bucket aktuell public oder private? Bitte in der Supabase-Konsole prüfen.</li>
+    <li>Priorisierung: Sollen alle 8 Findings vor dem nächsten Release angegangen werden oder nur die kritischen/hohen?</li>
+  </ul>
+</div>
+
+<footer>
+  VetApp Sicherheitsbericht · Erstellt 04.04.2026 · Claas' Dev-Agentur · Statische Code-Analyse (kein Penetrationstest)
+</footer>
+
+</body>
+</html>

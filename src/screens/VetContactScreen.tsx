@@ -4,9 +4,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card, Button } from '../components';
 import { useVetContact } from '../context/VetContactContext';
+import type { CompositeTabStackNavProp } from '../types/navigation';
 
 interface VetContactScreenProps {
-  navigation?: any;
+  navigation?: CompositeTabStackNavProp<'Vet Contact'>;
 }
 
 export function VetContactScreen({ navigation }: VetContactScreenProps) {

@@ -7,10 +7,11 @@ import { usePets } from '../context/PetContext';
 import { useMedical } from '../context/MedicalContext';
 import { parseGermanDate } from '../utils/petHelpers';
 import { recurrenceDisplayLabels, animalTypeDisplayLabels } from '../types';
+import type { RootStackNavProp, RootStackRouteProp } from '../types/navigation';
 
 interface EventDetailScreenProps {
-  navigation: any;
-  route: any;
+  navigation: RootStackNavProp<'EventDetail'>;
+  route: RootStackRouteProp<'EventDetail'>;
 }
 
 function formatDate(dateStr: string): string {

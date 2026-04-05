@@ -1,21 +1,25 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert, Linking, ActivityIndicator, Animated } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Alert, Animated, Linking } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import { colors, typography, spacing, borderRadius } from '../theme';
-import { Card, ErrorBanner, EmptyState } from '../components';
+import { Card } from '../components';
 import { usePets } from '../context/PetContext';
 import { useMedical } from '../context/MedicalContext';
 import { useVetContact } from '../context/VetContactContext';
 import { useSubscription } from '../context/SubscriptionContext';
-import { animalTypeDisplayLabels, recurrenceDisplayLabels } from '../types';
+import { animalTypeDisplayLabels } from '../types';
 import { getAge } from '../utils/petHelpers';
 import { supabase } from '../lib/supabase';
+import type { RootStackNavProp, RootStackRouteProp } from '../types/navigation';
+import { PetHealthTab } from './pet/PetHealthTab';
+import { PetDocumentsTab } from './pet/PetDocumentsTab';
+import { PetVetTab } from './pet/PetVetTab';
 
 interface PetDetailScreenProps {
-  navigation: any;
-  route: any;
+  navigation: RootStackNavProp<'PetDetail'>;
+  route: RootStackRouteProp<'PetDetail'>;
 }
 
 type DetailTab = 'vaccinations' | 'documents' | 'vet';
@@ -74,7 +78,6 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
   const treatments = allMedicalEvents.filter(e => e.petId === petId && e.type !== 'vaccination');
   const reminders = allReminders.filter(r => r.petId === petId);
   const petDocuments = allDocuments.filter(d => d.petId === petId);
-  const vet = vetContact;
 
   const handlePickDocument = async () => {
     const result = await DocumentPicker.getDocumentAsync({
@@ -156,6 +159,14 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
     ]);
   };
 
+  const handleTabPress = (tab: DetailTab, proFlag: boolean, isProFeature?: boolean) => {
+    if (isProFeature && !proFlag) {
+      navigation.navigate('Paywall', { feature: 'documents' });
+      return;
+    }
+    setActiveTab(tab);
+  };
+
   if (!pet) {
     return (
       <ScrollView style={styles.container}>
@@ -183,14 +194,6 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
       </ScrollView>
     );
   }
-
-  const handleTabPress = (tab: DetailTab, isPro: boolean, isProFeature?: boolean) => {
-    if (isProFeature && !isPro) {
-      navigation.navigate('Paywall', { feature: 'documents' });
-      return;
-    }
-    setActiveTab(tab);
-  };
 
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
@@ -220,281 +223,104 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
         </View>
       </LinearGradient>
 
-      {/* Content mit Fade-In (alles unterhalb des Hero-Banners) */}
       <Animated.View style={{ opacity: fadeOpacity }}>
-
-      {/* Pet Information */}
-      <Card style={styles.infoCard}>
-        <Text style={styles.sectionLabel}>TIER-INFORMATIONEN</Text>
-        <View style={styles.infoRows}>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Tierart</Text>
-            <Text style={styles.infoValue}>{animalTypeDisplayLabels[pet.type]}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Alter</Text>
-            <Text style={styles.infoValue}>{getAge(pet.birthDate)}</Text>
-          </View>
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Geburtsdatum</Text>
-            <Text style={styles.infoValue}>{formatDate(pet.birthDate)}</Text>
-          </View>
-          {pet.microchipCode && (
+        {/* Pet Information */}
+        <Card style={styles.infoCard}>
+          <Text style={styles.sectionLabel}>TIER-INFORMATIONEN</Text>
+          <View style={styles.infoRows}>
             <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>Chip-Nr.</Text>
-              <Text style={styles.infoValue}>{pet.microchipCode}</Text>
+              <Text style={styles.infoLabel}>Tierart</Text>
+              <Text style={styles.infoValue}>{animalTypeDisplayLabels[pet.type]}</Text>
             </View>
-          )}
-        </View>
-      </Card>
-
-      {/* Tab Navigation */}
-      <View
-        style={styles.tabBar}
-        onLayout={e => setTabBarWidth(e.nativeEvent.layout.width - 8)}
-      >
-        {/* Animierter Hintergrund-Indikator */}
-        <Animated.View
-          style={[
-            styles.tabIndicator,
-            {
-              width: tabBarWidth / tabCount,
-              transform: [{
-                translateX: tabIndicatorPosition.interpolate({
-                  inputRange: [0, 1, 2],
-                  outputRange: [0, tabBarWidth / tabCount, (tabBarWidth / tabCount) * 2],
-                }),
-              }],
-            },
-          ]}
-        />
-        {tabs.map(tab => (
-          <TouchableOpacity
-            key={tab.id}
-            style={styles.tab}
-            onPress={() => handleTabPress(tab.id, isPro, tab.pro)}
-          >
-            <Ionicons
-              name={tab.icon}
-              size={18}
-              color={activeTab === tab.id ? colors.primary : colors.textSecondary}
-            />
-            <Text style={[styles.tabLabel, activeTab === tab.id && styles.tabLabelActive]}>
-              {tab.label}
-            </Text>
-            {tab.pro && !isPro && (
-              <Ionicons name="lock-closed" size={10} color={colors.accent} />
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Alter</Text>
+              <Text style={styles.infoValue}>{getAge(pet.birthDate)}</Text>
+            </View>
+            <View style={styles.infoRow}>
+              <Text style={styles.infoLabel}>Geburtsdatum</Text>
+              <Text style={styles.infoValue}>{formatDate(pet.birthDate)}</Text>
+            </View>
+            {pet.microchipCode && (
+              <View style={styles.infoRow}>
+                <Text style={styles.infoLabel}>Chip-Nr.</Text>
+                <Text style={styles.infoValue}>{pet.microchipCode}</Text>
+              </View>
             )}
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      {/* Tab Content: Impfungen */}
-      {activeTab === 'vaccinations' && (
-        <View style={styles.tabContent}>
-          {medicalError && <ErrorBanner onRetry={refreshMedical} />}
-          {medicalLoading ? (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" color={colors.primary} />
-              <Text style={styles.loadingText}>Lade Gesundheitsdaten...</Text>
-            </View>
-          ) : (
-          <>
-          {/* Recent Treatments */}
-          <View style={styles.subSectionHeader}>
-            <Text style={styles.subSectionTitle}>Weitere Gesundheitseinträge</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('AddEvent', { petId: pet.id, eventType: 'checkup' })}>
-              <Ionicons name="add" size={22} color={colors.text} />
-            </TouchableOpacity>
           </View>
-          {treatments.length === 0 && (
-            <Text style={styles.emptyText}>Noch keine Behandlungen erfasst</Text>
-          )}
-          {treatments.map(treatment => (
-            <View key={treatment.id} style={[styles.vaccinationCard, styles.vaccinationCardRow]}>
-              <View style={styles.vaccinationCardContent}>
-                <Text style={styles.vaccinationName}>{treatment.name}</Text>
-                <View style={styles.vaccinationRow}>
-                  <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
-                  <Text style={styles.vaccinationDate}>{formatDate(treatment.date)}</Text>
-                </View>
-                {treatment.notes && (
-                  <Text style={styles.vaccinationDate}>{treatment.notes}</Text>
-                )}
-              </View>
-              <View style={styles.cardActions}>
-                <TouchableOpacity onPress={() => navigation.navigate('AddEvent', { petId: pet.id, editMedicalEvent: treatment })}>
-                  <Ionicons name="create-outline" size={18} color={colors.primary} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDeleteTreatment(treatment.id, treatment.name)}>
-                  <Ionicons name="trash-outline" size={18} color={colors.error} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
+        </Card>
 
-          {/* Vaccinations */}
-          <View style={styles.sectionDivider} />
-          <View style={styles.subSectionHeader}>
-            <Text style={styles.subSectionTitle}>Impfungen</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('AddEvent', { petId: pet.id })}>
-              <Ionicons name="add" size={22} color={colors.text} />
-            </TouchableOpacity>
-          </View>
-          {vaccinations.map(vax => (
-            <View key={vax.id} style={[styles.vaccinationCard, styles.vaccinationCardRow]}>
-              <View style={styles.vaccinationCardContent}>
-                <Text style={styles.vaccinationName}>{vax.name}</Text>
-                <View style={styles.vaccinationRow}>
-                  <Ionicons name="calendar-outline" size={14} color={colors.textSecondary} />
-                  <Text style={styles.vaccinationDate}>Verabreicht: {formatDate(vax.date)}</Text>
-                </View>
-                {vax.nextDate && (
-                  <View style={styles.vaccinationRow}>
-                    <Ionicons name="calendar" size={14} color={colors.primary} />
-                    <Text style={[styles.vaccinationDate, { color: colors.primary }]}>
-                      Nächste: {formatDate(vax.nextDate)}
-                    </Text>
-                  </View>
-                )}
-                {vax.recurrenceInterval && (
-                  <View style={styles.vaccinationRow}>
-                    <Ionicons name="repeat" size={14} color={colors.textSecondary} />
-                    <Text style={styles.vaccinationDate}>
-                      {recurrenceDisplayLabels[vax.recurrenceInterval] || vax.recurrenceInterval}
-                    </Text>
-                  </View>
-                )}
-              </View>
-              <View style={styles.cardActions}>
-                <TouchableOpacity onPress={() => navigation.navigate('AddEvent', { petId: pet.id, editMedicalEvent: vax })}>
-                  <Ionicons name="create-outline" size={18} color={colors.primary} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => handleDeleteVaccination(vax.id, vax.name)}>
-                  <Ionicons name="trash-outline" size={18} color={colors.error} />
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
-          {vaccinations.length === 0 && (
-            <EmptyState
-              emoji="💉"
-              title="Noch keine Impfungen"
-              subtitle="Trage die erste Impfung ein."
-              actionLabel="Impfung eintragen"
-              onAction={() => navigation.navigate('AddEvent', { petId: pet.id, eventType: 'vaccination' })}
-            />
-          )}
-
-          {/* Reminders */}
-          <Card style={styles.remindersSection}>
-            <View style={styles.subSectionHeader}>
-              <Text style={styles.sectionLabel}>ERINNERUNGEN</Text>
-              <TouchableOpacity onPress={() => navigation.navigate('AddReminder', { petId })}>
-                <Ionicons name="add" size={22} color={colors.text} />
-              </TouchableOpacity>
-            </View>
-            {reminders.length === 0 ? (
-              <View style={styles.emptyReminders}>
-                <Text style={styles.emptyText}>Keine anstehenden Erinnerungen</Text>
-                <TouchableOpacity onPress={() => navigation.navigate('AddReminder', { petId })}>
-                  <Text style={styles.addReminderLink}>Erinnerung hinzufügen</Text>
-                </TouchableOpacity>
-              </View>
-            ) : (
-              reminders.map(r => (
-                <TouchableOpacity
-                  key={r.id}
-                  style={styles.reminderItem}
-                  onPress={() => navigation.navigate('EventDetail', { eventId: r.id })}
-                >
-                  <Text style={styles.reminderTitle}>{r.title}</Text>
-                  <Text style={styles.reminderDate}>{formatDate(r.date)}</Text>
-                </TouchableOpacity>
-              ))
-            )}
-          </Card>
-          </>
-          )}
-        </View>
-      )}
-
-      {/* Tab Content: Dokumente (Pro) */}
-      {activeTab === 'documents' && isPro && (
-        <View style={styles.tabContent}>
-          <Card>
-            <Text style={styles.sectionLabel}>DOKUMENTE</Text>
-            {petDocuments.length === 0 ? (
-              <Text style={styles.emptyText}>Noch keine Dokumente vorhanden.</Text>
-            ) : (
-              <View style={styles.documentList}>
-                {petDocuments.map(doc => (
-                  <TouchableOpacity key={doc.id} style={styles.documentRow} onPress={() => handleOpenDocument(doc.id, doc.storagePath ?? '')} disabled={openingDocId === doc.id}>
-                    {openingDocId === doc.id ? (
-                      <ActivityIndicator size="small" color={colors.primary} />
-                    ) : (
-                      <Ionicons
-                        name={doc.fileType?.includes('pdf') ? 'document-text-outline' : 'image-outline'}
-                        size={24}
-                        color={colors.primary}
-                      />
-                    )}
-                    <View style={styles.documentInfo}>
-                      <Text style={styles.documentName} numberOfLines={1}>{doc.name}</Text>
-                      <Text style={styles.documentMeta}>
-                        {doc.fileSize ? `${(doc.fileSize / 1024).toFixed(0)} KB` : ''}
-                        {doc.fileType ? ` · ${doc.fileType.split('/')[1]?.toUpperCase()}` : ''}
-                      </Text>
-                    </View>
-                    <TouchableOpacity onPress={() => handleDeleteDocument(doc.id, doc.name)}>
-                      <Ionicons name="trash-outline" size={20} color={colors.error} />
-                    </TouchableOpacity>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-            <TouchableOpacity style={styles.uploadButton} onPress={handlePickDocument} disabled={uploading}>
-              {uploading ? (
-                <ActivityIndicator color={colors.primary} />
-              ) : (
-                <Ionicons name="cloud-upload-outline" size={24} color={colors.primary} />
+        {/* Tab Navigation */}
+        <View
+          style={styles.tabBar}
+          onLayout={e => setTabBarWidth(e.nativeEvent.layout.width - 8)}
+        >
+          <Animated.View
+            style={[
+              styles.tabIndicator,
+              {
+                width: tabBarWidth / tabCount,
+                transform: [{
+                  translateX: tabIndicatorPosition.interpolate({
+                    inputRange: [0, 1, 2],
+                    outputRange: [0, tabBarWidth / tabCount, (tabBarWidth / tabCount) * 2],
+                  }),
+                }],
+              },
+            ]}
+          />
+          {tabs.map(tab => (
+            <TouchableOpacity
+              key={tab.id}
+              style={styles.tab}
+              onPress={() => handleTabPress(tab.id, isPro, tab.pro)}
+            >
+              <Ionicons
+                name={tab.icon}
+                size={18}
+                color={activeTab === tab.id ? colors.primary : colors.textSecondary}
+              />
+              <Text style={[styles.tabLabel, activeTab === tab.id && styles.tabLabelActive]}>
+                {tab.label}
+              </Text>
+              {tab.pro && !isPro && (
+                <Ionicons name="lock-closed" size={10} color={colors.accent} />
               )}
-              <Text style={styles.uploadText}>{uploading ? 'Wird hochgeladen...' : 'Dokument hochladen'}</Text>
             </TouchableOpacity>
-          </Card>
+          ))}
         </View>
-      )}
 
-      {/* Tab Content: Tierarzt */}
-      {activeTab === 'vet' && (
-        <View style={styles.tabContent}>
-          <Card>
-            <Text style={styles.sectionLabel}>ZUGEWIESENER TIERARZT</Text>
-            {!vet ? (
-              <Text style={styles.emptyText}>Noch kein Tierarzt gespeichert</Text>
-            ) : (
-              <>
-            <Text style={styles.vetName}>{vet.name}</Text>
-            <Text style={styles.vetClinic}>{vet.clinic}</Text>
-            <View style={styles.vetInfoRow}>
-              <Ionicons name="call-outline" size={16} color={colors.primary} />
-              <Text style={styles.vetInfoText}>{vet.phone}</Text>
-            </View>
-            <View style={styles.vetInfoRow}>
-              <Ionicons name="mail-outline" size={16} color={colors.primary} />
-              <Text style={styles.vetInfoText}>{vet.email}</Text>
-            </View>
-            <View style={styles.vetInfoRow}>
-              <Ionicons name="location-outline" size={16} color={colors.primary} />
-              <Text style={styles.vetInfoText}>{vet.address}</Text>
-            </View>
-              </>
-            )}
-          </Card>
-        </View>
-      )}
+        {/* Tab Content */}
+        {activeTab === 'vaccinations' && (
+          <PetHealthTab
+            navigation={navigation}
+            petId={petId}
+            vaccinations={vaccinations}
+            treatments={treatments}
+            reminders={reminders}
+            medicalLoading={medicalLoading}
+            medicalError={medicalError}
+            onRefreshMedical={refreshMedical}
+            onDeleteVaccination={handleDeleteVaccination}
+            onDeleteTreatment={handleDeleteTreatment}
+          />
+        )}
 
-      <View style={{ height: 40 }} />
+        {activeTab === 'documents' && isPro && (
+          <PetDocumentsTab
+            petDocuments={petDocuments}
+            uploading={uploading}
+            openingDocId={openingDocId}
+            onPickDocument={handlePickDocument}
+            onOpenDocument={handleOpenDocument}
+            onDeleteDocument={handleDeleteDocument}
+          />
+        )}
+
+        {activeTab === 'vet' && (
+          <PetVetTab vet={vetContact} />
+        )}
+
+        <View style={{ height: 40 }} />
       </Animated.View>
     </ScrollView>
   );
@@ -581,70 +407,7 @@ const styles = StyleSheet.create({
   tabLabel: { ...typography.caption, color: colors.textSecondary, fontWeight: '500' },
   tabLabelActive: { color: colors.primary, fontWeight: '600' },
 
-  // Tab Content
-  tabContent: { paddingHorizontal: spacing.md },
-  subSectionHeader: {
-    flexDirection: 'row', justifyContent: 'space-between',
-    alignItems: 'center', marginBottom: spacing.sm, marginTop: spacing.md,
-  },
-  subSectionTitle: { ...typography.h3, color: colors.text },
-  emptyText: { ...typography.bodySmall, color: colors.textLight },
-  vaccinationCard: {
-    backgroundColor: colors.primaryLight, borderRadius: borderRadius.md,
-    padding: spacing.md, marginTop: spacing.sm, gap: 6,
-  },
-  vaccinationCardRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 0 },
-  cardActions: { flexDirection: 'column', gap: spacing.sm, alignItems: 'center', paddingLeft: spacing.sm },
-  vaccinationCardContent: { flex: 1, gap: 6 },
-  vaccinationName: { ...typography.h3, color: colors.text },
-  vaccinationRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  vaccinationDate: { ...typography.bodySmall, color: colors.textSecondary },
-  sectionDivider: {
-    marginTop: spacing.lg,
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
-  },
-  remindersSection: { marginTop: spacing.md },
-  emptyReminders: { alignItems: 'center', gap: 4 },
-  addReminderLink: { ...typography.bodySmall, color: colors.primary, textDecorationLine: 'underline' },
-  reminderItem: { paddingVertical: spacing.sm, borderBottomWidth: 1, borderBottomColor: colors.borderLight },
-  reminderTitle: { ...typography.label, color: colors.text },
-  reminderDate: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
-
-  // Documents Tab
-  documentList: { gap: spacing.sm, marginBottom: spacing.sm },
-  documentRow: {
-    flexDirection: 'row', alignItems: 'center', gap: spacing.sm,
-    paddingVertical: spacing.sm,
-    borderBottomWidth: 1, borderBottomColor: colors.borderLight,
-  },
-  documentInfo: { flex: 1 },
-  documentName: { ...typography.body, color: colors.text },
-  documentMeta: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
-  uploadButton: {
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
-    gap: spacing.sm, marginTop: spacing.md, paddingVertical: spacing.md,
-    borderWidth: 1, borderStyle: 'dashed', borderColor: colors.primary,
-    borderRadius: borderRadius.md,
-  },
-  uploadText: { ...typography.label, color: colors.primary },
-
-  // Loading
-  loadingContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: spacing.xxl,
-    gap: spacing.sm,
-  },
-  loadingText: { ...typography.bodySmall, color: colors.textSecondary },
-
   // Not Found
   notFoundText: { ...typography.h3, color: colors.text, marginBottom: spacing.sm },
   notFoundSub: { ...typography.bodySmall, color: colors.textSecondary },
-
-  // Vet Tab
-  vetName: { ...typography.h3, color: colors.text },
-  vetClinic: { ...typography.bodySmall, color: colors.textSecondary, marginBottom: spacing.md },
-  vetInfoRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginBottom: spacing.sm },
-  vetInfoText: { ...typography.bodySmall, color: colors.text },
 });

@@ -7,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme';
 import { useAuth } from '../context/AuthContext';
 import { usePets } from '../context/PetContext';
+import type { RootStackParamList, TabParamList } from '../types/navigation';
 import {
   LoginScreen,
   RegisterScreen,
@@ -27,8 +28,8 @@ import {
   AIAssistantScreen,
 } from '../screens';
 
-const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<TabParamList>();
 
 function TabNavigator() {
   return (

@@ -6,10 +6,11 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { InputField, Button } from '../components';
 import { useVetContact } from '../context/VetContactContext';
+import type { RootStackNavProp, RootStackRouteProp } from '../types/navigation';
 
 interface AddVetContactScreenProps {
-  navigation: any;
-  route?: any;
+  navigation: RootStackNavProp<'AddVetContact'>;
+  route?: RootStackRouteProp<'AddVetContact'>;
 }
 
 export function AddVetContactScreen({ navigation, route }: AddVetContactScreenProps) {

@@ -3,7 +3,48 @@
 > Index — Details im Agency-Vault (`D:\Agency-Vault\Learnings\`).
 > Wissensmanager pflegt beides: Vault-Notiz + Einzeiler hier.
 
+## 2026-04-05
+
+- Autonomie Level 3 freigeschaltet — Brian delegiert Standard-Features eigenstaendig, nur bei Architektur/neuen Features Rueckfrage bei Claas
+- Entscheidungen gebuendelt abarbeiten ist effizient — 10 Punkte in einer Runde statt ueber Wochen verteilt
+
+### Stitch — Wie man wirklich gute Designs rausbekommt
+
+**API & Setup:**
+- Stitch SDK authentifiziert ueber `STITCH_API_KEY` als Env-Var — nicht ueber MCP-Config (die ist nur fuer Chat-Interface)
+- Rate-Limit-Workaround: **ein Screen = ein eigenes Projekt** — mehrere Screens im selben Projekt schlagen ab Screen 2 fehl mit "Incomplete API response" (kein sinnvoller Fehlercode, einfach kaputt)
+- API ist v0.1.0 — Breaking Changes einkalkulieren, nie versionspinnen ohne Changelogs zu pruefen
+
+**Prompts — was den Unterschied macht:**
+- **Pixelwerte fuer alles Kritische** — "Hero 260px", "FAB 56px", "Touch-Target 44px minimum" — Stitch nimmt das ernst
+- **Farben als Hex, nie als Namen** — `#1B6B5A` statt "teal", `#FAF6F1` statt "warm off-white"
+- **Layout von oben nach unten, Abschnitt fuer Abschnitt** — kein Fliesstext, sondern nummerierte Liste
+- **Echten Content einsetzen** — "Bella", "Golden Retriever · 3 Jahre", "Flohschutzmittel" statt Placeholder. Stitch rendert was man reinschreibt.
+- **Emotionale Design-Ziele am Anfang** — "warm, premium, trustworthy" VOR den technischen Specs. Beeinflusst den Gesamtstil spuerbar.
+- **Hierarchie explizit beschreiben** — "h1 bold 28px", "grey caption 13px", "PRO pill badge" — Stitch rät sonst selbst und liegt meistens daneben
+- **Whitespace ist ein Befehl** — "generous whitespace", "breathes", "16px between sections" — ohne Anweisung stapelt Stitch gerne alles zusammen
+
+**Iterieren statt einmal perfekt prompten:**
+- `edit_screens` ist der eigentliche Hebel — erst grob generieren, dann gezielt korrigieren: "Make the header gradient darker", "reduce card padding to 12px", "move the FAB 24px from edge"
+- `generate_variants` fuer A/B — zwei Varianten mit unterschiedlicher Hierarchie oder Farbstimmung, dann entscheiden
+- Design-System VOR Screens anlegen (`create_design_system`) — sonst generiert Stitch freie Farben die nicht zum Token-Set passen
+
+**Output verwenden:**
+- HTML-Dateien lokal speichern — Screenshot-URLs (Google CDN) laufen ab
+- HTML ist Referenz fuer **Struktur und Proportionen**, nicht fuer Code — kein `div`, kein `box-shadow` in React Native
+- Alle finalen Werte kommen aus `src/theme/` — nie aus dem Stitch-Output abschreiben
+
 ## 2026-04-04
+- Google Stitch als MCP-Server fuer Design-Prototyping eingerichtet — generiert HTML + Screenshots aus Text-Prompts, Designer nutzt es fuer visuelle Referenzen vor der Developer-Delegation
+- Doku-Updates sofort nach jedem Arbeitsschritt — nicht erst am Ende eines Blocks; Brian traegt jede Delegation, jeden Fix, jeden Fortschritt direkt in handoff.md und tasks.md ein; kleine haeufige Updates statt grosse seltene
+- Mockup-Farben muessen echte App-Farben zeigen — Dark-Theme-Stil (#0f1117) gilt nur fuer Reports/Protokolle, NICHT fuer UI-Mockups; bei Delegation an Designer immer explizit den richtigen Stil angeben
+- Agency Meeting mit allen Spezialisten bringt wertvolle Perspektiven — jeder sieht andere Schmerzpunkte
+- Neue Teammitglieder (DevOps, Researcher) sehen Prozesse mit frischen Augen — sofort nutzbare Verbesserungsvorschlaege
+- Research VOR Feature-Entwicklung spart Sackgassen — nicht reaktiv recherchieren
+- Delegations-Kontext ist der groesste Hebel fuer Effizienz — Template mit Dateien, Rules, Kriterien, Risiko
+- Optimistic-Update-Animation: Animation VOR State-Update starten — sonst verschwindet das Item bevor die Animation sichtbar ist
+- Agency global statt projektspezifisch: Agents in ~/.claude/agents/ + projektspezifischer Kontext aus Repo-Rules — skaliert besser
+- Projekt-Templates sparen Rollout-Zeit: Einheitliche tasks.md, status.md, handoff.md, learnings.md + QA-Rule ermoeglicht schnellen Start
 - AsyncStorage v3 bricht Expo Go (SDK 54) — immer `npx expo install --check` vor Handy-Test, Fix: Downgrade auf v2.2.0
 - Foto-Upload React Native: FormData mit `{ uri, name, type } as any` — fetch+blob funktioniert nicht mit lokalen file:// URIs auf echten Geraeten
 - Storage-Policy Pfad-Segmente: `(storage.foldername(name))[1]` ist 1-basiert — tatsaechlichen Upload-Pfad im Dashboard pruefen bevor Policy geschrieben wird

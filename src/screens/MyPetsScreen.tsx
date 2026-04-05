@@ -6,9 +6,10 @@ import { Button } from '../components';
 import { usePets } from '../context/PetContext';
 import { Pet } from '../types';
 import { getAge } from '../utils/petHelpers';
+import type { CompositeTabStackNavProp } from '../types/navigation';
 
 interface MyPetsScreenProps {
-  navigation: any;
+  navigation: CompositeTabStackNavProp<'My Pets'>;
 }
 
 export function MyPetsScreen({ navigation }: MyPetsScreenProps) {

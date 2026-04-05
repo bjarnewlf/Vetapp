@@ -5,9 +5,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card } from '../components';
 import { OverdueRule, OVERDUE_RULE_KEY, DEFAULT_OVERDUE_RULE } from '../hooks/useOverdueSettings';
+import type { RootStackNavProp } from '../types/navigation';
 
 interface ReminderSettingsScreenProps {
-  navigation: any;
+  navigation: RootStackNavProp<'ReminderSettings'>;
 }
 
 const overdueOptions: { id: OverdueRule; label: string; description: string }[] = [

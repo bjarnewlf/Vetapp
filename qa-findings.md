@@ -5,6 +5,62 @@
 
 ---
 
+## Roadmap-Bericht: Qualitaets- und Sicherheitsstatus — 2026-04-04
+
+### A) Qualitaets-Status
+
+**TypeScript:** `npx tsc --noEmit` — 0 Fehler. Sauber. (Bestaetigt aus Reviews 4 + 5)
+
+**Sicherheits-Findings (aus `sicherheitsbericht-2026-04-04.html`):**
+- 1 Kritisch: Premium-Bypass — `togglePro()` schreibt `is_premium` direkt ohne IAP. Jeder eingeloggte User kann sich kostenlos auf Pro setzen (bestaetigt in `SubscriptionContext.tsx` Z.51-59, kein IAP-Code vorhanden).
+- 2 Hoch: Rate-Limit Fail-Open in Edge Function `ai-chat`; `ai_usage`-Tabelle fehlt im Schema (keine RLS).
+- 3 Mittel: Anon Key als Authorization-Header; Dokument-Signed-URLs 1 Jahr gueltig (auch in `fileUpload.ts` bestaetigt); Storage-Bucket-Policies nicht im Schema.
+- 2 Niedrig: Fehlende E-Mail-Validierung clientseitig; Auth-Logging in Production.
+
+**Zusaetzliche Code-Risiken (aus Code-Reviews):**
+- F-023 (Mittel, offen): Foto-Upload im Onboarding geht an falschen Parameter — stiller Datenverlust.
+- F-022 (Niedrig, offen): Unnoetige Signed-URL-Generierung in `fileUpload.ts` (auch Sicherheits-Finding S-5 betreffend).
+- F-024/F-025 (Niedrig, offen): Param-Name-Mismatch in AddEventScreen; tote Styles in HomeScreen.
+
+---
+
+### B) Was muss vor Go-Live gefixt werden?
+
+**Blocker (Release-kritisch):**
+- S-1 (Kritisch): `togglePro()` durch echtes IAP ersetzen + RLS fuer `profiles.is_premium` gegen Client-Writes sperren. Ohne diesen Fix kann jeder User kostenlos Pro aktivieren.
+
+**Hoch — vor Go-Live umsetzen:**
+- S-2: Rate-Limit Fail-Open -> Fail-Closed in `ai-chat/index.ts` (1 Zeile).
+- S-3: `ai_usage`-Tabelle mit RLS in `supabase-schema.sql` erganzen. Ohne Tabelle greift Rate-Limiting nie.
+
+**Mittel — empfohlen vor Release:**
+- S-4: Authorization-Header auf User-JWT umstellen.
+- S-5: Dokument-URLs on-demand generieren, max 24-48h (auch F-022 loest sich damit).
+- S-6: Storage-Bucket `pet-documents` auf privat pruefen + Policies dokumentieren.
+- F-023: Foto-Param im Onboarding reparieren (2-Zeilen-Fix).
+
+**Niedrig — koennen nach Release folgen:**
+- S-7: E-Mail-Validierung, S-8: Auth-Logging hinter `__DEV__`, F-024, F-025.
+
+---
+
+### C) Test-Abdeckung
+
+**Aktuelle Tests:** Keine. Kein Test-Runner konfiguriert. TypeScript ist einziges Sicherheitsnetz.
+
+**Minimum fuer MVP (Empfehlung):**
+- Unit-Tests: `SubscriptionContext` — sicherstellen dass `togglePro` nach IAP-Implementierung keinen direkten DB-Write mehr macht. Hoechste Prioritaet nach S-1-Fix.
+- Integration-Tests: Supabase-RLS verifizieren — kann User `is_premium` direkt per API-Call setzen? (manuell oder mit `supabase-js` in einem Test-Skript).
+- E2E: Nicht zwingend fuer MVP, aber Happy-Path-Test (Registrierung -> Tier anlegen -> Event erfassen) wuerde Regressions absichern.
+
+**Was nicht testen (fuer MVP):**
+- UI-Snapshots, Animations, Design-Komponenten — kein Mehrwert bei diesem Stack.
+- Vollstaendige Coverage — 3-4 kritische Tests > 80% Coverage auf unwichtigem Code.
+
+**Naechster Schritt:** S-1 (IAP / Premium-Bypass) ist der einzige echte Release-Blocker. Alle anderen Findings sind fix- oder risikokalkuierbar.
+
+---
+
 ## Review 1: MedicalEvent-Migration — 2026-04-04 (ABGESCHLOSSEN)
 
 Alle 8 Findings aus Review 1 wurden bearbeitet. Details unten im Archiv-Abschnitt.
@@ -412,6 +468,67 @@ Flow ist vollstandig: PetDetailScreen -> AddEventScreen (editMedicalEvent-Param)
 Der Code ist stabil. TypeScript sauber. Alle kritischen und mittleren Bugs aus Review 1 und 2 sind gefixt und verifiziert. Verbleibende Findings sind alle niedrig bis mittel, kein Datenverlust, keine Crashes.
 
 Empfehlung: F-011 (docs) und F-010 (toter Import) vor Release als 5-Minuten-Fix erledigen. F-014 ist ein einzelner If-Guard — sinnvoll aber nicht blockierend.
+
+---
+
+## Review 7 — Slide-Out-Animation RemindersScreen (2026-04-04)
+
+### QA-026 — Animation startet NACH DB-Bestätigung, nicht davor
+- **Schwere:** Mittel
+- **Beschreibung:** `completeReminder()` wird in `handleToggle` mit `await` aufgerufen, BEVOR die Slide-Out-Animation startet (Zeile 60 vs. 65). Der optimistische State-Update in `MedicalContext` setzt `status = 'completed'` sofort — dadurch filtert `activeReminders` das Item ggf. aus der FlatList raus bevor die Animation abgespielt werden kann. In der Praxis liegt die Sichtbarkeit der Animation davon ab, wie schnell React den State neu rendert.
+- **Wo:** `src/screens/RemindersScreen.tsx` Z. 59–76; `src/context/MedicalContext.tsx` Z. 185–189
+- **Fix:** Animation ZUERST starten (`.start()` mit Callback), dann `completeReminder()` aufrufen. Pattern: `Animated.parallel([...]).start(() => { completeReminder(id); })`.
+- **Entscheidung:** Offen
+
+### QA-027 — Kein Reduce-Motion-Support
+- **Schwere:** Mittel
+- **Beschreibung:** Die Animation ignoriert die System-Einstellung "Bewegung reduzieren" (iOS: `UIAccessibilityIsReduceMotionEnabled`, Android: `animator duration scale = 0`). React Native bietet `AccessibilityInfo.isReduceMotionEnabled()` / `useReducedMotion()` (Reanimated). Nutzer mit Vestibularis-Störungen oder Epilepsie betroffen.
+- **Wo:** `src/screens/RemindersScreen.tsx` Z. 65–76
+- **Fix:** `AccessibilityInfo.isReduceMotionEnabled()` prüfen; bei `true` Animation überspringen (direkt `opacity.setValue(0)`).
+- **Entscheidung:** Offen
+
+### QA-028 — Memory Leak: Animated.Values akkumulieren ohne Cleanup
+- **Schwere:** Niedrig
+- **Beschreibung:** `animValues` (useRef Map) wird mit jeder Reminder-ID befüllt und nie bereinigt. Abgehakte Erinnerungen bleiben nach `refresh()` als `completed` im State und werden durch `activeReminders`-Filter ausgeblendet — ihre `Animated.Value`-Einträge in der Map aber nie gelöscht. Bei vielen abgehakten Erinnerungen in einer Session wächst die Map unbegrenzt.
+- **Wo:** `src/screens/RemindersScreen.tsx` Z. 21–31
+- **Fix:** Nach erfolgreicher Animation `animValues.current.delete(id)` aufrufen (im `.start()`-Callback).
+- **Entscheidung:** Offen
+
+### QA-029 — Rollback reaktiviert Item ohne sichtbaren Hinweis
+- **Schwere:** Niedrig
+- **Beschreibung:** Bei Netzwerkfehler rollt `MedicalContext` den Status korrekt zurück (Z. 200). Das Item erscheint wieder in der Liste. Die Animated.Values (translateX, opacity) wurden aber bereits auf 120/0 animiert — das Item wäre unsichtbar/verschoben, bis die FlatList neu rendert und frische Values erzeugt. Außerdem zeigt der Screen nur `ErrorBanner`, aber kein spezifisches Feedback für dieses Item.
+- **Wo:** `src/screens/RemindersScreen.tsx` Z. 62–63; `src/context/MedicalContext.tsx` Z. 198–202
+- **Fix:** Im Fehlerfall `opacity.setValue(1)` und `translateX.setValue(0)` zurücksetzen.
+- **Entscheidung:** Offen
+
+### QA-030 — Schnelles Mehrfach-Abhaken: animValues-Kollision möglich
+- **Schwere:** Niedrig
+- **Beschreibung:** `pendingIds` verhindert Doppel-Tap auf dasselbe Item korrekt. Bei mehreren verschiedenen Items gleichzeitig können mehrere Animationen parallel laufen — das ist kein Bug per se. Problematisch: Wenn `refresh()` nach dem ersten abgehakten Item die FlatList neu rendert (Z. 223 in MedicalContext), entstehen neue `getAnimValues()`-Instanzen für Items deren Animation noch läuft und überschreiben die laufende Animation nicht, da die Map gecheckt wird. Kein direkter Bug, aber Verhalten unter Last nicht vollständig abgedeckt.
+- **Wo:** `src/screens/RemindersScreen.tsx` Z. 23–31; `src/context/MedicalContext.tsx` Z. 223
+- **Fix:** Beobachten; falls UI-Glitches auftreten, `refresh()` erst nach Abschluss aller laufenden Animationen triggern.
+- **Entscheidung:** Offen
+
+### QA-031 — accessibilityChecked fehlt am Checkbox
+- **Schwere:** Niedrig
+- **Beschreibung:** `accessibilityRole="checkbox"` ist vorhanden, aber `accessibilityState={{ checked: isCompleted }}` fehlt. Screen-Reader können den aktuellen Zustand nicht kommunizieren.
+- **Wo:** `src/screens/RemindersScreen.tsx` Z. 116–117
+- **Fix:** `accessibilityState={{ checked: isCompleted }}` ergänzen.
+- **Entscheidung:** Offen
+
+### Typ-Check: nicht ausgeführt (kein Code geändert, Review-Only)
+
+### Zusammenfassung
+
+| ID | Schwere | Kurzbeschreibung |
+|---|---|---|
+| QA-026 | Mittel | Animation startet nach DB-Call — Item ggf. bereits aus Liste verschwunden |
+| QA-027 | Mittel | Kein Reduce-Motion-Support |
+| QA-028 | Niedrig | animValues Map ohne Cleanup — Memory Leak |
+| QA-029 | Niedrig | Rollback bei Fehler setzt Animated.Values nicht zurück |
+| QA-030 | Niedrig | Schnelles Mehrfach-Abhaken: Verhalten unter Last unklar |
+| QA-031 | Niedrig | accessibilityState.checked fehlt am Checkbox |
+
+**Naechster Schritt:** QA-026 und QA-027 (beide Mittel) sollten vor Release gefixt werden. QA-026 ist das dringlichste — die Animation ist in der aktuellen Reihenfolge funktional kaputt.
 
 ---
 

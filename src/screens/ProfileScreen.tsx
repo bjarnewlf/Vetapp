@@ -4,7 +4,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../theme';
 import { Card, Button } from '../components';
 import { useAuth } from '../context/AuthContext';
-export function ProfileScreen({ navigation }: { navigation: any }) {
+import type { CompositeStackTabNavProp } from '../types/navigation';
+
+interface ProfileScreenProps {
+  navigation: CompositeStackTabNavProp<'Profile'>;
+}
+
+export function ProfileScreen({ navigation }: ProfileScreenProps) {
   const { user: authUser, signOut } = useAuth();
   const user = {
     name: authUser?.user_metadata?.name || 'User',

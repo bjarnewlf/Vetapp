@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VetApp — Dashboard Redesign Mockup</title>
+  <style>
+    /* -------------------------------------------------------
+       Reset & Base
+    ------------------------------------------------------- */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #13141a;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+      color: #e2e4e9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px 80px;
+      gap: 60px;
+    }
+
+    /* -------------------------------------------------------
+       Design Tokens (VetApp — Light Theme Original)
+    ------------------------------------------------------- */
+    :root {
+      --primary:       #1B6B5A;
+      --primary-dark:  #145244;
+      --primary-mid:   #2D8A73;
+      --primary-light: #E8F5F1;
+      --primary-grad:  #3AA08A;
+      --accent:        #CC6B3D;
+      --accent-light:  #F5D0B9;
+      --bg:            #FAF6F1;
+      --surface:       #FFFFFF;
+      --surface-light: #FFF8F2;
+      --text:          #1A1A1A;
+      --text-secondary:#6B6B6B;
+      --text-light:    #999999;
+      --text-on-primary:#FFFFFF;
+      --border:        #E8E0D8;
+      --border-light:  #F0EBE5;
+      --error:         #D94040;
+      --error-light:   #FDEAEA;
+      --success:       #2E8B57;
+      --success-light: #E8F5EE;
+      --warning:       #D4A020;
+      --warning-light: #FFF8E1;
+      --warning-border:#E8D080;
+      --shadow:        rgba(0,0,0,0.08);
+      /* Spacing */
+      --sp-xs: 4px;  --sp-sm: 8px; --sp-smd: 12px;
+      --sp-md: 16px; --sp-lg: 24px; --sp-xl: 32px;
+      /* Radius */
+      --r-sm: 8px; --r-md: 12px; --r-lg: 16px; --r-xl: 24px;
+    }
+
+    /* -------------------------------------------------------
+       Page Layout
+    ------------------------------------------------------- */
+    .page-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #e2e4e9;
+      letter-spacing: -0.5px;
+      text-align: center;
+    }
+    .page-subtitle {
+      font-size: 15px;
+      color: #8a8d9a;
+      text-align: center;
+      max-width: 640px;
+      line-height: 1.6;
+    }
+
+    /* -------------------------------------------------------
+       Analysis Block
+    ------------------------------------------------------- */
+    .analysis-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      max-width: 900px;
+      width: 100%;
+    }
+    .analysis-card {
+      background: #1a1d2e;
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid #2a2d3e;
+    }
+    .analysis-card h3 {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+    .analysis-card.problems h3 { color: #e05050; }
+    .analysis-card.good h3     { color: #2E8B57; }
+    .analysis-card.concept h3  { color: #CC6B3D; }
+    .analysis-card.hierarchy h3 { color: #7b8cde; }
+    .analysis-card ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .analysis-card li {
+      font-size: 14px;
+      color: #c4c7d4;
+      line-height: 1.5;
+      display: flex;
+      gap: 10px;
+    }
+    .analysis-card li .bullet { flex-shrink: 0; margin-top: 1px; }
+    .analysis-card.problems li .bullet { color: #e05050; }
+    .analysis-card.good li .bullet     { color: #2E8B57; }
+    .analysis-card.concept li .bullet  { color: #CC6B3D; }
+    .analysis-card.hierarchy li .bullet { color: #7b8cde; }
+
+    /* -------------------------------------------------------
+       Phone Frame
+    ------------------------------------------------------- */
+    .phones-row {
+      display: flex;
+      gap: 48px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .phone-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+    .phone-label {
+      font-size: 13px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #8a8d9a;
+    }
+    .phone-frame {
+      width: 390px;
+      height: 844px;
+      background: var(--bg);
+      border-radius: 52px;
+      border: 10px solid #2a2d3e;
+      overflow: hidden;
+      position: relative;
+      box-shadow:
+        0 0 0 1px #1a1d2e,
+        0 40px 80px rgba(0,0,0,0.6),
+        inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    /* Status bar notch */
+    .phone-frame::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 126px; height: 34px;
+      background: #2a2d3e;
+      border-radius: 0 0 22px 22px;
+      z-index: 100;
+    }
+    .screen {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: var(--bg);
+      scrollbar-width: none;
+    }
+    .screen::-webkit-scrollbar { display: none; }
+
+    /* -------------------------------------------------------
+       CURRENT SCREEN — components
+    ------------------------------------------------------- */
+    .current-header {
+      background: linear-gradient(135deg, #1B6B5A, #2D8A73, #3AA08A);
+      padding: 64px 20px 20px;
+      border-radius: 0 0 24px 24px;
+    }
+    .current-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .h1 { font-size: 28px; font-weight: 700; color: #fff; }
+    .body-sm-white { font-size: 14px; color: rgba(255,255,255,0.85); margin-top: 4px; }
+    .icon-btn {
+      width: 44px; height: 44px;
+      border-radius: 22px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(255,255,255,0.15);
+      font-size: 20px; cursor: pointer;
+    }
+    .body { padding: 16px; }
+
+    .card {
+      background: var(--surface);
+      border-radius: var(--r-lg);
+      padding: var(--sp-md);
+      box-shadow: 0 2px 8px var(--shadow);
+      margin-bottom: var(--sp-md);
+    }
+    .card-error { background: var(--error-light); }
+    .card-warning { background: var(--warning-light); }
+
+    .overdue-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+    .overdue-icon { font-size: 18px; }
+    .overdue-title { font-size: 14px; font-weight: 600; color: var(--error); }
+    .overdue-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 6px 0; border-top: 1px solid var(--error-light);
+    }
+    .overdue-item-name { font-size: 13px; color: var(--text); }
+    .overdue-item-date { font-size: 11px; color: var(--error); }
+
+    .reminder-row { display: flex; align-items: center; gap: 12px; }
+    .reminder-icon-circle {
+      width: 44px; height: 44px; border-radius: 22px;
+      background: var(--warning-light);
+      display: flex; align-items: center; justify-content: center; font-size: 20px;
+    }
+    .reminder-label { font-size: 12px; color: var(--text-secondary); }
+    .reminder-title { font-size: 14px; font-weight: 600; color: var(--text); margin-top: 2px; }
+    .reminder-date  { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; margin-top: 4px; }
+    .section-title { font-size: 22px; font-weight: 700; color: var(--text); }
+    .add-link { font-size: 14px; font-weight: 600; color: var(--primary); }
+
+    .pets-grid { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .pet-card {
+      flex: 1; min-width: 140px; background: var(--surface);
+      border-radius: var(--r-lg); padding: var(--sp-md);
+      box-shadow: 0 2px 8px var(--shadow);
+    }
+    .pet-image {
+      width: 100%; aspect-ratio: 1.3;
+      border-radius: var(--r-md);
+      background: linear-gradient(135deg, #c8e6e0, #b2d8d0);
+      margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px;
+    }
+    .pet-name { font-size: 18px; font-weight: 600; color: var(--text); }
+    .pet-type { font-size: 13px; color: var(--text-secondary); }
+
+    .stats-card { margin-bottom: 20px; }
+    .stats-title { font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 12px; }
+    .stats-row { display: flex; justify-content: space-around; }
+    .stat-item { text-align: center; }
+    .stat-number { font-size: 24px; font-weight: 700; color: var(--primary); line-height: 1; }
+    .stat-label { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+
+    .ai-card-current {
+      background: var(--primary-light);
+      border: 1.5px solid #B8DDD4;
+      border-radius: var(--r-lg);
+      padding: var(--sp-md);
+      margin-bottom: var(--sp-md);
+    }
+    .ai-top-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+    .ai-icon {
+      width: 44px; height: 44px; border-radius: var(--r-md);
+      background: var(--primary); display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .ai-title-text { font-size: 16px; font-weight: 600; color: var(--primary-dark); }
+    .ai-subtitle-text { font-size: 13px; color: var(--primary); margin-top: 2px; }
+    .ai-cta-row { display: flex; justify-content: space-between; align-items: center; }
+    .pro-badge {
+      background: var(--primary); border-radius: 999px;
+      padding: 3px 8px; font-size: 9px; font-weight: 800;
+      letter-spacing: 1px; color: #fff;
+    }
+    .ai-cta-link { font-size: 14px; font-weight: 600; color: var(--primary-dark); }
+
+    /* Scroll indicator for current */
+    .scroll-hint {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-light);
+      padding: 8px;
+      font-style: italic;
+    }
+
+    /* -------------------------------------------------------
+       NEW SCREEN — Redesign
+    ------------------------------------------------------- */
+    .new-header {
+      background: linear-gradient(160deg, #1B6B5A 0%, #145244 100%);
+      padding: 52px 20px 16px;
+    }
+    .new-header-top {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .greeting-small { font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 500; }
+    .greeting-name  { font-size: 22px; font-weight: 700; color: #fff; margin-top: 2px; }
+
+    /* Alert pill inside header */
+    .alert-pill {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(217,64,64,0.2);
+      border: 1px solid rgba(217,64,64,0.4);
+      border-radius: 999px;
+      padding: 5px 12px;
+      font-size: 12px; font-weight: 600; color: #ff8a8a;
+      margin-bottom: 14px;
+    }
+
+    /* Pet strip — horizontal scroll */
+    .pet-strip-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.8px; color: rgba(255,255,255,0.6);
+      margin-bottom: 8px;
+    }
+    .pet-strip {
+      display: flex; gap: 10px; overflow-x: auto;
+      padding-bottom: 4px; scrollbar-width: none;
+    }
+    .pet-chip {
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(255,255,255,0.12);
+      border-radius: 999px;
+      padding: 6px 12px 6px 6px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .pet-chip-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(255,255,255,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; overflow: hidden;
+    }
+    .pet-chip-avatar img {
+      width: 100%; height: 100%; object-fit: cover; border-radius: 50%;
+    }
+    .pet-chip-name { font-size: 13px; font-weight: 600; color: #fff; }
+    .pet-chip-status {
+      width: 7px; height: 7px; border-radius: 50%;
+      margin-left: 2px;
+    }
+    .pet-chip-status.ok      { background: #4cd97a; }
+    .pet-chip-status.warning { background: #D4A020; }
+    .pet-chip-status.overdue { background: #D94040; }
+
+    /* Body new */
+    .new-body { padding: 16px; background: var(--bg); }
+
+    /* Quick action row */
+    .quick-row {
+      display: flex; gap: 8px; margin-bottom: 16px;
+    }
+    .quick-btn {
+      flex: 1; background: var(--surface);
+      border-radius: var(--r-md);
+      padding: 12px 8px;
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      box-shadow: 0 2px 8px var(--shadow);
+      cursor: pointer;
+    }
+    .quick-btn-icon { font-size: 22px; }
+    .quick-btn-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-align: center; line-height: 1.3; }
+
+    /* Urgency section */
+    .urgency-card {
+      background: var(--error-light);
+      border: 1px solid #f0b0b0;
+      border-radius: var(--r-lg);
+      padding: var(--sp-smd) var(--sp-md);
+      margin-bottom: var(--sp-md);
+    }
+    .urgency-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .urgency-title { font-size: 13px; font-weight: 700; color: var(--error); text-transform: uppercase; letter-spacing: 0.5px; }
+    .urgency-item {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 0;
+      border-top: 1px solid rgba(217,64,64,0.12);
+    }
+    .urgency-item-left { display: flex; align-items: center; gap: 10px; }
+    .urgency-pet-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--primary); flex-shrink: 0;
+    }
+    .urgency-item-name { font-size: 14px; font-weight: 600; color: var(--text); }
+    .urgency-item-meta { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+    .urgency-date { font-size: 12px; font-weight: 600; color: var(--error); }
+
+    /* Upcoming section */
+    .next-card {
+      background: var(--surface);
+      border-radius: var(--r-lg);
+      padding: var(--sp-md);
+      box-shadow: 0 2px 8px var(--shadow);
+      margin-bottom: var(--sp-md);
+    }
+    .next-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .next-title { font-size: 16px; font-weight: 700; color: var(--text); }
+    .next-link { font-size: 12px; font-weight: 600; color: var(--primary); }
+    .next-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0;
+      border-top: 1px solid var(--border-light);
+    }
+    .next-item:first-of-type { border-top: none; padding-top: 0; }
+    .next-date-block {
+      width: 44px; height: 44px; border-radius: var(--r-sm);
+      background: var(--warning-light);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .next-date-day   { font-size: 16px; font-weight: 800; color: var(--warning); line-height: 1; }
+    .next-date-month { font-size: 9px;  font-weight: 600; color: var(--warning); text-transform: uppercase; letter-spacing: 0.5px; }
+    .next-item-info { flex: 1; }
+    .next-item-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .next-item-pet   { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+    .next-item-badge {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      padding: 3px 7px; border-radius: 999px;
+    }
+    .badge-vaccination { background: var(--primary-light); color: var(--primary); }
+    .badge-checkup     { background: #e8eef8; color: #3a5fa8; }
+    .badge-deworming   { background: var(--warning-light); color: #a07000; }
+
+    /* Health summary */
+    .summary-card {
+      background: var(--surface);
+      border-radius: var(--r-lg);
+      padding: var(--sp-md);
+      box-shadow: 0 2px 8px var(--shadow);
+      margin-bottom: var(--sp-md);
+    }
+    .summary-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .summary-title { font-size: 16px; font-weight: 700; color: var(--text); }
+    .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .summary-cell {
+      background: var(--surface-light);
+      border-radius: var(--r-md); padding: 12px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .summary-cell-icon {
+      width: 36px; height: 36px; border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .icon-bg-primary { background: var(--primary-light); }
+    .icon-bg-warning { background: var(--warning-light); }
+    .icon-bg-success { background: var(--success-light); }
+    .icon-bg-accent  { background: var(--accent-light); }
+    .summary-cell-val { font-size: 20px; font-weight: 800; color: var(--text); line-height: 1; }
+    .summary-cell-lbl { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+
+    /* Recent events */
+    .recent-card {
+      background: var(--surface);
+      border-radius: var(--r-lg);
+      padding: var(--sp-md);
+      box-shadow: 0 2px 8px var(--shadow);
+      margin-bottom: var(--sp-md);
+    }
+    .recent-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .recent-title  { font-size: 16px; font-weight: 700; color: var(--text); }
+    .recent-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 9px 0; border-top: 1px solid var(--border-light);
+    }
+    .recent-item:first-of-type { border-top: none; padding-top: 0; }
+    .event-dot {
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 2px;
+    }
+    .dot-vaccination { background: var(--primary); }
+    .dot-checkup     { background: #3a5fa8; }
+    .dot-deworming   { background: var(--warning); }
+    .dot-other       { background: var(--accent); }
+    .recent-event-title { font-size: 14px; font-weight: 600; color: var(--text); }
+    .recent-event-sub   { font-size: 12px; color: var(--text-secondary); margin-top: 1px; }
+    .recent-event-date  { font-size: 12px; color: var(--text-light); flex-shrink: 0; }
+
+    /* AI card new design */
+    .new-ai-card {
+      background: linear-gradient(135deg, #145244 0%, #1B6B5A 60%, #2D8A73 100%);
+      border-radius: var(--r-lg);
+      padding: var(--sp-md);
+      margin-bottom: var(--sp-md);
+      position: relative; overflow: hidden;
+    }
+    .new-ai-card::before {
+      content: '✦';
+      position: absolute; top: -10px; right: -10px;
+      font-size: 80px; opacity: 0.06; color: #fff;
+    }
+    .new-ai-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .new-ai-icon {
+      width: 40px; height: 40px; border-radius: var(--r-md);
+      background: rgba(255,255,255,0.15);
+      display: flex; align-items: center; justify-content: center; font-size: 20px;
+    }
+    .new-ai-title   { font-size: 16px; font-weight: 700; color: #fff; }
+    .new-ai-sub     { font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 2px; }
+    .new-ai-prompt-hint {
+      background: rgba(255,255,255,0.1);
+      border-radius: var(--r-sm); padding: 10px 14px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .new-ai-hint-text { font-size: 13px; color: rgba(255,255,255,0.75); font-style: italic; }
+    .new-ai-hint-arrow { font-size: 16px; color: rgba(255,255,255,0.9); }
+    .new-ai-footer { display: flex; justify-content: flex-end; margin-top: 10px; }
+    .new-pro-badge {
+      background: var(--accent); border-radius: 999px;
+      padding: 3px 10px; font-size: 9px; font-weight: 800;
+      letter-spacing: 1px; color: #fff;
+    }
+
+    /* Tab bar */
+    .tab-bar {
+      position: sticky; bottom: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-around; align-items: center;
+      padding: 10px 0 20px;
+    }
+    .tab-item {
+      display: flex; flex-direction: column; align-items: center; gap: 3px;
+      min-width: 56px; cursor: pointer;
+    }
+    .tab-icon { font-size: 22px; }
+    .tab-label { font-size: 10px; font-weight: 600; }
+    .tab-item.active .tab-icon  { color: var(--accent); }
+    .tab-item.active .tab-label { color: var(--accent); }
+    .tab-item:not(.active) .tab-icon  { color: #999; }
+    .tab-item:not(.active) .tab-label { color: #999; }
+
+    /* -------------------------------------------------------
+       Annotation overlay (callouts)
+    ------------------------------------------------------- */
+    .annotation-panel {
+      max-width: 390px; width: 100%;
+      display: flex; flex-direction: column; gap: 10px;
+      margin-top: -10px;
+    }
+    .annotation {
+      background: #1a1d2e;
+      border-left: 3px solid var(--accent);
+      border-radius: 0 10px 10px 0;
+      padding: 10px 14px;
+      font-size: 13px; color: #c4c7d4; line-height: 1.5;
+    }
+    .annotation strong { color: var(--accent); }
+
+    /* -------------------------------------------------------
+       Section dividers on page
+    ------------------------------------------------------- */
+    .section-divider {
+      width: 100%; max-width: 900px;
+      border: none; border-top: 1px solid #2a2d3e;
+    }
+    .section-heading {
+      font-size: 18px; font-weight: 700; color: #e2e4e9;
+      letter-spacing: -0.3px;
+    }
+    .section-desc {
+      font-size: 14px; color: #8a8d9a; margin-top: 6px;
+    }
+    .section-block {
+      display: flex; flex-direction: column; gap: 8px;
+      align-items: center; text-align: center;
+    }
+
+    @media (max-width: 880px) {
+      .analysis-grid { grid-template-columns: 1fr; }
+      .phones-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =====================================================
+       HEADER
+  ===================================================== -->
+  <div style="display:flex;flex-direction:column;align-items:center;gap:10px;max-width:900px;text-align:center;">
+    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:#CC6B3D;">VetApp — Design Konzept</div>
+    <h1 class="page-title">Dashboard Redesign</h1>
+    <p class="page-subtitle">
+      Aktueller HomeScreen: Bilder dominieren, nuetzliche Daten verstecken sich unter dem Fold.
+      Dieses Konzept dreht die Hierarchie um — Information zuerst, Bilder reduziert aber praesent.
+    </p>
+  </div>
+
+  <!-- =====================================================
+       ANALYSE
+  ===================================================== -->
+  <div style="display:flex;flex-direction:column;gap:16px;align-items:center;width:100%;">
+    <div class="section-block">
+      <div class="section-heading">Analyse: Was ist das Problem?</div>
+    </div>
+    <div class="analysis-grid">
+      <div class="analysis-card problems">
+        <h3>Schwachstellen</h3>
+        <ul>
+          <li><span class="bullet">✗</span><span>Pet-Karten belegen ~40% des sichtbaren Bereichs mit Foto-Aspect-Ratio 1.3 — reines Bild, keine Information</span></li>
+          <li><span class="bullet">✗</span><span>Stats-Card ("Uebersicht") ist <em>unterhalb</em> der Pet-Karten — man sieht sie erst nach Scrollen</span></li>
+          <li><span class="bullet">✗</span><span>Stats zeigen nur Zaehler (3 Impfungen, 5 Behandlungen) — kein Kontext, wann zuletzt, was als naechstes</span></li>
+          <li><span class="bullet">✗</span><span>Naechste Erinnerung: nur eine, kein Ueberblick der naechsten 2–3 Wochen</span></li>
+          <li><span class="bullet">✗</span><span>Kein Bezug zwischen Reminder und welchem Tier — bei 3+ Tieren unklar</span></li>
+          <li><span class="bullet">✗</span><span>KI-Card ganz unten — Premium-Feature faellt kaum auf</span></li>
+          <li><span class="bullet">✗</span><span>Grüner Header-Gradient kontrastiert mit AI-Card (ebenfalls gruener Hintergrund) — visuell repetitiv</span></li>
+        </ul>
+      </div>
+      <div class="analysis-card good">
+        <h3>Was funktioniert</h3>
+        <ul>
+          <li><span class="bullet">✓</span><span>Overdue-Alert mit Pulse-Animation — sofortige Aufmerksamkeit, korrekte Priorisierung</span></li>
+          <li><span class="bullet">✓</span><span>Naechste-Erinnerung-Card — gute Idee, aber nur eine Erinnerung sichtbar</span></li>
+          <li><span class="bullet">✓</span><span>Persoenliche Begruessung schafft Nahbarkeit</span></li>
+          <li><span class="bullet">✓</span><span>Empty State fuer keine Tiere — klar und handlungsanleitend</span></li>
+          <li><span class="bullet">✓</span><span>AnimatedPressable auf Pet-Cards — gutes Feedback</span></li>
+        </ul>
+      </div>
+      <div class="analysis-card concept">
+        <h3>Redesign-Prinzipien</h3>
+        <ul>
+          <li><span class="bullet">→</span><span><strong>Information first:</strong> Tiere als Chips im Header — kompakt, immer sichtbar, mit Status-Dot</span></li>
+          <li><span class="bullet">→</span><span><strong>Aktionsfaehige Daten:</strong> Kommende Erinnerungen als Timeline-Liste mit Datum-Block und Tier-Referenz</span></li>
+          <li><span class="bullet">→</span><span><strong>Kontextualisierte Statistiken:</strong> 2x2 Grid mit Icon, Zahl und Bezeichnung statt kahler Ziffernreihe</span></li>
+          <li><span class="bullet">→</span><span><strong>Letzte Events:</strong> Neue Sektion zeigt was zuletzt passiert ist — "Luna: Impfung vor 3 Tagen"</span></li>
+          <li><span class="bullet">→</span><span><strong>AI nach oben:</strong> KI-Card weiter oben positionieren, da Premium-Upsell wertvoll ist</span></li>
+        </ul>
+      </div>
+      <div class="analysis-card hierarchy">
+        <h3>Neue Informationshierarchie</h3>
+        <ul>
+          <li><span class="bullet">1.</span><span><strong>Header (above fold):</strong> Begruessung + Tier-Chips mit Status-Dot + ggf. Alert-Pill fuer Overdue</span></li>
+          <li><span class="bullet">2.</span><span><strong>Quick Actions:</strong> 4 Schnell-Buttons (Eintrag hinzufuegen, Erinnerung, Tierarzt, KI)</span></li>
+          <li><span class="bullet">3.</span><span><strong>Overdue Alert (bedingt):</strong> Nur wenn vorhanden — bleibt an Position 3, nicht verdraengt</span></li>
+          <li><span class="bullet">4.</span><span><strong>Naechste Termine:</strong> 2–3 anstehende Erinnerungen mit Datum, Tier, Typ-Badge</span></li>
+          <li><span class="bullet">5.</span><span><strong>Gesundheits-Snapshot:</strong> 2x2 Grid (Impfungen, offene Reminder, letzte Behandlung, Tiere)</span></li>
+          <li><span class="bullet">6.</span><span><strong>Letzte Ereignisse:</strong> 3 juengste Events als kompakte Liste</span></li>
+          <li><span class="bullet">7.</span><span><strong>KI-Assistent:</strong> Premium-Card, dunkel und markant</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider" />
+
+  <!-- =====================================================
+       PHONES SIDE BY SIDE
+  ===================================================== -->
+  <div class="section-block">
+    <div class="section-heading">Vorher / Nachher — Visueller Vergleich</div>
+    <div class="section-desc">Beide Mockups zeigen den initialen sichtbaren Bereich (above the fold) — ohne Scrollen.</div>
+  </div>
+
+  <div class="phones-row">
+
+    <!-- ===== CURRENT ===== -->
+    <div class="phone-wrapper">
+      <div class="phone-label">Aktuell</div>
+      <div class="phone-frame">
+        <div class="screen">
+          <!-- Header -->
+          <div class="current-header">
+            <div class="current-header-row">
+              <div>
+                <div class="h1">Hallo, Max! 👋</div>
+                <div class="body-sm-white">Willkommen zurück bei VetApp</div>
+              </div>
+              <div class="icon-btn">👤</div>
+            </div>
+          </div>
+          <!-- Body -->
+          <div class="body">
+            <!-- Overdue -->
+            <div class="card card-error">
+              <div class="overdue-header">
+                <span class="overdue-icon">⚠️</span>
+                <span class="overdue-title">2 überfällige Erinnerungen</span>
+              </div>
+              <div class="overdue-item">
+                <span class="overdue-item-name">Flohhalsband erneuern</span>
+                <span class="overdue-item-date">15. Mär</span>
+              </div>
+              <div class="overdue-item">
+                <span class="overdue-item-name">Entwurmung Milo</span>
+                <span class="overdue-item-date">20. Mär</span>
+              </div>
+            </div>
+            <!-- Next Reminder -->
+            <div class="card">
+              <div class="reminder-row">
+                <div class="reminder-icon-circle">🔔</div>
+                <div>
+                  <div class="reminder-label">Nächste Erinnerung</div>
+                  <div class="reminder-title">Impfung auffrischen</div>
+                  <div class="reminder-date">📅 12. Apr. 2026</div>
+                </div>
+              </div>
+            </div>
+            <!-- Section Header -->
+            <div class="section-header">
+              <span class="section-title">Meine Tiere</span>
+              <span class="add-link">+ Tier hinzufügen</span>
+            </div>
+            <!-- Pet Grid — THIS IS WHERE THE FOLD IS -->
+            <div class="pets-grid">
+              <div class="pet-card">
+                <div class="pet-image">🐕</div>
+                <div class="pet-name">Luna</div>
+                <div class="pet-type">Hund</div>
+              </div>
+              <div class="pet-card">
+                <div class="pet-image">🐈</div>
+                <div class="pet-name">Milo</div>
+                <div class="pet-type">Katze</div>
+              </div>
+            </div>
+            <!-- fold indicator -->
+            <div style="border-top:2px dashed #e05050;margin:0 0 12px;position:relative;">
+              <span style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--bg);padding:0 8px;font-size:11px;font-weight:700;color:#e05050;white-space:nowrap;">↑ Fold — alles darunter erst nach Scrollen sichtbar ↑</span>
+            </div>
+            <!-- Stats — BELOW FOLD -->
+            <div class="card stats-card">
+              <div class="stats-title">Übersicht</div>
+              <div class="stats-row">
+                <div class="stat-item">
+                  <div class="stat-number">2</div>
+                  <div class="stat-label">Tiere</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">5</div>
+                  <div class="stat-label">Impfungen</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">3</div>
+                  <div class="stat-label">Behandlungen</div>
+                </div>
+                <div class="stat-item">
+                  <div class="stat-number">4</div>
+                  <div class="stat-label">Erinnerungen</div>
+                </div>
+              </div>
+            </div>
+            <!-- AI Card -->
+            <div class="ai-card-current">
+              <div class="ai-top-row">
+                <div class="ai-icon">✨</div>
+                <div>
+                  <div class="ai-title-text">KI-Gesundheitsassistent</div>
+                  <div class="ai-subtitle-text">Deine Tiere kennt die KI bereits.</div>
+                </div>
+              </div>
+              <div class="ai-cta-row">
+                <span class="pro-badge">PRO</span>
+                <span class="ai-cta-link">Frage stellen →</span>
+              </div>
+            </div>
+          </div>
+          <!-- Tab Bar -->
+          <div class="tab-bar">
+            <div class="tab-item active"><span class="tab-icon">🏠</span><span class="tab-label">Home</span></div>
+            <div class="tab-item"><span class="tab-icon">🐾</span><span class="tab-label">Tiere</span></div>
+            <div class="tab-item"><span class="tab-icon">✨</span><span class="tab-label">KI</span></div>
+            <div class="tab-item"><span class="tab-icon">🔔</span><span class="tab-label">Termine</span></div>
+            <div class="tab-item"><span class="tab-icon">🏥</span><span class="tab-label">Tierarzt</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="annotation-panel">
+        <div class="annotation"><strong>Problem 1:</strong> Pet-Grid mit grossen Fotos belegt ~40% des sichtbaren Bereichs ohne Informationsgehalt</div>
+        <div class="annotation"><strong>Problem 2:</strong> Stats-Card ("Übersicht") liegt unterhalb des Folds — die wichtigsten Zahlen sieht man erst nach Scrollen</div>
+        <div class="annotation"><strong>Problem 3:</strong> Reminder zeigt nur 1 Eintrag, kein Tier-Bezug, keine Datum-Visualisierung</div>
+      </div>
+    </div>
+
+    <!-- ===== NEW ===== -->
+    <div class="phone-wrapper">
+      <div class="phone-label">Redesign — Vorschlag</div>
+      <div class="phone-frame">
+        <div class="screen">
+
+          <!-- New Header -->
+          <div class="new-header">
+            <div class="new-header-top">
+              <div>
+                <div class="greeting-small">Guten Morgen</div>
+                <div class="greeting-name">Hallo, Max</div>
+              </div>
+              <div class="icon-btn">👤</div>
+            </div>
+            <!-- Alert pill — only when overdue -->
+            <div class="alert-pill">
+              ⚠️ 2 überfällige Erinnerungen
+            </div>
+            <!-- Pet Strip -->
+            <div class="pet-strip-label">Meine Tiere</div>
+            <div class="pet-strip">
+              <div class="pet-chip">
+                <div class="pet-chip-avatar">🐕</div>
+                <span class="pet-chip-name">Luna</span>
+                <span class="pet-chip-status overdue"></span>
+              </div>
+              <div class="pet-chip">
+                <div class="pet-chip-avatar">🐈</div>
+                <span class="pet-chip-name">Milo</span>
+                <span class="pet-chip-status warning"></span>
+              </div>
+              <div class="pet-chip" style="background:rgba(255,255,255,0.07);border:1px dashed rgba(255,255,255,0.25);">
+                <span style="font-size:16px;color:rgba(255,255,255,0.5);">+</span>
+                <span class="pet-chip-name" style="color:rgba(255,255,255,0.5);">Tier hinzufügen</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="new-body">
+
+            <!-- Quick Actions -->
+            <div class="quick-row">
+              <div class="quick-btn">
+                <span class="quick-btn-icon">📋</span>
+                <span class="quick-btn-label">Eintrag</span>
+              </div>
+              <div class="quick-btn">
+                <span class="quick-btn-icon">🔔</span>
+                <span class="quick-btn-label">Erinnerung</span>
+              </div>
+              <div class="quick-btn">
+                <span class="quick-btn-icon">🏥</span>
+                <span class="quick-btn-label">Tierarzt</span>
+              </div>
+              <div class="quick-btn" style="position:relative;">
+                <span class="quick-btn-icon">✨</span>
+                <span class="quick-btn-label">KI fragen</span>
+                <span style="position:absolute;top:6px;right:6px;background:var(--accent);color:#fff;font-size:7px;font-weight:800;padding:1px 4px;border-radius:999px;letter-spacing:0.5px;">PRO</span>
+              </div>
+            </div>
+
+            <!-- Overdue (expandable) -->
+            <div class="urgency-card">
+              <div class="urgency-header">
+                <span style="font-size:16px;">⚠️</span>
+                <span class="urgency-title">Überfällig</span>
+              </div>
+              <div class="urgency-item">
+                <div class="urgency-item-left">
+                  <div class="urgency-pet-dot" style="background:#D94040;"></div>
+                  <div>
+                    <div class="urgency-item-name">Flohhalsband erneuern</div>
+                    <div class="urgency-item-meta">Luna · Hund</div>
+                  </div>
+                </div>
+                <div class="urgency-date">15. Mär</div>
+              </div>
+              <div class="urgency-item">
+                <div class="urgency-item-left">
+                  <div class="urgency-pet-dot" style="background:#D94040;"></div>
+                  <div>
+                    <div class="urgency-item-name">Entwurmung</div>
+                    <div class="urgency-item-meta">Milo · Katze</div>
+                  </div>
+                </div>
+                <div class="urgency-date">20. Mär</div>
+              </div>
+            </div>
+
+            <!-- fold indicator -->
+            <div style="border-top:2px dashed #2E8B57;margin:0 0 16px;position:relative;">
+              <span style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);background:var(--bg);padding:0 8px;font-size:11px;font-weight:700;color:#2E8B57;white-space:nowrap;">↑ Fold — alles oben ist without scrolling sichtbar ↑</span>
+            </div>
+
+            <!-- Next Reminders -->
+            <div class="next-card">
+              <div class="next-header">
+                <div class="next-title">Anstehende Termine</div>
+                <div class="next-link">Alle →</div>
+              </div>
+              <div class="next-item">
+                <div class="next-date-block">
+                  <div class="next-date-day">12</div>
+                  <div class="next-date-month">Apr</div>
+                </div>
+                <div class="next-item-info">
+                  <div class="next-item-title">Impfung auffrischen</div>
+                  <div class="next-item-pet">Luna · Hund</div>
+                </div>
+                <div class="next-item-badge badge-vaccination">Impfung</div>
+              </div>
+              <div class="next-item">
+                <div class="next-date-block">
+                  <div class="next-date-day">18</div>
+                  <div class="next-date-month">Apr</div>
+                </div>
+                <div class="next-item-info">
+                  <div class="next-item-title">Checkup Tierarzt</div>
+                  <div class="next-item-pet">Milo · Katze</div>
+                </div>
+                <div class="next-item-badge badge-checkup">Checkup</div>
+              </div>
+              <div class="next-item">
+                <div class="next-date-block" style="background:#f5e8f5;">
+                  <div class="next-date-day" style="color:#8a3a8a;">2</div>
+                  <div class="next-date-month" style="color:#8a3a8a;">Mai</div>
+                </div>
+                <div class="next-item-info">
+                  <div class="next-item-title">Jahresimpfung</div>
+                  <div class="next-item-pet">Luna · Hund</div>
+                </div>
+                <div class="next-item-badge badge-vaccination">Impfung</div>
+              </div>
+            </div>
+
+            <!-- Health Snapshot -->
+            <div class="summary-card">
+              <div class="summary-header">
+                <div style="font-size:16px;font-weight:700;color:var(--text);">Gesundheits-Snapshot</div>
+              </div>
+              <div class="summary-grid">
+                <div class="summary-cell">
+                  <div class="summary-cell-icon icon-bg-primary">💉</div>
+                  <div>
+                    <div class="summary-cell-val">5</div>
+                    <div class="summary-cell-lbl">Impfungen gesamt</div>
+                  </div>
+                </div>
+                <div class="summary-cell">
+                  <div class="summary-cell-icon icon-bg-warning">🔔</div>
+                  <div>
+                    <div class="summary-cell-val">4</div>
+                    <div class="summary-cell-lbl">Offene Reminder</div>
+                  </div>
+                </div>
+                <div class="summary-cell">
+                  <div class="summary-cell-icon icon-bg-success">📋</div>
+                  <div>
+                    <div class="summary-cell-val">3</div>
+                    <div class="summary-cell-lbl">Behandlungen</div>
+                  </div>
+                </div>
+                <div class="summary-cell">
+                  <div class="summary-cell-icon icon-bg-accent">📄</div>
+                  <div>
+                    <div class="summary-cell-val" style="color:var(--text-light);font-size:14px;">Pro</div>
+                    <div class="summary-cell-lbl">Dokumente</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Events -->
+            <div class="recent-card">
+              <div class="recent-header">
+                <div class="recent-title">Zuletzt eingetragen</div>
+                <div class="next-link">Alle →</div>
+              </div>
+              <div class="recent-item">
+                <div class="event-dot dot-vaccination"></div>
+                <div style="flex:1;">
+                  <div class="recent-event-title">Tollwut-Impfung</div>
+                  <div class="recent-event-sub">Luna · Hund</div>
+                </div>
+                <div class="recent-event-date">1. Apr</div>
+              </div>
+              <div class="recent-item">
+                <div class="event-dot dot-checkup"></div>
+                <div style="flex:1;">
+                  <div class="recent-event-title">Jahres-Checkup</div>
+                  <div class="recent-event-sub">Milo · Katze</div>
+                </div>
+                <div class="recent-event-date">28. Mär</div>
+              </div>
+              <div class="recent-item">
+                <div class="event-dot dot-deworming"></div>
+                <div style="flex:1;">
+                  <div class="recent-event-title">Entwurmung</div>
+                  <div class="recent-event-sub">Luna · Hund</div>
+                </div>
+                <div class="recent-event-date">15. Mär</div>
+              </div>
+            </div>
+
+            <!-- AI Card -->
+            <div class="new-ai-card">
+              <div class="new-ai-row">
+                <div class="new-ai-icon">✨</div>
+                <div>
+                  <div class="new-ai-title">KI-Gesundheitsassistent</div>
+                  <div class="new-ai-sub">Kennt Luna & Milo bereits</div>
+                </div>
+              </div>
+              <div class="new-ai-prompt-hint">
+                <span class="new-ai-hint-text">"Wann war Lunas letzte Impfung?"</span>
+                <span class="new-ai-hint-arrow">→</span>
+              </div>
+              <div class="new-ai-footer">
+                <span class="new-pro-badge">PRO FEATURE</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Tab Bar -->
+          <div class="tab-bar">
+            <div class="tab-item active"><span class="tab-icon">🏠</span><span class="tab-label">Home</span></div>
+            <div class="tab-item"><span class="tab-icon">🐾</span><span class="tab-label">Tiere</span></div>
+            <div class="tab-item"><span class="tab-icon">✨</span><span class="tab-label">KI</span></div>
+            <div class="tab-item"><span class="tab-icon">🔔</span><span class="tab-label">Termine</span></div>
+            <div class="tab-item"><span class="tab-icon">🏥</span><span class="tab-label">Tierarzt</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="annotation-panel">
+        <div class="annotation"><strong>Tier-Chips:</strong> Horizontal scrollbar im Header — kompakt, immer sichtbar, Status-Dot zeigt Handlungsbedarf auf einen Blick</div>
+        <div class="annotation"><strong>Quick Actions:</strong> 4 Buttons fuer die haeufigsten Aktionen — reduziert Navigationsschritte deutlich</div>
+        <div class="annotation"><strong>Overdue:</strong> Mit Tier-Bezug ("Luna · Hund") — bei mehreren Tieren sofort klar, wer betroffen ist</div>
+        <div class="annotation"><strong>Termine-Timeline:</strong> Datum-Block macht Naehe/Ferne sofort sichtbar. Typ-Badge (Impfung/Checkup) gibt Kontext</div>
+        <div class="annotation"><strong>Snapshot 2x2:</strong> Icons und Kontext statt kahler Zahlen. Dokumente-Zelle als Pro-Upsell</div>
+        <div class="annotation"><strong>KI dunkler Hintergrund:</strong> Unterscheidet sich visuell vom restlichen Screen, schafft Premium-Anmutung</div>
+      </div>
+    </div>
+
+  </div><!-- /phones-row -->
+
+  <hr class="section-divider" />
+
+  <!-- =====================================================
+       EDGE CASES
+  ===================================================== -->
+  <div style="display:flex;flex-direction:column;gap:20px;align-items:center;max-width:900px;width:100%;">
+    <div class="section-block">
+      <div class="section-heading">Edge Cases & Skalierung</div>
+      <div class="section-desc">Wie verhält sich das Design bei 1 Tier, 4 Tieren, oder wenn keine Daten vorhanden sind?</div>
+    </div>
+    <div class="analysis-grid">
+      <div class="analysis-card concept">
+        <h3>1 Tier (Neu-User)</h3>
+        <ul>
+          <li><span class="bullet">→</span><span>Pet-Strip zeigt 1 Chip + "Tier hinzufügen"-Button — wirkt nicht leer</span></li>
+          <li><span class="bullet">→</span><span>Kein Alert-Pill wenn keine Overdue — Header wirkt sauber</span></li>
+          <li><span class="bullet">→</span><span>Termine-Section zeigt "Noch keine Erinnerungen" mit Inline-CTA</span></li>
+          <li><span class="bullet">→</span><span>Snapshot-Zahlen: Alles 0 — aber mit Icons und Labels nicht beaengstigend</span></li>
+        </ul>
+      </div>
+      <div class="analysis-card hierarchy">
+        <h3>3–4 Tiere (Power-User)</h3>
+        <ul>
+          <li><span class="bullet">→</span><span>Pet-Strip scrollt horizontal — kein Wrap, kein Platzbedarf nach unten</span></li>
+          <li><span class="bullet">→</span><span>Termine zeigen Tier-Name immer — bei vielen Tieren essentiell</span></li>
+          <li><span class="bullet">→</span><span>Overdue-Card listet maximal 3, "+N weitere" dahinter</span></li>
+          <li><span class="bullet">→</span><span>Snapshot aggregiert alle Tiere — Gesamtbild statt Tier-Silos</span></li>
+        </ul>
+      </div>
+      <div class="analysis-card good">
+        <h3>Kein Pro-Abo</h3>
+        <ul>
+          <li><span class="bullet">→</span><span>KI Quick-Action-Button: PRO-Badge + disabled-opacity, Tap navigiert zu Paywall</span></li>
+          <li><span class="bullet">→</span><span>Dokumente-Zelle im Snapshot: "Pro" statt Zahl — klar aber nicht aufdringlich</span></li>
+          <li><span class="bullet">→</span><span>KI-Card bleibt sichtbar, dient als Upsell — "Frage stellen" führt zur Paywall</span></li>
+        </ul>
+      </div>
+      <div class="analysis-card problems">
+        <h3>Implementierungs-Hinweise</h3>
+        <ul>
+          <li><span class="bullet">!</span><span>Pet-Chips brauchen keinen neuen Component — View + TouchableOpacity + StatusDot reicht</span></li>
+          <li><span class="bullet">!</span><span>Termine-Timeline: Bestehende Reminder-Daten, nur anders gerendert — kein Backend noetig</span></li>
+          <li><span class="bullet">!</span><span>Quick-Actions sind nur Navigation-Shortcuts — keine neue Logik</span></li>
+          <li><span class="bullet">!</span><span>Letzte Events: <code>medicalEvents.sort().slice(0,3)</code> — bereits vorhanden</span></li>
+          <li><span class="bullet">!</span><span>Header-Gradient: Dunklere Variante waehlen, damit AI-Card (ebenfalls dunkelgrueen) sich abhebt</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- =====================================================
+       FOOTER
+  ===================================================== -->
+  <div style="text-align:center;color:#4a4d5e;font-size:12px;max-width:600px;line-height:1.7;">
+    VetApp Dashboard Redesign Konzept — erstellt 04.04.2026<br>
+    Alle Farben und Abstände aus dem bestehenden Theme (colors.ts, spacing, borderRadius).<br>
+    Keine neuen Dependencies. Keine neuen Backend-Features erforderlich.
+  </div>
+
+</body>
+</html>

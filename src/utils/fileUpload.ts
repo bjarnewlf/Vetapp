@@ -66,7 +66,7 @@ export async function uploadFile(
   fileUri: string,
   fileName: string,
   mimeType?: string,
-): Promise<{ url: string; path: string }> {
+): Promise<{ path: string }> {
   const timestamp = Date.now();
   const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
   const path = `${userId}/${petId}/${timestamp}_${safeName}`;
@@ -87,16 +87,7 @@ export async function uploadFile(
 
   if (error) throw new Error(`Upload fehlgeschlagen: ${error.message}`);
 
-  // Get signed URL (valid for 1 year)
-  const { data: urlData, error: urlError } = await supabase.storage
-    .from(BUCKET)
-    .createSignedUrl(path, 60 * 60 * 24 * 365);
-
-  if (urlError || !urlData?.signedUrl) {
-    throw new Error('URL-Erstellung fehlgeschlagen');
-  }
-
-  return { url: urlData.signedUrl, path };
+  return { path };
 }
 
 export async function deleteFile(filePath: string): Promise<void> {

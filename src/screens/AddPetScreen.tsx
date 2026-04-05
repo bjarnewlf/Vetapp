@@ -12,6 +12,7 @@ import { usePets } from '../context/PetContext';
 import { useSubscription, FREE_LIMITS } from '../context/SubscriptionContext';
 import { parseGermanDate } from '../utils/petHelpers';
 import type { Pet } from '../types';
+import type { RootStackNavProp, RootStackRouteProp } from '../types/navigation';
 
 const animalTypes: AnimalType[] = ['Dog', 'Cat', 'Bird', 'Rabbit', 'Fish', 'Reptile', 'Other'];
 
@@ -23,8 +24,8 @@ function toGermanDate(isoDate: string): string {
 }
 
 interface AddPetScreenProps {
-  navigation: any;
-  route: any;
+  navigation: RootStackNavProp<'AddPet'>;
+  route: RootStackRouteProp<'AddPet'>;
 }
 
 export function AddPetScreen({ navigation, route }: AddPetScreenProps) {
