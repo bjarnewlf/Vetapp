@@ -44,64 +44,54 @@ Alle 10 offenen Entscheidungen mit Claas geklaert:
 
 ## Aktuelle Uebergabe
 
-**Agent:** Brian (Instanz 1)
-**Zeitpunkt:** 2026-04-05 Vormittag
-**Session:** Erinnerungen-abhaken-Bug gefixt — wartet auf Handy-Test
+**Agent:** Brian
+**Zeitpunkt:** 2026-04-05 Nachmittag (Feierabend)
+**Session:** Crash-Recovery + Sammel-Commit + Erinnerungen-Slide-Out-Fix V2
 
 ### Erledigt
 
-- **Bug 1 (Nested Touchables):** `RemindersScreen.tsx` — Karte von `TouchableOpacity` auf `View` umgestellt, Content und Checkbox sind jetzt zwei separate `Pressable`-Elemente. Kein Touch-Konflikt mehr auf echten Geraeten.
-- **Bug 2 (Animation Race Condition):** `activeReminders`-Filter beruecksichtigt jetzt `pendingIds` — Items bleiben waehrend Animation in der Liste, auch wenn Status schon `completed` ist.
-- **QA-031 gefixt:** `accessibilityState={{ checked: isCompleted }}` an Checkbox ergaenzt.
-- **QA-026 gefixt:** Animation laeuft ZUERST, `completeReminder` erst im Callback.
-- **QA-029 gefixt:** Animation-Rollback bei Fehler (war schon im Code, jetzt korrekt da Touchables aufgeloest).
-- TypeScript: 0 Fehler.
+- **Crash-Recovery:** PC-Absturz von Claas — alle Dateien und Git-Zustand geprueft, keine Schaeden gefunden
+- **Sammel-Commit** (`da90b83`): 60 Dateien committed — Code, Rules, Berichte, Stitch, Doku
+- **Erinnerungen Slide-Out Fix V2:** Race Condition behoben — `completedIds` Ref als permanente Blacklist eingefuehrt, Items koennen nach Animation nicht mehr zurueck-poppen
+- **TypeScript:** 0 Fehler
 
-### Noch umzusetzen
+### Offen / Naechste Session
 
-- [ ] Changelog-Automation (DevOps) — Option C bestaetigt
-- [ ] Jest minimal Setup (Developer) — Option A bestaetigt
-- [ ] Taeglicher Vault-Report (Wissensmanager als Scheduled Agent)
-
-### Offen / Nicht fertig
-
-- **Erinnerungen-Bug: Fix implementiert, Claas testet auf Handy (ST-04)**
-- Tierarzt-Kontakt noch nicht getestet
+- **Erinnerungen-Fix V2 testen (ST-04)** — Claas muss auf Handy bestaetigen: Slide-Out ohne Zurueck-Poppen
+- **API-Key in settings.local.json** — Stitch API-Key im Klartext. Datei in `.gitignore` aufnehmen oder Key entfernen
+- Tierarzt-Kontakt testen
 - notification_id Migration deployen (SQL-Datei fehlt)
 - Sicherheits-Findings S-1 bis S-8
-- Uncommitted Changes committen (viele geaenderte + neue Dateien)
-- Stitch: Developer setzt HTML-Referenzen in React Native um (nach Bedarf)
+- Changelog-Automation (DevOps), Jest Setup (Developer), Vault-Report (Wissensmanager)
 
-### Wichtig fuer andere Instanzen
+### Wichtig fuer naechste Session
 
-- **Erinnerungen-Fix gerade in Test** — RemindersScreen.tsx NICHT anfassen
-- **Autonomie Level 3** — Brian delegiert Standard-Features ohne Rueckfrage
-- **tasks.md ist die Koordinationsdatei** — vor Arbeit pruefen was vergeben/in Arbeit ist
-- **Stitch-Dateien** im Projektroot: stitch-home.html, stitch-pet-detail.html, stitch-reminders.html
+- **Erinnerungen-Fix:** Alter Ansatz (pendingIds im Filter) war fragil. Neuer Ansatz: `completedIds` Ref die NIE geleert wird. Wenn der Fix immer noch nicht greift, liegt das Problem tiefer (evtl. im MedicalContext oder Supabase-Update)
+- **settings.local.json NICHT committen** — enthaelt API-Key
+- **Autonomie Level 3** aktiv
+- **Expo Server** wurde gestartet, ist nach PC-Neustart weg
 
 ---
 
 ## Vorherige Uebergaben (zusammengefasst)
 
+### 2026-04-05 Session 2 (Vormittag)
+- Erinnerungen-abhaken-Bug gefixt (Nested Touchables + Race Condition), QA-Findings gefixt
+
 ### 2026-04-05 Session 1 (frueh)
 - 10 Entscheidungen mit Claas geklaert, Autonomie Level 3 freigeschaltet
 
 ### 2026-04-04 Session 5+6
-- Health-Check: alle 5 Empfehlungen umgesetzt (Tags, DataContext, Navigation, PetDetail, Inbox)
-- Stitch: evaluiert, eingerichtet, 3 Screens generiert, Designer-Rule + Vault-Doku
-- Bericht als HTML: health-check-bericht-2026-04-04.html
+- Health-Check: alle 5 Empfehlungen umgesetzt, Stitch evaluiert + eingerichtet
 
 ### 2026-04-04 Session 4
-- Agency Meeting (7+1 Spezialisten), Protokoll als HTML
-- 8 von 10 Meeting-Massnahmen umgesetzt
-- Slide-Out-Bug gefixt, Dashboard-Redesign V2 implementiert + auf Handy verifiziert
-- Obsidian-Recherche (Researcher), Deploy-/Smoke-Test-Checklisten
+- Agency Meeting, Dashboard-Redesign V2, Slide-Out-Bug gefixt
 
-### 2026-04-04 Session 2
-- Roadmaps (VetApp + Agency), Agency-Infrastruktur, 4 QA-Findings gefixt
+### 2026-04-04 Session 2+3
+- Roadmaps, Agency-Infrastruktur, QA-Findings, Meeting-Massnahmen
 
 ### 2026-04-04 Session 1
-- Handy-Test, Package-Fixes, Foto-Upload-Fix, Erinnerungen-Fix
+- Handy-Test, Package-Fixes, Foto-Upload-Fix
 
 ### 2026-04-03
 - Sprint Tag 1: Alle Basis-Features, Design-System, erste QA

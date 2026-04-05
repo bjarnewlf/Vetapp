@@ -2,7 +2,7 @@
 
 > Ziel: Phase 2 (Entwicklung MVP) abschliessen — vorzeigbar auf dem Handy.
 > PDF-Export und Tierarztfinder sind bewusst ausgeklammert (Scope noch undefiniert).
-> Stand: 2026-04-05 Vormittag
+> Stand: 2026-04-05 Feierabend
 >
 > **ACHTUNG: Mehrere Brian-Instanzen aktiv!** Vor Aufgabenstart pruefen ob Task schon vergeben ist.
 > Status-Konvention: `[ ]` = offen, `[~]` = in Arbeit (Instanz angeben), `[x]` = erledigt
@@ -20,11 +20,17 @@
 - [x] Dokument hochladen
 - [x] Gradient-Header
 - [x] Dashboard-Redesign auf Handy verifiziert
-- [~] **Erinnerungen abhaken** — Fix implementiert (Nested Touchables + Race Condition), Claas testet gerade auf Handy
+- [ ] **Erinnerungen abhaken** — Fix V2 implementiert (completedIds Ref), Claas muss auf Handy testen
 - [ ] Tierarzt-Kontakt testen
 - [ ] Slide-Out-Animation nach Fix nochmal testen
 - [ ] Bugs sammeln und fixen
 - [ ] Alte Tabellen `vaccinations`/`treatments` droppen (nach erfolgreichem Test)
+
+---
+
+## SOFORT — Hygiene
+
+- [ ] **API-Key aus settings.local.json entfernen** — Stitch API-Key steht im Klartext in erlaubter Bash-Zeile. Key entfernen oder `.claude/settings.local.json` in `.gitignore` aufnehmen.
 
 ---
 
@@ -53,26 +59,11 @@
 
 ---
 
-## ARCHITEKTUR — Health-Check Empfehlungen
-
-### Erledigt
-- [x] Empfehlung 1-5 alle umgesetzt
-
----
-
-## MEETING-MASSNAHMEN — Agency Meeting 04.04.2026
-
-### Erledigt
-- [x] Massnahme 1-8 alle umgesetzt
-- [x] Massnahme 9: Abgelehnt — Brian erinnert aktiv statt stille Freigabe
-- [x] Massnahme 10: Bestaetigt — DevOps setzt Changelog-Automation um
-
----
-
 ## VOR PHASE-2-ABSCHLUSS
 
-- [x] Erinnerungen-abhaken-Bug fixen — Fix implementiert, in Test
-- [ ] Handy-Test: Erinnerungen-Fix bestaetigen
+- [x] Erinnerungen-abhaken-Bug fixen — Fix V2 implementiert, in Test
+- [x] **Sammel-Commit** — 60 Dateien committed (da90b83)
+- [ ] Handy-Test: Erinnerungen-Fix V2 bestaetigen
 - [ ] Bugs aus Handy-Test fixen
 - [ ] notification_id Migration fuer reminders deployen
 - [ ] Dem Kunden vorzeigbaren MVP praesentieren
@@ -97,23 +88,12 @@
 
 ## QA-FINDINGS — Erinnerungen (aus Review 7)
 
-- [x] **QA-026: Animation nach DB-Call** — Gefixt: Animation laeuft zuerst, completeReminder im Callback
+- [x] **QA-026: Animation nach DB-Call** — Gefixt
 - [ ] **QA-027: Kein Reduce-Motion-Support** — Offen (Backlog)
-- [x] **QA-028: Memory Leak animValues** — Akzeptiert (Map waechst minimal, kein praxisrelevanter Leak)
-- [x] **QA-029: Rollback setzt Animation zurueck** — Gefixt: opacity/translateX werden bei Fehler zurueckgesetzt
-- [x] **QA-030: Mehrfach-Abhaken** — Akzeptiert (pendingIds-Guard funktioniert korrekt)
+- [x] **QA-028: Memory Leak animValues** — Akzeptiert
+- [x] **QA-029: Rollback setzt Animation zurueck** — Gefixt
+- [x] **QA-030: Mehrfach-Abhaken** — Akzeptiert (pendingIds-Guard)
 - [x] **QA-031: accessibilityState.checked** — Gefixt
-
----
-
-## ENTSCHEIDUNGEN — Alle geklaert
-
-Alle 10 Entscheidungen am 2026-04-05 mit Claas geklaert. Siehe Entscheidungslog in handoff.md.
-
-Zurueckgestellt:
-- PDF-Export Scope — noch nicht mit Kunde geklaert
-- Tierarztfinder Scope — Backlog fuer spaetere Weiterentwicklung
-- Guenstigeres KI-Modell — erst bei Live-Gang oder Kosten-Auffaelligkeiten
 
 ---
 
@@ -150,36 +130,25 @@ Zurueckgestellt:
 
 ## ERLEDIGT
 
+### 2026-04-05 — Session 4 (Nachmittag, Feierabend)
+- [x] PC-Crash: alle Dateien und Git geprueft, keine Schaeden
+- [x] Sammel-Commit: 60 Dateien (da90b83)
+- [x] API-Key-Leak in settings.local.json identifiziert
+- [x] Erinnerungen Slide-Out Fix V2: completedIds Ref statt fragiler pendingIds-Filter
+
 ### 2026-04-05 — Session 2 (Vormittag)
 - [x] Erinnerungen-abhaken-Bug analysiert und gefixt (Nested Touchables + Race Condition)
 - [x] QA-026, QA-029, QA-031 gefixt
-- [x] Doku aktualisiert (handoff, tasks, status, qa-findings)
 
 ### 2026-04-05 — Session 1 (Entscheidungsrunde)
 - [x] 10 Entscheidungen mit Claas geklaert
 - [x] Autonomie Level 3 freigeschaltet
-- [x] Vault-Optimierung geprueft (3/4 erledigt)
-- [x] handoff.md + tasks.md aktualisiert
 
-### 2026-04-04 Session 5+6 — Health-Check + Stitch
-- [x] Alle 5 Health-Check-Empfehlungen umgesetzt
-- [x] Stitch evaluiert, eingerichtet, 3 Screens generiert
-- [x] Designer-Rule + Vault-Doku
-
-### 2026-04-04 Session 4 — Dashboard-Redesign + Fixes
-- [x] Slide-Out-Bug gefixt, Dashboard-Redesign V2, Handy-Test
-
-### 2026-04-04 Session 3 — Agency Meeting
-- [x] Meeting, Checklisten, Obsidian-Recherche, Vault-Update
-
-### 2026-04-04 Session 2 — Roadmaps + QA
-- [x] Roadmaps, Agency-Infrastruktur, QA-Findings
-
-### 2026-04-04 Session 1 — Handy-Test
-- [x] Package-Fixes, Foto-Upload, Erinnerungen-Fix
+### 2026-04-04 — Sessions 1-6
+- [x] Alle Basis-Features, Health-Check, Stitch, Meeting, Dashboard, Roadmaps
 
 ### 2026-04-03 — Sprint Tag 1
 - [x] Alle Basis-Features, Design-System, erste QA
 
 ---
-Zuletzt aktualisiert: 2026-04-05 Vormittag
+Zuletzt aktualisiert: 2026-04-05 Feierabend

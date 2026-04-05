@@ -17,6 +17,7 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
   const { reminders, completeReminder, error: medicalError, refresh: refreshMedical } = useMedical();
   const { rule: overdueRule, loaded: settingsLoaded } = useOverdueSettings();
   const pendingIds = useRef<Set<string>>(new Set());
+  const completedIds = useRef<Set<string>>(new Set());
 
   // Animations-State pro Karte: opacity + translateX für slide-out
   const animValues = useRef<Map<string, { opacity: Animated.Value; translateX: Animated.Value }>>(new Map());
@@ -38,7 +39,7 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
   }, [reminders, overdueRule, settingsLoaded]);
 
   const activeReminders = reminders
-    .filter(r => r.status !== 'completed' || pendingIds.current.has(r.id))
+    .filter(r => r.status !== 'completed' && !completedIds.current.has(r.id))
     .sort((a, b) => {
       if (a.status === 'overdue' && b.status !== 'overdue') return -1;
       if (a.status !== 'overdue' && b.status === 'overdue') return 1;
@@ -73,23 +74,24 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
       if (finished) {
         try {
           const success = await completeReminder(reminder.id);
-          if (!success) {
+          if (success) {
+            completedIds.current.add(reminder.id);
+            pendingIds.current.delete(reminder.id);
+          } else {
             // QA-029: Animation zurücksetzen wenn Speichern fehlschlägt
             translateX.setValue(0);
             opacity.setValue(1);
+            pendingIds.current.delete(reminder.id);
             Alert.alert('Fehler', 'Speichern fehlgeschlagen. Bitte versuche es erneut.');
           }
-          // Kein delete aus der Map — sonst würde getAnimValues beim nächsten
-          // React-Render neue Values mit opacity=1 erstellen, was das Item kurz
-          // wieder sichtbar macht bevor es aus activeReminders verschwindet.
         } catch {
           // QA-029: Animation zurücksetzen bei Netzwerkfehler
           translateX.setValue(0);
           opacity.setValue(1);
+          pendingIds.current.delete(reminder.id);
           Alert.alert('Fehler', 'Speichern fehlgeschlagen. Bitte versuche es erneut.');
         }
       }
-      pendingIds.current.delete(reminder.id);
     });
   };
 
