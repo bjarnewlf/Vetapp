@@ -10,7 +10,8 @@
 
 ## SOFORT — Handy-Test (wartet auf Claas)
 
-- [ ] **Erinnerungen abhaken** — Fix V2 (completedIds Ref) auf Handy testen
+- [x] **Erinnerungen abhaken (einmalig)** — funktioniert, Slide-Out OK
+- [ ] **Erinnerungen abhaken (jaehrlich)** — 30-Tage-Horizont-Filter eingebaut, Claas testet spaeter
 - [ ] **Tierarzt-Kontakt** testen (ST-07: Anlegen, Bearbeiten, Telefon-Link)
 - [ ] Slide-Out-Animation Timing/Smoothness pruefen
 - [ ] Bugs sammeln und fixen
@@ -40,7 +41,8 @@
 - [x] Sammel-Commit — 60 Dateien (da90b83)
 - [x] QA-Runde + Findings fixen (F-027 bis F-032)
 - [x] Jest Setup
-- [ ] Handy-Test: Erinnerungen-Fix V2 bestaetigen
+- [x] Erinnerungen einmalig — funktioniert
+- [ ] Erinnerungen jaehrlich — 30-Tage-Filter testen
 - [ ] Handy-Test: Tierarzt-Kontakt
 - [ ] notification_id Migration deployen
 - [ ] Bugs aus Handy-Test fixen
@@ -85,6 +87,7 @@
 
 ## BACKLOG (nach MVP)
 
+- [ ] **Stretch-Header PetDetail** — Beim Runterziehen waechst der Hero-Banner, Tierfoto wird groesser sichtbar (Pull-to-Reveal / Parallax-Effekt, wie Apple Music/Spotify). Idee von Claas 05.04.
 - [ ] Chat-Historie persistent machen
 - [ ] Custom Font (Inter)
 - [ ] Dark Mode
@@ -102,6 +105,10 @@
 ---
 
 ## ERLEDIGT
+
+### 2026-04-05 — Session 5 (Nachmittag, Handy-Test + Fix)
+- [x] Erinnerungen einmalig abhaken — funktioniert
+- [x] 30-Tage-Horizont-Filter fuer Erinnerungen eingebaut (jaehrliche poppen nicht mehr sofort auf)
 
 ### 2026-04-05 — Session 4 (Nachmittag, autonom)
 - [x] API-Key Hygiene (settings.local.json aus Git, .gitignore)

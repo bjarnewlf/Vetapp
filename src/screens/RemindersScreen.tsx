@@ -13,6 +13,8 @@ interface RemindersScreenProps {
   navigation: CompositeTabStackNavProp<'Reminders'>;
 }
 
+const REMINDER_HORIZON_DAYS = 30;
+
 export function RemindersScreen({ navigation }: RemindersScreenProps) {
   const { reminders, completeReminder, error: medicalError, refresh: refreshMedical } = useMedical();
   const { rule: overdueRule, loaded: settingsLoaded } = useOverdueSettings();
@@ -41,7 +43,16 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
   }, [reminders, overdueRule, settingsLoaded]);
 
   const activeReminders = reminders
-    .filter(r => r.status !== 'completed' && !completedIds.current.has(r.id))
+    .filter(r => {
+      if (r.status === 'completed' || completedIds.current.has(r.id)) return false;
+      // Überfällige immer anzeigen
+      if (r.status === 'overdue') return true;
+      // Zukünftige nur wenn innerhalb des Horizonts
+      const reminderDate = new Date(r.date);
+      const horizon = new Date();
+      horizon.setDate(horizon.getDate() + REMINDER_HORIZON_DAYS);
+      return reminderDate <= horizon;
+    })
     .sort((a, b) => {
       if (a.status === 'overdue' && b.status !== 'overdue') return -1;
       if (a.status !== 'overdue' && b.status === 'overdue') return 1;
