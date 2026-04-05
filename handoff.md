@@ -11,27 +11,21 @@
 - **Projekt 2:** Laeuft parallel in zweiter Claude-Instanz — Doku kommt spaeter in den Vault
 - **Brian Autonomie:** Level 3 freigeschaltet — Standard-Features ohne Rueckfrage
 - **Immer sauber arbeiten:** Claas will keine Quick-Fixes oder technische Schulden — immer den sauberen Weg
+- **Branch-Frage offen:** master vs. main als Haupt-Branch — Claas entscheidet spaeter
 
 ---
 
 ## Offene Migrationen / Deployments
 
-| Was | Status | Datum |
-|---|---|---|
-| notification_id fuer reminders | **DEPLOYED** | 2026-04-05 |
-| Edge Function ai-chat (S-2 + S-4) | **DEPLOYED** | 2026-04-05 |
-| Migration-Dateien auf 14-stellige Timestamps | **ERLEDIGT** | 2026-04-05 |
-| Migration CLI synchronisiert (repair) | **ERLEDIGT** | 2026-04-05 |
-
-Keine offenen Deployments.
+Keine offenen Deployments. Alles live.
 
 ---
 
 ## Aktuelle Uebergabe
 
 **Agent:** Brian
-**Zeitpunkt:** 2026-04-05
-**Session:** Deployments + QA-Runde 7
+**Zeitpunkt:** 2026-04-05 Feierabend
+**Session:** Deployments, QA-Runde 7, GitHub aufgeraeumt
 
 ### Erledigt (diese Session)
 
@@ -43,12 +37,19 @@ Keine offenen Deployments.
 - **F-033 gefixt** — OnboardingScreen SafeArea (beim Umbau uebersehen)
 - **Recherche archiviert** — AI Computer Use / Maestro fuer Mobile Testing (Vault)
 - **Idee archiviert** — Agency-Website Black-Hole-Hover-Effekt (Vault/Kopf/Ideen)
+- **GitHub aufgeraeumt** — 14 Commits gepusht, master in main gemerged, beide Branches aktuell
+- **Fake-Task gestrichen** — "alte Tabellen droppen" war ungueltig (nur Variablennamen, keine DB-Tabellen)
 
-### Wartet auf Claas (Handy-Tests)
+### Naechste Session — was ansteht
 
+**Handy-Tests (nur Claas, 10-15 Min):**
 - Erinnerungen abhaken (jaehrlich) — 30-Tage-Filter testen
 - Tierarzt-Kontakt (ST-07)
 - SafeArea auf iPhone pruefen (jetzt inkl. OnboardingScreen)
+
+**Danach:**
+- Bugs aus Handy-Test fixen
+- MVP dem Kunden zeigen → Phase-2-Zahlung (2.160 EUR)
 
 ### Offen (vor Go-Live, nicht dringend)
 
@@ -61,8 +62,9 @@ Keine offenen Deployments.
 
 ## Vorherige Uebergaben (zusammengefasst)
 
-### 2026-04-05 Abend (Feierabend)
-- Mega-Tag: Crash-Recovery, QA, Jest, Security S-2-S-8, SafeArea, 30-Tage-Horizont
+### 2026-04-05 (Mega-Tag)
+- Crash-Recovery, QA, Jest, Security S-2-S-8, SafeArea, 30-Tage-Horizont
+- Deployments, QA-Runde 7, GitHub aufgeraeumt
 
 ### 2026-04-04
 - Health-Check, Stitch, Meeting, Dashboard, Roadmaps, QA
