@@ -23,48 +23,63 @@ Keine offenen Deployments. Alles live.
 
 ## Aktuelle Uebergabe
 
-**Agent:** Brian
-**Zeitpunkt:** 2026-04-05 Feierabend
-**Session:** Deployments, QA-Runde 7, GitHub aufgeraeumt
+**Agent:** Dokumentar
+**Zeitpunkt:** 2026-04-05
+**Session:** Session 10 Dokumentation (Handy-Test + Visuelle Features)
 
-### Erledigt (diese Session)
+### Handy-Test — Ergebnis (2026-04-05)
 
-- **Edge Function `ai-chat` deployed** — S-2 (Rate-Limit fail-closed) + S-4 (Authorization Bearer) live
-- **Migration-Dateien umbenannt** — 8-stellig auf 14-stellig (Supabase CLI Format)
-- **3 alte Migrationen repariert** — `migration repair --status applied`, CLI synchron
-- **`notification_id` Migration deployed** — Spalte existierte bereits, kein Problem
-- **QA-Runde 7** — 4 Findings (1 Mittel, 3 Niedrig)
-- **F-033 gefixt** — OnboardingScreen SafeArea (beim Umbau uebersehen)
-- **Recherche archiviert** — AI Computer Use / Maestro fuer Mobile Testing (Vault)
-- **Idee archiviert** — Agency-Website Black-Hole-Hover-Effekt (Vault/Kopf/Ideen)
-- **GitHub aufgeraeumt** — 14 Commits gepusht, master in main gemerged, beide Branches aktuell
-- **Fake-Task gestrichen** — "alte Tabellen droppen" war ungueltig (nur Variablennamen, keine DB-Tabellen)
+Alle Punkte auf dem Geraet bestaetigt:
+- Jaehrliche Erinnerungen abhaken: OK
+- 30-Tage-Anzeige: OK
+- Tierarzt-Kontakt (Anlegen, Bearbeiten, Anrufen): OK
+- SafeArea unten: OK (nach Tab-Bar-Fix)
+
+### Erledigt (Session 10)
+
+**Fixes:**
+- F-034 gefixt — `__DEV__`-Guard in `VetContactContext.tsx` Z.49 und `PetContext.tsx` Z.241
+- SafeArea Tab-Bar — Hoehe `60 + insets.bottom`, kein Extra-Padding
+- HomeScreen "VetApp" Text — `paddingTop`-Bug: `headerCollapsedContent` jetzt `bottom: 0`, kein Inline-`paddingTop`
+- PetDetailScreen Foto-Bleed — Opacity interpoliert von 0.5 (expanded) auf 0 (collapsed)
+- PetDetailScreen Performance — `shouldRasterizeIOS`, `renderToHardwareTextureAndroid`, `removeClippedSubviews`, doppeltes Nav-Rendering eliminiert
+
+**Neue Features:**
+- HomeScreen Collapsing Gradient Header — 120px (expanded) → 64px (collapsed), Pull-to-Reveal-Stretch
+- PetDetailScreen Parallax Hero — 240px Hero, Tierfoto 50% Opacity, Overscroll-Stretch, Gradient-Overlay
+
+**TypeScript:** 0 Fehler (bestaetigt)
+
+### Offene Punkte (technisch)
+
+- `useNativeDriver: true` fuer height-Animationen nicht moeglich (RN-Einschraenkung). Hardware-Texture-Hints kompensieren — kein Handlungsbedarf.
+- Profil-Button in HomeScreen technisch doppelt (expanded View + absolut) — funktioniert korrekt, kein Fix noetig.
 
 ### Naechste Session — was ansteht
 
-**Handy-Tests (nur Claas, 10-15 Min):**
-- Erinnerungen abhaken (jaehrlich) — 30-Tage-Filter testen
-- Tierarzt-Kontakt (ST-07)
-- SafeArea auf iPhone pruefen (jetzt inkl. OnboardingScreen)
+**MVP-Demo (primaer):**
+- Claas zeigt App dem Kunden
+- Phase-2-Zahlung ausloesen (2.160 EUR)
 
-**Danach:**
-- Bugs aus Handy-Test fixen
-- MVP dem Kunden zeigen → Phase-2-Zahlung (2.160 EUR)
+**Danach (Phase 3):**
+- S-1: RevenueCat IAP Integration (Release-Blocker)
+- KI-Assistent mit Tool Use (~2-3 Tage)
+- Weitere Animationen / Feinschliff
 
 ### Offen (vor Go-Live, nicht dringend)
 
-- F-034: console.error/warn in Contexts ohne __DEV__-Guard (Batch)
-- F-035: ai_usage Insert-Reihenfolge (Rate-Limit-Zaehler)
-- F-036: UTC/Lokal-Mix im 30-Tage-Horizont (max 2h Abweichung)
-- **S-1: Premium-Bypass** — RevenueCat IAP (1-2 Tage, Phase 3)
+- F-035: ai_usage Insert-Reihenfolge
+- F-036: UTC/Lokal-Mix im 30-Tage-Horizont (max 2h)
+- S-1: Premium-Bypass — RevenueCat IAP (Phase 3, Release-Blocker)
 
 ---
 
 ## Vorherige Uebergaben (zusammengefasst)
 
-### 2026-04-05 (Mega-Tag)
-- Crash-Recovery, QA, Jest, Security S-2-S-8, SafeArea, 30-Tage-Horizont
-- Deployments, QA-Runde 7, GitHub aufgeraeumt
+### 2026-04-05 (Mega-Tag, Sessions 1-9)
+- Crash-Recovery, QA, Jest, Security S-2-S-8, SafeArea flaechendeckend
+- Deployments (Edge Function, Migrations, notification_id), QA-Runde 7, GitHub aufgeraeumt
+- F-033 gefixt (OnboardingScreen SafeArea), F-034 teilweise (aiService + Contexts ausser 2 Stellen)
 
 ### 2026-04-04
 - Health-Check, Stitch, Meeting, Dashboard, Roadmaps, QA

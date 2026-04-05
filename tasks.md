@@ -11,10 +11,10 @@
 ## SOFORT — Handy-Test (wartet auf Claas)
 
 - [x] **Erinnerungen abhaken (einmalig)** — funktioniert, Slide-Out OK
-- [ ] **Erinnerungen abhaken (jaehrlich)** — 30-Tage-Horizont-Filter eingebaut, Claas testet spaeter
-- [ ] **Tierarzt-Kontakt** testen (ST-07: Anlegen, Bearbeiten, Telefon-Link)
-- [ ] **SafeArea pruefen** — useSafeAreaInsets() in allen Screens (inkl. OnboardingScreen), auf iPhone testen
-- [ ] Bugs sammeln und fixen
+- [x] **Erinnerungen abhaken (jaehrlich)** — 30-Tage-Horizont-Filter: bestaetigt auf Handy (2026-04-05)
+- [x] **Tierarzt-Kontakt** testen (ST-07: Anlegen, Bearbeiten, Telefon-Link) — bestaetigt auf Handy (2026-04-05)
+- [x] **SafeArea pruefen** — useSafeAreaInsets() in allen Screens (inkl. OnboardingScreen), auf iPhone getestet: OK (2026-04-05)
+- [x] Bugs sammeln und fixen — SafeArea Tab-Bar, Header-Text, Foto-Bleed, Performance alle gefixt
 
 ---
 
@@ -28,7 +28,7 @@
 
 ## VOR GO-LIVE (nicht dringend)
 
-- [ ] **F-034:** console.error/warn in Contexts ohne __DEV__-Guard (10 Stellen, Batch)
+- [x] **F-034:** console.error/warn in Contexts ohne __DEV__-Guard — VetContactContext.tsx Z.49 + PetContext.tsx Z.241 gefixt (2026-04-05)
 - [ ] **F-035:** ai_usage Insert-Reihenfolge optimieren
 - [ ] **F-036:** UTC/Lokal-Mix im 30-Tage-Horizont (kosmetisch, max 2h)
 
@@ -43,8 +43,8 @@
 - [x] Falsche Premium-Features entfernt
 - [x] Security S-2 bis S-8 gefixt
 - [x] Edge Function + Migration deployed
-- [ ] Handy-Test: Erinnerungen jaehrlich + Tierarzt + SafeArea
-- [ ] Bugs aus Handy-Test fixen
+- [x] Handy-Test: Erinnerungen jaehrlich + Tierarzt + SafeArea — alle bestanden (2026-04-05)
+- [x] Bugs aus Handy-Test fixen — SafeArea Tab-Bar, Header-Text, Foto-Bleed, Performance
 - [ ] Dem Kunden vorzeigbaren MVP praesentieren
 - [ ] Phase-2-Zahlung ausloesen (2.160 EUR)
 
@@ -85,7 +85,7 @@
 
 ## BACKLOG (nach MVP)
 
-- [ ] **Stretch-Header PetDetail** — Pull-to-Reveal Parallax-Effekt (Idee Claas 05.04.)
+- [x] **Stretch-Header PetDetail** — Parallax Hero implementiert: 240px Hero, Foto-Fade, Overscroll-Stretch (2026-04-05)
 - [ ] **Maestro E2E-Tests** — Setup evaluiert, Konzept im Vault archiviert
 - [ ] Chat-Historie persistent
 - [ ] Custom Font (Inter)
@@ -103,6 +103,16 @@
 ---
 
 ## ERLEDIGT
+
+### 2026-04-05 — Session 10 (Handy-Test + Visuelle Features)
+- [x] Handy-Test abgeschlossen: jaehrliche Erinnerungen, Tierarzt-Kontakt, SafeArea — alle OK
+- [x] F-034 gefixt: VetContactContext.tsx Z.49 + PetContext.tsx Z.241
+- [x] SafeArea Tab-Bar korrekt: 60 + insets.bottom, kein Extra-Padding
+- [x] HomeScreen Collapsing Gradient Header implementiert (120px → 64px)
+- [x] HomeScreen "VetApp" Text Fix — paddingTop-Bug behoben
+- [x] PetDetailScreen Parallax Hero — 240px, Foto-Fade, Overscroll-Stretch
+- [x] PetDetailScreen Foto-Bleed Fix — Opacity 0.5 → 0 beim Scrollen
+- [x] PetDetailScreen Performance: shouldRasterizeIOS, renderToHardwareTextureAndroid, removeClippedSubviews, doppeltes Nav-Rendering eliminiert
 
 ### 2026-04-05 — Session 9 (Deployments + QA)
 - [x] Edge Function ai-chat deployed (S-2 + S-4 live)
@@ -141,4 +151,4 @@
 - [x] Sprint Tag 1: Alle Basis-Features
 
 ---
-Zuletzt aktualisiert: 2026-04-05
+Zuletzt aktualisiert: 2026-04-05 (Session 10 — Handy-Test + Visuelle Features)

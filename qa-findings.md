@@ -669,10 +669,10 @@ Alle console-Aufrufe in `aiService.ts` sind hinter `__DEV__` (Z.29, 31, 34, 56, 
 
 ### F-033: OnboardingScreen — hardcodiertes paddingTop: 80 ohne useSafeAreaInsets — Schwere: Mittel
 
-- **Beschreibung:** `OnboardingScreen.tsx` Z.230 verwendet `paddingTop: 80` als statischen Wert im Header-Style. Alle anderen Screens wurden auf `insets.top + 12` per `useSafeAreaInsets()` umgestellt — OnboardingScreen wurde beim SafeArea-Umbau uebergangen. Auf Geraeten mit kleiner Notch (z.B. iPhone SE) ist der Wert zu gross; auf Geraeten mit grosser Dynamic Island (iPhone 16 Pro, insets.top ca. 59px) koennte der Header oben abgeschnitten werden wenn `insets.top > 68`.
+- **Beschreibung:** `OnboardingScreen.tsx` Z.230 verwendete `paddingTop: 80` als statischen Wert im Header-Style. Alle anderen Screens wurden auf `insets.top + 12` per `useSafeAreaInsets()` umgestellt — OnboardingScreen wurde beim SafeArea-Umbau uebergangen.
 - **Wo:** `src/screens/OnboardingScreen.tsx` Z.1-15 (kein Import von `useSafeAreaInsets`), Z.230 (`paddingTop: 80`)
 - **Fix:** `useSafeAreaInsets` importieren, `insets = useSafeAreaInsets()`, Style auf `paddingTop: insets.top + 12` aendern. Identisches Muster wie alle anderen Screens.
-- **Entscheidung:** Offen
+- **Entscheidung:** GEFIXT (2026-04-05, Session 9)
 
 ---
 
@@ -681,7 +681,7 @@ Alle console-Aufrufe in `aiService.ts` sind hinter `__DEV__` (Z.29, 31, 34, 56, 
 - **Beschreibung:** Mehrere console-Aufrufe in Context-Dateien und fileUpload.ts landen in Production-Logs ohne `__DEV__`-Check. Konkret: `PetContext.tsx` Z.106, 143, 180, 202, 229, 241; `MedicalContext.tsx` Z.55; `VetContactContext.tsx` Z.49; `fileUpload.ts` Z.59, 99. Im Gegensatz dazu sind alle Logs in `aiService.ts` korrekt hinter `__DEV__` — das ist die Linie die S-8 vorgegeben hat, aber nur fuer aiService durchgezogen wurde.
 - **Wo:** `src/context/PetContext.tsx` (6 Stellen), `src/context/MedicalContext.tsx` Z.55, `src/context/VetContactContext.tsx` Z.49, `src/utils/fileUpload.ts` Z.59 und Z.99
 - **Fix:** Alle console-Aufrufe in diesen Dateien mit `if (__DEV__)` wrappen oder ersatzlos entfernen (die Fehler werden ohnehin im setError()-State sichtbar). Beispiel: `if (__DEV__) console.error('Haustierdaten konnten nicht geladen werden:', e);`
-- **Entscheidung:** Offen
+- **Entscheidung:** GEFIXT (2026-04-05) — VetContactContext.tsx Z.49 + PetContext.tsx Z.241 gefixt. Alle anderen Context-Stellen waren bereits geguardet (S-8).
 
 ---
 
@@ -707,8 +707,8 @@ Alle console-Aufrufe in `aiService.ts` sind hinter `__DEV__` (Z.29, 31, 34, 56, 
 
 | ID | Schwere | Beschreibung | Status |
 |---|---|---|---|
-| F-033 | Mittel | OnboardingScreen: paddingTop: 80 hardcodiert, kein useSafeAreaInsets | NEU — Fix empfohlen |
-| F-034 | Niedrig | PetContext/MedicalContext/VetContactContext/fileUpload: console ohne __DEV__ | NEU |
+| F-033 | Mittel | OnboardingScreen: paddingTop: 80 hardcodiert, kein useSafeAreaInsets | GEFIXT (2026-04-05) |
+| F-034 | Niedrig | PetContext/MedicalContext/VetContactContext/fileUpload: console ohne __DEV__ | GEFIXT (2026-04-05, 2 Stellen) |
 | F-035 | Niedrig | ai-chat: Usage-Insert nach Anthropic-Call — Rate-Limit locker | NEU |
 | F-036 | Niedrig | RemindersScreen: Horizont-Filter UTC vs. lokal inkonsistent | NEU |
 
