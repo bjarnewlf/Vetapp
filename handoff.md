@@ -23,45 +23,40 @@ Keine offenen Deployments. Alles live.
 
 ## Aktuelle Uebergabe
 
-**Agent:** Dokumentar
-**Zeitpunkt:** 2026-04-05
-**Session:** Session 10 Dokumentation (Handy-Test + Visuelle Features)
+**Agent:** Brian
+**Zeitpunkt:** 2026-04-06
+**Session:** Session 11 — MVP-Praesentation erstellt
 
-### Handy-Test — Ergebnis (2026-04-05)
+### Erledigt (Session 11)
 
-Alle Punkte auf dem Geraet bestaetigt:
-- Jaehrliche Erinnerungen abhaken: OK
-- 30-Tage-Anzeige: OK
-- Tierarzt-Kontakt (Anlegen, Bearbeiten, Anrufen): OK
-- SafeArea unten: OK (nach Tab-Bar-Fix)
+- **Gewerbe-Blocker in tasks.md eingetragen** — MVP-Praesentation haengt an Gewerbe-Anmeldung (Claas persoenlich)
+- **VetApp_Phase2_Praesentation.pptx erstellt** — 16 Folien, 56 KB
+  - Erste Version abgelehnt (zu flach, zu wenig visuell)
+  - Zweite Version: Cards, Stat-Boxes, zwei-spaltige Layouts, grosse Zahlen, Farb-Blocking
+  - Claas hat zweite Version abgenommen: "das passt erst mal so"
+  - Datei liegt in: `C:\Users\claas\claude-workspace\VetApp\VetApp_Phase2_Praesentation.pptx`
 
-### Erledigt (Session 10)
+### Praesentation — Inhalt (16 Folien)
 
-**Fixes:**
-- F-034 gefixt — `__DEV__`-Guard in `VetContactContext.tsx` Z.49 und `PetContext.tsx` Z.241
-- SafeArea Tab-Bar — Hoehe `60 + insets.bottom`, kein Extra-Padding
-- HomeScreen "VetApp" Text — `paddingTop`-Bug: `headerCollapsedContent` jetzt `bottom: 0`, kein Inline-`paddingTop`
-- PetDetailScreen Foto-Bleed — Opacity interpoliert von 0.5 (expanded) auf 0 (collapsed)
-- PetDetailScreen Performance — `shouldRasterizeIOS`, `renderToHardwareTextureAndroid`, `removeClippedSubviews`, doppeltes Nav-Rendering eliminiert
-
-**Neue Features:**
-- HomeScreen Collapsing Gradient Header — 120px (expanded) → 64px (collapsed), Pull-to-Reveal-Stretch
-- PetDetailScreen Parallax Hero — 240px Hero, Tierfoto 50% Opacity, Overscroll-Stretch, Gradient-Overlay
-
-**TypeScript:** 0 Fehler (bestaetigt)
-
-### Offene Punkte (technisch)
-
-- `useNativeDriver: true` fuer height-Animationen nicht moeglich (RN-Einschraenkung). Hardware-Texture-Hints kompensieren — kein Handlungsbedarf.
-- Profil-Button in HomeScreen technisch doppelt (expanded View + absolut) — funktioniert korrekt, kein Fix noetig.
+1. Titelfolie — "VetApp" mit dekorativem Dark-Rect + orange Akzentlinie
+2. Problem — 2×2 Card-Grid mit #CC6B3D Top-Stripes
+3. Loesung — Zentrales Teal-Banner + 4 Saeulen-Grid
+4. Phase-2-Abnahme — Checkliste auf dunklem Teal mit Haekchen-Badges
+5–10. 6 Feature-Slides — grosse Zahl rechts, Detail-Cards links
+11. Free vs. Pro — Side-by-side, Pro-Card orange umrandet und groesser
+12. Tech-Stack — 4 Cards mit Abkuerzungen (RN/TS/SB/AI)
+13. Qualitaet — 3 Stat-Boxes: 0 TS-Fehler, 8 Security-Fixes, 10 Smoke-Tests
+14. Phase-3-Roadmap — 4 Cards auf Teal-Hintergrund
+15. Next Steps — 4 Action-Cards mit Nummern-Badges
+16. Abschluss — "Danke." auf Teal
 
 ### Naechste Session — was ansteht
 
-**MVP-Demo (primaer):**
-- Claas zeigt App dem Kunden
-- Phase-2-Zahlung ausloesen (2.160 EUR)
+**Blocker:**
+- Gewerbe anmelden (Claas) — danach MVP-Praesentation beim Kunden
+- Phase-2-Zahlung ausloesen (2.160 EUR) nach Praesentation
 
-**Danach (Phase 3):**
+**Phase 3 (danach):**
 - S-1: RevenueCat IAP Integration (Release-Blocker)
 - KI-Assistent mit Tool Use (~2-3 Tage)
 - Weitere Animationen / Feinschliff
@@ -76,10 +71,14 @@ Alle Punkte auf dem Geraet bestaetigt:
 
 ## Vorherige Uebergaben (zusammengefasst)
 
-### 2026-04-05 (Mega-Tag, Sessions 1-9)
+### 2026-04-05 (Session 10 — Handy-Test + Visuelle Features)
+- Handy-Test abgeschlossen: jaehrliche Erinnerungen, Tierarzt-Kontakt, SafeArea — alle OK
+- F-034 gefixt, SafeArea Tab-Bar, HomeScreen Collapsing Header, PetDetail Parallax Hero
+- TypeScript: 0 Fehler
+
+### 2026-04-05 (Sessions 1-9)
 - Crash-Recovery, QA, Jest, Security S-2-S-8, SafeArea flaechendeckend
 - Deployments (Edge Function, Migrations, notification_id), QA-Runde 7, GitHub aufgeraeumt
-- F-033 gefixt (OnboardingScreen SafeArea), F-034 teilweise (aiService + Contexts ausser 2 Stellen)
 
 ### 2026-04-04
 - Health-Check, Stitch, Meeting, Dashboard, Roadmaps, QA

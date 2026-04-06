@@ -2,7 +2,7 @@
 
 > Ziel: Phase 2 (Entwicklung MVP) abschliessen — vorzeigbar auf dem Handy.
 > PDF-Export und Tierarztfinder sind bewusst ausgeklammert (Scope noch undefiniert).
-> Stand: 2026-04-05
+> Stand: 2026-04-06
 >
 > Status-Konvention: `[ ]` = offen, `[~]` = in Arbeit, `[x]` = erledigt
 
@@ -45,6 +45,8 @@
 - [x] Edge Function + Migration deployed
 - [x] Handy-Test: Erinnerungen jaehrlich + Tierarzt + SafeArea — alle bestanden (2026-04-05)
 - [x] Bugs aus Handy-Test fixen — SafeArea Tab-Bar, Header-Text, Foto-Bleed, Performance
+- [x] **Kunden-Praesentation erstellt** — VetApp_Phase2_Praesentation.pptx, 16 Folien, abgenommen (2026-04-06)
+- [ ] **Gewerbe anmelden (Claas)** — blocker fuer MVP-Praesentation + Phase-2-Zahlung
 - [ ] Dem Kunden vorzeigbaren MVP praesentieren
 - [ ] Phase-2-Zahlung ausloesen (2.160 EUR)
 
@@ -104,6 +106,10 @@
 
 ## ERLEDIGT
 
+### 2026-04-06 — Session 11 (MVP-Praesentation)
+- [x] Kunden-Praesentation erstellt: VetApp_Phase2_Praesentation.pptx, 16 Folien, abgenommen
+- [x] Gewerbe-Blocker in tasks.md dokumentiert
+
 ### 2026-04-05 — Session 10 (Handy-Test + Visuelle Features)
 - [x] Handy-Test abgeschlossen: jaehrliche Erinnerungen, Tierarzt-Kontakt, SafeArea — alle OK
 - [x] F-034 gefixt: VetContactContext.tsx Z.49 + PetContext.tsx Z.241
@@ -151,4 +157,4 @@
 - [x] Sprint Tag 1: Alle Basis-Features
 
 ---
-Zuletzt aktualisiert: 2026-04-05 (Session 10 — Handy-Test + Visuelle Features)
+Zuletzt aktualisiert: 2026-04-06 (Session 11 — Praesentation abgenommen)
