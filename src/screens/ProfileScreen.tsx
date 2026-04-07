@@ -218,9 +218,7 @@ const styles = StyleSheet.create({
     ...typography.body,
     color: colors.textOnPrimary,
   },
-  upgradeButton: {
-    backgroundColor: colors.accent,
-  },
+  upgradeButton: {},
   aiCard: {
     marginBottom: spacing.md,
   },

@@ -17,7 +17,7 @@ import { useFadeIn } from '../hooks/useFadeIn';
 import { SkeletonCard } from '../components';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
-import { colors, typography, spacing, borderRadius } from '../theme';
+import { colors, typography, spacing, borderRadius, TAB_BAR_HEIGHT } from '../theme';
 import { sendChatMessage, buildPetContext, ChatMessage } from '../services/aiService';
 import { usePets } from '../context/PetContext';
 import { useMedical } from '../context/MedicalContext';
@@ -269,7 +269,7 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
         </View>
 
         {/* Input-Bar */}
-        <View style={styles.inputContainer}>
+        <View style={[styles.inputContainer, { paddingBottom: TAB_BAR_HEIGHT }]}>
           <View style={styles.inputInner}>
             <TextInput
               style={[typography.body, styles.textInput]}
@@ -285,6 +285,8 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
             style={[styles.sendButton, (!input.trim() || loading) && styles.sendButtonDisabled]}
             onPress={() => doSend(input)}
             disabled={!input.trim() || loading}
+            accessibilityLabel="Nachricht senden"
+            accessibilityRole="button"
           >
             {loading ? (
               <ActivityIndicator size="small" color={colors.textOnPrimary} />
@@ -415,7 +417,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.surface,
-    borderRadius: borderRadius.lg,
+    borderRadius: borderRadius.xl,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
     borderWidth: 1,
@@ -559,13 +561,13 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: borderRadius.full,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'flex-end',
   },
   sendButtonDisabled: {
-    backgroundColor: colors.border,
+    opacity: 0.5,
   },
 
   // --- Loading / Non-Pro ---

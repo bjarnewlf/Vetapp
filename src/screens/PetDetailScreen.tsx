@@ -4,7 +4,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import * as DocumentPicker from 'expo-document-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, typography, spacing, borderRadius } from '../theme';
+import { colors, fonts, typography, spacing, borderRadius } from '../theme';
 import { Card } from '../components';
 import { usePets } from '../context/PetContext';
 import { useMedical } from '../context/MedicalContext';
@@ -12,6 +12,7 @@ import { useVetContact } from '../context/VetContactContext';
 import { useSubscription } from '../context/SubscriptionContext';
 import { animalTypeDisplayLabels } from '../types';
 import { getAge } from '../utils/petHelpers';
+import { MAX_DOCUMENT_SIZE, ALLOWED_MIME_TYPES } from '../utils/fileUpload';
 import { supabase } from '../lib/supabase';
 import type { RootStackNavProp, RootStackRouteProp } from '../types/navigation';
 import { PetHealthTab } from './pet/PetHealthTab';
@@ -133,6 +134,14 @@ export function PetDetailScreen({ navigation, route }: PetDetailScreenProps) {
     });
     if (!result.canceled && result.assets[0]) {
       const file = result.assets[0];
+      if (file.size && file.size > MAX_DOCUMENT_SIZE) {
+        Alert.alert('Datei zu groß', `Maximal ${MAX_DOCUMENT_SIZE / 1024 / 1024} MB erlaubt.`);
+        return;
+      }
+      if (file.mimeType && !ALLOWED_MIME_TYPES.includes(file.mimeType as any)) {
+        Alert.alert('Dateityp nicht erlaubt', 'Erlaubt sind: PDF, JPEG, PNG und HEIC.');
+        return;
+      }
       setUploading(true);
       const success = await addDocument({
         petId,
@@ -474,8 +483,8 @@ const styles = StyleSheet.create({
   },
   heroName: {
     fontSize: 28,
-    fontWeight: '800',
-    color: '#FFFFFF',
+    fontFamily: fonts.heading.bold,
+    color: colors.textOnPrimary,
     letterSpacing: -0.5,
   },
   heroMeta: {
@@ -522,7 +531,7 @@ const styles = StyleSheet.create({
   infoRows: { gap: spacing.sm },
   infoRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 4 },
   infoLabel: { ...typography.bodySmall, color: colors.primary },
-  infoValue: { ...typography.bodySmall, color: colors.text, fontWeight: '500' },
+  infoValue: { ...typography.bodySmall, color: colors.text, fontFamily: fonts.body.medium },
 
   // Tab Bar
   tabBar: {
@@ -544,8 +553,8 @@ const styles = StyleSheet.create({
     gap: 4, paddingVertical: 10, borderRadius: borderRadius.sm,
     zIndex: 1,
   },
-  tabLabel: { ...typography.caption, color: colors.textSecondary, fontWeight: '500' },
-  tabLabelActive: { color: colors.primary, fontWeight: '600' },
+  tabLabel: { ...typography.caption, color: colors.textSecondary, fontFamily: fonts.body.medium },
+  tabLabelActive: { color: colors.primary, fontFamily: fonts.body.semiBold },
 
   // Not Found
   notFoundText: { ...typography.h3, color: colors.text, marginBottom: spacing.sm },

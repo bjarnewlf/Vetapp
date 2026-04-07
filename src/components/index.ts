@@ -6,7 +6,7 @@ export { SelectField } from './SelectField';
 export type { SelectFieldOption } from './SelectField';
 export { ErrorBanner } from './ErrorBanner';
 export { EmptyState } from './EmptyState';
-export { SkeletonBox, SkeletonCard, SkeletonListItem } from './SkeletonLoader';
+export { SkeletonBox, SkeletonCard, SkeletonListItem, SkeletonPetCard } from './SkeletonLoader';
 export { AnimatedPressable } from './AnimatedPressable';
 export { PetListRow } from './PetListRow';
 export { TimelineItem } from './TimelineItem';

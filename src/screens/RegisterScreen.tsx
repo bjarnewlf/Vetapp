@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, typography, spacing, borderRadius } from '../theme';
+import { colors, fonts, typography, spacing, borderRadius } from '../theme';
 import { InputField, Button } from '../components';
 import { useAuth } from '../context/AuthContext';
 
@@ -26,8 +26,8 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
       Alert.alert('Ungültige E-Mail', 'Bitte gib eine gültige E-Mail-Adresse ein.');
       return;
     }
-    if (password.length < 6) {
-      Alert.alert('Passwort zu kurz', 'Bitte mindestens 6 Zeichen verwenden.');
+    if (password.length < 8) {
+      Alert.alert('Passwort zu kurz', 'Bitte mindestens 8 Zeichen verwenden.');
       return;
     }
     setLoading(true);
@@ -68,7 +68,7 @@ export function RegisterScreen({ onSwitchToLogin }: RegisterScreenProps) {
         />
         <InputField
           label="Passwort"
-          placeholder="Mindestens 6 Zeichen"
+          placeholder="Mindestens 8 Zeichen"
           value={password}
           onChangeText={setPassword}
           secureTextEntry
@@ -139,6 +139,6 @@ const styles = StyleSheet.create({
   switchLink: {
     ...typography.body,
     color: colors.primary,
-    fontWeight: '600',
+    fontFamily: fonts.body.semiBold,
   },
 });

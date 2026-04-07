@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { colors, borderRadius, typography } from '../theme';
+import { colors, fonts, borderRadius, typography } from '../theme';
 
 interface StatusBadgeProps {
   status: 'overdue' | 'upcoming' | 'completed';
@@ -30,6 +30,6 @@ const styles = StyleSheet.create({
   },
   text: {
     ...typography.caption,
-    fontWeight: '600',
+    fontFamily: fonts.body.semiBold,
   },
 });

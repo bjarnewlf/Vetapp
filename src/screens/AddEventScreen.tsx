@@ -4,7 +4,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, typography, spacing, borderRadius } from '../theme';
+import { colors, fonts, typography, spacing, borderRadius } from '../theme';
 import { InputField, Button, Card, SelectField } from '../components';
 import type { SelectFieldOption } from '../components';
 import { usePets } from '../context/PetContext';
@@ -412,7 +412,7 @@ const styles = StyleSheet.create({
   forPetLabel: {
     ...typography.bodySmall,
     color: colors.primary,
-    fontWeight: '600',
+    fontFamily: fonts.body.semiBold,
   },
   selectCard: {
     flexDirection: 'row',
@@ -462,7 +462,7 @@ const styles = StyleSheet.create({
   },
   proTagText: {
     fontSize: 11,
-    fontWeight: '600',
+    fontFamily: fonts.body.semiBold,
     color: colors.accent,
   },
   summaryCard: {

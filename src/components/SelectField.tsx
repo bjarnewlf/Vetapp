@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, typography, spacing, borderRadius } from '../theme';
+import { colors, fonts, typography, spacing, borderRadius } from '../theme';
 
 export interface SelectFieldOption {
   value: string;
@@ -119,6 +119,6 @@ const styles = StyleSheet.create({
   },
   pickerOptionSelected: {
     color: colors.primary,
-    fontWeight: '600',
+    fontFamily: fonts.body.semiBold,
   },
 });

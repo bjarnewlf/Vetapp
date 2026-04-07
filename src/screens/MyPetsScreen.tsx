@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, Image } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, typography, spacing, borderRadius } from '../theme';
-import { Button } from '../components';
+import { colors, typography, spacing, borderRadius, TAB_BAR_HEIGHT } from '../theme';
+import { Button, SkeletonPetCard } from '../components';
 import { usePets } from '../context/PetContext';
 import { Pet } from '../types';
 import { getAge } from '../utils/petHelpers';
@@ -14,7 +14,7 @@ interface MyPetsScreenProps {
 }
 
 export function MyPetsScreen({ navigation }: MyPetsScreenProps) {
-  const { pets } = usePets();
+  const { pets, loading } = usePets();
   const insets = useSafeAreaInsets();
 
   const renderPet = ({ item }: { item: Pet }) => (
@@ -48,7 +48,14 @@ export function MyPetsScreen({ navigation }: MyPetsScreenProps) {
           onPress={() => navigation.navigate('AddPet')}
           style={styles.addButton}
         />
-        {pets.length === 0 ? (
+        {loading ? (
+          <View style={styles.list}>
+            <SkeletonPetCard />
+            <SkeletonPetCard />
+            <SkeletonPetCard />
+            <SkeletonPetCard />
+          </View>
+        ) : pets.length === 0 ? (
           <View style={styles.empty}>
             <Ionicons name="paw-outline" size={48} color={colors.textLight} />
             <Text style={styles.emptyText}>Noch keine Haustiere</Text>
@@ -59,7 +66,7 @@ export function MyPetsScreen({ navigation }: MyPetsScreenProps) {
             data={pets}
             renderItem={renderPet}
             keyExtractor={item => item.id}
-            contentContainerStyle={styles.list}
+            contentContainerStyle={[styles.list, { paddingBottom: TAB_BAR_HEIGHT + insets.bottom }]}
             showsVerticalScrollIndicator={false}
           />
         )}

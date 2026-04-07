@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Alert, KeyboardAvoidingView, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { colors, typography, spacing, borderRadius } from '../theme';
+import { colors, fonts, typography, spacing, borderRadius } from '../theme';
 import { InputField, Button } from '../components';
 import { useAuth } from '../context/AuthContext';
 
@@ -18,6 +18,11 @@ export function LoginScreen({ onSwitchToRegister }: LoginScreenProps) {
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
       Alert.alert('Fehlende Angaben', 'Bitte E-Mail und Passwort eingeben.');
+      return;
+    }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      Alert.alert('Ungültige E-Mail', 'Bitte gib eine gültige E-Mail-Adresse ein.');
       return;
     }
     setLoading(true);
@@ -123,6 +128,6 @@ const styles = StyleSheet.create({
   switchLink: {
     ...typography.body,
     color: colors.primary,
-    fontWeight: '600',
+    fontFamily: fonts.body.semiBold,
   },
 });

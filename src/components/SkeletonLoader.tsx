@@ -67,6 +67,38 @@ export function SkeletonListItem(): React.ReactElement {
   );
 }
 
+export function SkeletonPetCard(): React.ReactElement {
+  return (
+    <View style={skeletonPetCardStyles.container}>
+      <SkeletonBox width={48} height={48} borderRadius={24} />
+      <View style={skeletonPetCardStyles.lines}>
+        <SkeletonBox width="70%" height={14} />
+        <SkeletonBox width="40%" height={12} style={{ marginTop: spacing.xs }} />
+      </View>
+    </View>
+  );
+}
+
+const skeletonPetCardStyles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+    borderRadius: borderRadius.lg,
+    padding: spacing.md,
+    shadowColor: 'rgba(0,0,0,0.08)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 1,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  lines: {
+    flex: 1,
+    marginLeft: spacing.md,
+    gap: spacing.xs,
+  },
+});
+
 const styles = StyleSheet.create({
   cardContainer: {
     flexDirection: 'row',

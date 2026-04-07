@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { Animated, TouchableWithoutFeedback, ViewStyle } from 'react-native';
+import * as Haptics from 'expo-haptics';
 
 interface AnimatedPressableProps {
   onPress: () => void;
@@ -7,6 +8,7 @@ interface AnimatedPressableProps {
   children: React.ReactNode;
   scaleDown?: number;
   disabled?: boolean;
+  haptic?: boolean;
 }
 
 export function AnimatedPressable({
@@ -15,10 +17,14 @@ export function AnimatedPressable({
   children,
   scaleDown = 0.97,
   disabled,
+  haptic = false,
 }: AnimatedPressableProps) {
   const scale = useRef(new Animated.Value(1)).current;
 
   const handlePressIn = () => {
+    if (haptic) {
+      Haptics.selectionAsync();
+    }
     Animated.spring(scale, {
       toValue: scaleDown,
       useNativeDriver: true,

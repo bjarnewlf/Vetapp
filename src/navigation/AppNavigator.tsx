@@ -3,9 +3,8 @@ import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../theme';
+import { FloatingTabBar } from '../components/FloatingTabBar';
 import { useAuth } from '../context/AuthContext';
 import { usePets } from '../context/PetContext';
 import type { RootStackParamList, TabParamList } from '../types/navigation';
@@ -33,41 +32,18 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabParamList>();
 
 function TabNavigator() {
-  const insets = useSafeAreaInsets();
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
+      tabBar={(props) => <FloatingTabBar {...props} />}
+      screenOptions={{
         headerShown: false,
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName: keyof typeof Ionicons.glyphMap = 'home';
-          switch (route.name) {
-            case 'Home': iconName = focused ? 'home' : 'home-outline'; break;
-            case 'My Pets': iconName = focused ? 'paw' : 'paw-outline'; break;
-            case 'AI': iconName = focused ? 'chatbubble-ellipses' : 'chatbubble-ellipses-outline'; break;
-            case 'Reminders': iconName = focused ? 'notifications' : 'notifications-outline'; break;
-            case 'Vet Contact': iconName = focused ? 'medkit' : 'medkit-outline'; break;
-          }
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-        tabBarActiveTintColor: colors.tabActive,
-        tabBarInactiveTintColor: colors.tabInactive,
-        tabBarStyle: {
-          backgroundColor: colors.surface,
-          borderTopColor: colors.borderLight,
-          paddingBottom: insets.bottom,
-          paddingTop: 8,
-          height: 60 + insets.bottom,
-        },
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '500',
-        },
-      })}
+        tabBarShowLabel: false,
+      }}
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarLabel: 'Start' }} />
       <Tab.Screen name="My Pets" component={MyPetsScreen} options={{ tabBarLabel: 'Tiere' }} />
-      <Tab.Screen name="AI" component={AIAssistantScreen} options={{ tabBarLabel: 'KI-Assistent' }} />
-      <Tab.Screen name="Reminders" component={RemindersScreen} options={{ tabBarLabel: 'Erinnerungen' }} />
+      <Tab.Screen name="AI" component={AIAssistantScreen} options={{ tabBarLabel: 'KI' }} />
+      <Tab.Screen name="Reminders" component={RemindersScreen} options={{ tabBarLabel: 'Erinnern' }} />
       <Tab.Screen name="Vet Contact" component={VetContactScreen} options={{ tabBarLabel: 'Tierarzt' }} />
     </Tab.Navigator>
   );

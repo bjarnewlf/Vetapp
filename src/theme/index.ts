@@ -1,5 +1,6 @@
 export { colors } from './colors';
 export { typography } from './typography';
+export { fonts } from './fonts';
 
 export const spacing = {
   xs: 4,
@@ -18,3 +19,6 @@ export const borderRadius = {
   xl: 24,
   full: 999,
 } as const;
+
+// 64px bar + 16px bottom offset (absolute positioned)
+export const TAB_BAR_HEIGHT = 80;

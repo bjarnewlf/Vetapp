@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { colors, typography, spacing, borderRadius } from '../theme';
+import { colors, fonts, typography, spacing, borderRadius } from '../theme';
 import { AnimatedPressable } from './AnimatedPressable';
 
 type TimelineItemType = 'reminder' | 'vaccination' | 'deworming' | 'checkup' | 'custom';
@@ -127,6 +127,6 @@ const styles = StyleSheet.create({
   },
   badgeText: {
     fontSize: 11,
-    fontWeight: '600',
+    fontFamily: fonts.body.semiBold,
   },
 });

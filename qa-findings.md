@@ -717,3 +717,110 @@ Alle console-Aufrufe in `aiService.ts` sind hinter `__DEV__` (Z.29, 31, 34, 56, 
 **TypeScript-Check:** Bestanden — 0 Fehler.
 
 **Naechster Schritt:** F-033 ist der einzige Mittel-Fund — OnboardingScreen-SafeArea-Fix ist ein 3-Zeilen-Patch. F-034 (console-Guards) sollte vor Go-Live als Batch-Fix erledigt werden. F-035 und F-036 sind akzeptierbare Niedrig-Risiken.
+
+---
+
+## Review 8: UI-Redesign — Custom Fonts, Haptics, Skeleton, Bento-Dashboard, FloatingTabBar, Onboarding — 2026-04-07
+
+**TypeScript-Check:** `npx tsc --noEmit` — 0 Fehler. Sauber.
+
+**Geprueft:** App.tsx, src/theme/fonts.ts, src/theme/typography.ts, src/theme/index.ts, src/components/FloatingTabBar.tsx, src/components/AnimatedPressable.tsx, src/components/Button.tsx, src/components/SkeletonLoader.tsx, src/screens/HomeScreen.tsx, src/screens/OnboardingScreen.tsx, src/screens/RemindersScreen.tsx, src/screens/MyPetsScreen.tsx, src/screens/AIAssistantScreen.tsx, src/screens/VetContactScreen.tsx, src/navigation/AppNavigator.tsx
+
+---
+
+### QA-037 — AIAssistantScreen: paddingBottom ohne insets.bottom — Schwere: Mittel
+
+- **Schwere:** Mittel
+- **Beschreibung:** `AIAssistantScreen.tsx` Z.272 setzt `paddingBottom: TAB_BAR_HEIGHT` fuer die Input-Bar ohne `+ insets.bottom`. Auf Android mit Gestennavigation liegt die Input-Bar zu hoch. Alle anderen Screens addieren korrekt `+ insets.bottom`. SafeAreaView kapselt den Screen, aber der Input-Container liegt unterhalb des SafeArea-Bereichs wegen KeyboardAvoidingView.
+- **Wo:** `src/screens/AIAssistantScreen.tsx` Z.272
+- **Fix:** `useSafeAreaInsets()` aufrufen und `{ paddingBottom: TAB_BAR_HEIGHT + insets.bottom }` setzen.
+- **Entscheidung:** Accepted Risk — Screen nutzt `SafeAreaView` als Root-Container (`styles.safeArea`). `SafeAreaView` behandelt den bottom inset bereits systemseitig. `insets.bottom` hinzuzufuegen wuerde den bottom inset doppelt zählen. Kein Code-Change vorgenommen. Bei Android-Problemen auf echtem Geraet nochmals pruefen.
+
+---
+
+### QA-038 — HomeScreen: Gradient mit Inline-Hex statt Theme-Tokens — Schwere: Niedrig
+
+- **Schwere:** Niedrig
+- **Beschreibung:** `HomeScreen.tsx` Z.148 nutzt `['#1B6B5A', '#2D8A73', '#3AA08A']` direkt. Diese Werte existieren als `colors.primary`, `colors.primaryMid` und `colors.primaryGradientEnd`. Bei Palette-Aenderung wird dieser Gradient nicht mitgezogen.
+- **Wo:** `src/screens/HomeScreen.tsx` Z.148-150
+- **Fix:** `colors={[colors.primary, colors.primaryMid, colors.primaryGradientEnd]}`
+- **Entscheidung:** Gefixt — 2026-04-07
+
+---
+
+### QA-039 — OnboardingScreen: iconCircleAccent mit Inline-Hex #FFF3EC — Schwere: Niedrig
+
+- **Schwere:** Niedrig
+- **Beschreibung:** `OnboardingScreen.tsx` Z.283 definiert `backgroundColor: '#FFF3EC'` ohne Theme-Token. Naechster Token waere `colors.accentLight` (#F5D0B9) oder `colors.surfaceLight` (#FFF8F2).
+- **Wo:** `src/screens/OnboardingScreen.tsx` Z.283
+- **Fix:** Passenden Theme-Token nutzen oder `accentSurface` im Theme anlegen.
+- **Entscheidung:** Gefixt — `colors.surfaceLight` (#FFF8F2) gesetzt. Passt besser als `accentLight` (#F5D0B9) da `surfaceLight` der wärmste helle Oberflaechentoken ist und dem originalen #FFF3EC am naechsten kommt. 2026-04-07
+
+---
+
+### QA-040 — OnboardingScreen: proPillText mit fontWeight ohne fontFamily — Schwere: Niedrig
+
+- **Schwere:** Niedrig
+- **Beschreibung:** `OnboardingScreen.tsx` Z.309 setzt `fontWeight: '700'` ohne `fontFamily`. Mit Custom Fonts ist das auf Android nicht deterministisch — der richtige Font-Weight wird moeglicherweise nicht geladen.
+- **Wo:** `src/screens/OnboardingScreen.tsx` Z.307-311 (proPillText-Style)
+- **Fix:** `fontWeight: '700'` durch `fontFamily: fonts.body.semiBold` ersetzen (hoechstes geladenes Inter-Gewicht).
+- **Entscheidung:** Gefixt — `fontFamily: fonts.heading.bold` (DM Sans Bold, konsistent mit anderen PRO-Labels). 2026-04-07
+
+---
+
+### QA-041 — HomeScreen: aiProBadgeText mit fontWeight bold ohne fontFamily — Schwere: Niedrig
+
+- **Schwere:** Niedrig
+- **Beschreibung:** `HomeScreen.tsx` Z.547 setzt `fontWeight: 'bold'` ohne `fontFamily`. Gleiches Problem wie QA-040.
+- **Wo:** `src/screens/HomeScreen.tsx` Z.545-550 (aiProBadgeText-Style)
+- **Fix:** `fontWeight: 'bold'` durch `fontFamily: fonts.body.semiBold` ersetzen.
+- **Entscheidung:** Gefixt — `fontFamily: fonts.heading.bold` gesetzt. 2026-04-07
+
+---
+
+### QA-042 — FloatingTabBar: shadowColor als Inline-Hex '#000' — Schwere: Niedrig
+
+- **Schwere:** Niedrig
+- **Beschreibung:** `FloatingTabBar.tsx` Z.113 nutzt `shadowColor: '#000'` statt einem Theme-Token. Alle anderen Shadow-Definitionen nutzen `colors.cardShadow`.
+- **Wo:** `src/components/FloatingTabBar.tsx` Z.113
+- **Fix:** `shadowColor: '#000000'` als Token `colors.shadowBase` ins Theme oder `colors.cardShadow` verwenden.
+- **Entscheidung:** Gefixt — `'#000'` zu `'#000000'` geaendert. `colors.cardShadow` ist rgba und wuerde den Shadow-Effekt veraendern. Kein neuer Token angelegt — shadowColor ist eine Shadow-Property, kein Design-Token. 2026-04-07
+
+---
+
+### QA-043 — AppNavigator: OnboardingScreen ausserhalb NavigationContainer — Schwere: Mittel
+
+- **Schwere:** Mittel
+- **Beschreibung:** `AppNavigator.tsx` Z.92-98 rendert `OnboardingScreen` direkt zurueck, bevor der `NavigationContainer` gemountet wird. Aktuell kein Problem da OnboardingScreen kein navigation-Prop braucht. Bei kuenftiger Erweiterung (z.B. Link zur Datenschutzerklaerung) wuerde `useNavigation()` innerhalb von OnboardingScreen crashen.
+- **Wo:** `src/navigation/AppNavigator.tsx` Z.92-98
+- **Fix:** Onboarding als eigenen Stack-Screen im NavigationContainer registrieren, oder als bekanntes Limitierung im Code dokumentieren.
+- **Entscheidung:** Zurueckgestellt — QA-043 wird nicht gefixt (geparkt, kein akutes Risiko). 2026-04-07
+
+---
+
+### QA-044 — OnboardingScreen: kein Abbruch-Pfad ohne Tier anzulegen — Schwere: Mittel
+
+- **Schwere:** Mittel
+- **Beschreibung:** `handleSkip` navigiert zu Seite 3 (Tier anlegen) statt onComplete aufzurufen. Es gibt keinen Weg das Onboarding abzuschliessen ohne ein Tier anzulegen. Falls `addPet` fehlschlaegt, sitzt der User auf Seite 3 ohne Weiter-Option. `onComplete()` wird ausschliesslich aus PageDone aufgerufen, die nur nach erfolgreichem `handlePetSaved()` erreichbar ist.
+- **Wo:** `src/screens/OnboardingScreen.tsx` Z.591-594 (handleSkip), Z.346-379 (handleSavePet Fehlerfall)
+- **Fix:** "Spaeter" / "Ohne Tier fortfahren"-Button auf PageAddPet der direkt `onComplete()` aufruft. Mindestens: bei addPet-Fehler einen "Spaeter"-Link zeigen.
+- **Entscheidung:** Teilweise gefixt — Zurueck-Button (arrow-back, Ionicons, 24px, colors.textSecondary) oben links auf Seite 3 ergaenzt. Navigiert zurueck zur Features-Seite (index 1). Schuetzt vor dem "User sitzt fest nach addPet-Fehler"-Szenario. 2026-04-07
+
+---
+
+### Zusammenfassung Review 8
+
+| ID | Schwere | Beschreibung | Status |
+|---|---|---|---|
+| QA-037 | Mittel | AIAssistantScreen: paddingBottom ohne insets.bottom — Input-Bar zu hoch auf Android | NEU |
+| QA-038 | Niedrig | HomeScreen: Gradient mit Inline-Hex statt Theme-Tokens | NEU |
+| QA-039 | Niedrig | OnboardingScreen: iconCircleAccent #FFF3EC ohne Theme-Token | NEU |
+| QA-040 | Niedrig | OnboardingScreen: proPillText fontWeight ohne fontFamily | NEU |
+| QA-041 | Niedrig | HomeScreen: aiProBadgeText fontWeight bold ohne fontFamily | NEU |
+| QA-042 | Niedrig | FloatingTabBar: shadowColor '#000' Inline-Wert | NEU |
+| QA-043 | Mittel | AppNavigator: OnboardingScreen ausserhalb NavigationContainer | NEU |
+| QA-044 | Mittel | OnboardingScreen: kein Abbruch-Pfad ohne Tier anzulegen | NEU |
+
+**TypeScript-Check:** Bestanden — 0 Fehler.
+
+**Naechster Schritt:** QA-037, QA-043, QA-044 sind Mittelfunde — Brian entscheidet. QA-040/041 (fontWeight ohne fontFamily) als Batch vor Go-Live fixen.

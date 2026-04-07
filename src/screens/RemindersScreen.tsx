@@ -1,9 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Text, StyleSheet, FlatList, Pressable, Alert, Animated } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, typography, spacing, borderRadius } from '../theme';
-import { Button, StatusBadge, ErrorBanner, EmptyState } from '../components';
+import { colors, typography, spacing, borderRadius, TAB_BAR_HEIGHT } from '../theme';
+import { Button, StatusBadge, ErrorBanner, EmptyState, SkeletonListItem } from '../components';
 import { useMedical } from '../context/MedicalContext';
 import { Reminder } from '../types';
 import { useOverdueSettings } from '../hooks/useOverdueSettings';
@@ -17,7 +18,7 @@ interface RemindersScreenProps {
 const REMINDER_HORIZON_DAYS = 30;
 
 export function RemindersScreen({ navigation }: RemindersScreenProps) {
-  const { reminders, completeReminder, error: medicalError, refresh: refreshMedical } = useMedical();
+  const { reminders, completeReminder, loading: remindersLoading, error: medicalError, refresh: refreshMedical } = useMedical();
   const { rule: overdueRule, loaded: settingsLoaded } = useOverdueSettings();
   const insets = useSafeAreaInsets();
   const pendingIds = useRef<Set<string>>(new Set());
@@ -74,6 +75,7 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
     const { opacity, translateX } = getAnimValues(reminder.id);
 
     // QA-026: Animation ZUERST starten, completeReminder im Callback aufrufen
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     Animated.parallel([
       Animated.timing(translateX, {
         toValue: 120,
@@ -169,7 +171,14 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
             <Text style={styles.overdueBannerText}>{overdueCount} überfällig</Text>
           </View>
         )}
-        {activeReminders.length === 0 ? (
+        {remindersLoading ? (
+          <View style={styles.list}>
+            <SkeletonListItem />
+            <SkeletonListItem />
+            <SkeletonListItem />
+            <SkeletonListItem />
+          </View>
+        ) : activeReminders.length === 0 ? (
           <EmptyState
             emoji="🔔"
             title="Keine Erinnerungen"
@@ -182,7 +191,7 @@ export function RemindersScreen({ navigation }: RemindersScreenProps) {
             data={activeReminders}
             renderItem={renderReminder}
             keyExtractor={item => item.id}
-            contentContainerStyle={styles.list}
+            contentContainerStyle={[styles.list, { paddingBottom: TAB_BAR_HEIGHT + insets.bottom }]}
             showsVerticalScrollIndicator={false}
           />
         )}

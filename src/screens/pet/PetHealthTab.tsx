@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, typography, spacing, borderRadius } from '../../theme';
-import { Card, ErrorBanner, EmptyState } from '../../components';
+import { Card, ErrorBanner, EmptyState, SkeletonListItem } from '../../components';
 import { recurrenceDisplayLabels } from '../../types';
 import type { MedicalEvent, Reminder } from '../../types';
 import type { RootStackNavProp } from '../../types/navigation';
@@ -45,9 +45,10 @@ export function PetHealthTab({
     <View style={styles.tabContent}>
       {medicalError && <ErrorBanner onRetry={onRefreshMedical} />}
       {medicalLoading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>Lade Gesundheitsdaten...</Text>
+        <View style={styles.skeletonContainer}>
+          <SkeletonListItem />
+          <SkeletonListItem />
+          <SkeletonListItem />
         </View>
       ) : (
         <>
@@ -201,11 +202,8 @@ const styles = StyleSheet.create({
   reminderItem: { paddingVertical: spacing.sm, borderBottomWidth: 1, borderBottomColor: colors.borderLight },
   reminderTitle: { ...typography.label, color: colors.text },
   reminderDate: { ...typography.caption, color: colors.textSecondary, marginTop: 2 },
-  loadingContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: spacing.xxl,
+  skeletonContainer: {
     gap: spacing.sm,
+    paddingVertical: spacing.md,
   },
-  loadingText: { ...typography.bodySmall, color: colors.textSecondary },
 });

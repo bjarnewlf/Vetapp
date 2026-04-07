@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, Linking, Alert, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors, typography, spacing, borderRadius } from '../theme';
+import { colors, typography, spacing, borderRadius, TAB_BAR_HEIGHT } from '../theme';
 import { Card, Button } from '../components';
 import { useVetContact } from '../context/VetContactContext';
 import type { CompositeTabStackNavProp } from '../types/navigation';
@@ -17,7 +17,7 @@ export function VetContactScreen({ navigation }: VetContactScreenProps) {
 
   if (!vet) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { paddingBottom: TAB_BAR_HEIGHT + insets.bottom }]}>
         <Text style={[styles.title, { paddingTop: insets.top + 12 }]}>Tierarzt</Text>
         <Card style={{ alignItems: 'center' as const, marginTop: 32 }}>
           <Ionicons name="medkit-outline" size={48} color={colors.textLight} />
@@ -41,7 +41,7 @@ export function VetContactScreen({ navigation }: VetContactScreenProps) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: TAB_BAR_HEIGHT + insets.bottom }]}>
       <View style={[styles.titleRow, { paddingTop: insets.top + 12 }]}>
         <Text style={styles.title}>Tierarzt</Text>
         <TouchableOpacity onPress={() => navigation?.navigate('AddVetContact')}>
