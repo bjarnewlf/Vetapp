@@ -2,6 +2,11 @@ import { supabase } from '../lib/supabase';
 
 const BUCKET = 'pet-documents';
 
+export const MAX_DOCUMENT_SIZE = 10 * 1024 * 1024; // 10 MB
+export const MAX_PHOTO_SIZE = 5 * 1024 * 1024;     // 5 MB
+export const ALLOWED_MIME_TYPES = ['application/pdf', 'image/jpeg', 'image/png', 'image/heic'] as const;
+type AllowedMimeType = typeof ALLOWED_MIME_TYPES[number];
+
 /**
  * Lädt ein Pet-Profilfoto in Supabase Storage hoch.
  * Pfad: pet-photos/{userId}/{petId}.jpg
@@ -11,7 +16,10 @@ export async function uploadPetPhoto(
   userId: string,
   petId: string,
   fileUri: string,
+  fileSize?: number,
 ): Promise<{ path: string }> {
+  if (fileSize && fileSize > MAX_PHOTO_SIZE) throw new Error('Foto ist zu groß (max. 5 MB).');
+
   const path = `pet-photos/${userId}/${petId}.jpg`;
 
   const formData = new FormData();
@@ -24,7 +32,7 @@ export async function uploadPetPhoto(
   const { error } = await supabase.storage
     .from(BUCKET)
     .upload(path, formData, {
-      contentType: 'multipart/form-data',
+      contentType: 'image/jpeg',
       upsert: true, // Überschreiben erlaubt (Foto ersetzen)
     });
 
@@ -39,7 +47,7 @@ export async function uploadPetPhoto(
 export async function getPetPhotoUrl(storagePath: string): Promise<string> {
   const { data, error } = await supabase.storage
     .from(BUCKET)
-    .createSignedUrl(storagePath, 3600);
+    .createSignedUrl(storagePath, 7 * 24 * 3600);
 
   if (error || !data?.signedUrl) {
     throw new Error('Foto-URL konnte nicht erstellt werden.');
@@ -56,7 +64,7 @@ export async function deletePetPhoto(storagePath: string): Promise<void> {
     .remove([storagePath]);
 
   if (error) {
-    console.warn('Foto-Löschung fehlgeschlagen:', error.message);
+    if (__DEV__) console.warn('Foto-Löschung fehlgeschlagen:', error.message);
   }
 }
 
@@ -66,7 +74,15 @@ export async function uploadFile(
   fileUri: string,
   fileName: string,
   mimeType?: string,
+  fileSize?: number,
 ): Promise<{ path: string }> {
+  if (mimeType && !ALLOWED_MIME_TYPES.includes(mimeType as AllowedMimeType)) {
+    throw new Error('Dateityp nicht erlaubt. Erlaubt: PDF, JPEG, PNG, HEIC.');
+  }
+  if (fileSize && fileSize > MAX_DOCUMENT_SIZE) {
+    throw new Error('Datei ist zu groß (max. 10 MB).');
+  }
+
   const timestamp = Date.now();
   const safeName = fileName.replace(/[^a-zA-Z0-9._-]/g, '_');
   const path = `${userId}/${petId}/${timestamp}_${safeName}`;
@@ -81,7 +97,7 @@ export async function uploadFile(
   const { error } = await supabase.storage
     .from(BUCKET)
     .upload(path, formData, {
-      contentType: 'multipart/form-data',
+      contentType: mimeType || 'application/octet-stream',
       upsert: false,
     });
 
@@ -96,6 +112,6 @@ export async function deleteFile(filePath: string): Promise<void> {
     .remove([filePath]);
 
   if (error) {
-    console.warn('Datei-Löschung fehlgeschlagen:', error.message);
+    if (__DEV__) console.warn('Datei-Löschung fehlgeschlagen:', error.message);
   }
 }

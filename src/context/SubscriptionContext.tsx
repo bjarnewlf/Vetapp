@@ -35,7 +35,6 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
       // Profile may not exist yet — create it
       await supabase.from('profiles').upsert({
         id: user.id,
-        is_premium: false,
       });
       setIsPro(false);
     } else {
@@ -52,10 +51,13 @@ export function SubscriptionProvider({ children }: { children: React.ReactNode }
     if (!user) return;
     const newValue = !isPro;
     setIsPro(newValue);
-    await supabase
+    const { error } = await supabase
       .from('profiles')
       .update({ is_premium: newValue })
       .eq('id', user.id);
+    if (error) {
+      setIsPro(!newValue);
+    }
   };
 
   return (

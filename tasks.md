@@ -47,7 +47,7 @@
 - [x] Bugs aus Handy-Test fixen — SafeArea Tab-Bar, Header-Text, Foto-Bleed, Performance
 - [x] **Kunden-Praesentation erstellt** — VetApp_Phase2_Praesentation.pptx, 16 Folien, abgenommen (2026-04-06)
 - [ ] **Gewerbe anmelden (Claas)** — blocker fuer MVP-Praesentation + Phase-2-Zahlung
-- [ ] Dem Kunden vorzeigbaren MVP praesentieren
+- [ ] **MVP-Demo beim Kunden** — Plan: Videocall (Praesentation + Live-Demo), danach Expo Go Link zum Selbsttesten (`npx expo start --tunnel`). Vor Demo: togglePro verstecken. EAS Build erst ab Phase 3.
 - [ ] Phase-2-Zahlung ausloesen (2.160 EUR)
 
 ---
@@ -65,7 +65,7 @@
 - [x] **S-2: Rate-Limit Fail-Closed** — deployed
 - [x] **S-3: ai_usage Schema-Doku**
 - [x] **S-4: Authorization-Header** — deployed
-- [x] **S-5: Dokument-URLs** — bereits auf 1h begrenzt
+- [x] **S-5: Dokument-URLs** — TTL von 1h auf 7 Tage erhoeht (2026-04-09)
 - [x] **S-6: Storage-Bucket-Policies**
 - [x] **S-7: E-Mail-Validierung**
 - [x] **S-8: Auth-Logging** — hinter __DEV__ (aiService, Contexts noch offen → F-034)
@@ -88,11 +88,16 @@
 ## BACKLOG (nach MVP)
 
 - [x] **Stretch-Header PetDetail** — Parallax Hero implementiert: 240px Hero, Foto-Fade, Overscroll-Stretch (2026-04-05)
+- [x] **Custom Font (Inter + DM Sans)** — DM Sans Headlines, Inter Body, fontWeight-Migration komplett (2026-04-07)
+- [x] **UI-Redesign** — Bento-Dashboard, Floating Tab Bar, Onboarding 4 Seiten, Haptic, Skeletons (2026-04-07)
 - [ ] **Maestro E2E-Tests** — Setup evaluiert, Konzept im Vault archiviert
 - [ ] Chat-Historie persistent
-- [ ] Custom Font (Inter)
 - [ ] Dark Mode
-- [ ] Bottom Sheets
+- [ ] Bottom Sheets (Libraries installiert, Implementierung offen)
+- [ ] Pet-Card Karussell (Design vorhanden, Claas unsicher)
+- [ ] Personalisierter KI-Chat (nach Tool-Use)
+- [ ] Erfolgs-Animationen (Confetti etc.)
+- [ ] QA-043: Onboarding Navigation-Refactoring
 - [ ] SelectField: Tap-outside
 - [ ] F-010: signUp Fehlermeldung
 - [ ] F-012: Paywall-Check Recurrence
@@ -157,4 +162,20 @@
 - [x] Sprint Tag 1: Alle Basis-Features
 
 ---
-Zuletzt aktualisiert: 2026-04-06 (Session 11 — Praesentation abgenommen)
+### 2026-04-07 — Session 12 (UI-Redesign)
+- [x] AP-0 bis AP-8: Custom Fonts, Bento-Dashboard, Floating Tab Bar, Onboarding, Haptic, Skeletons
+- [x] Button-Konsistenz: size Prop, fontWeight-Fixes app-weit, AI Send-Button Farbe
+- [x] Dashboard-Vereinfachung: Erinnerungs-Card raus, Duplikat-Filter, "Anstehend"
+- [x] QA-Review: QA-037 bis QA-044, alle gefixt (ausser QA-043 geparkt)
+- [x] Handy-Test Bugs gefixt: Doppel-Profil-Icon, Tab Bar Hoehe, Header schmaler
+- [x] Design-Referenzen: 4 HTML-Mockups, Button-Audit, Dashboard-Review
+
+### 2026-04-09 — Session 13 (Demo-Readiness-Check)
+- [x] Demo-Readiness-Check: tsc, Unit-Tests, Expo-Check — alle bestanden
+- [x] Code-Review: 7 kritische Dateien durch 2 QA-Agents, 7 Findings
+- [x] QA-045 gefixt: togglePro() Rollback bei DB-Fehler
+- [x] QA-046 gefixt: fileUpload contentType korrigiert (multipart/form-data → MIME-Type)
+- [x] QA-047 gefixt: Signed URL TTL 1h → 7 Tage
+- [x] Security-Check + Privacy-Analyse dokumentiert
+
+Zuletzt aktualisiert: 2026-04-09 (Session 13 — Demo-Readiness-Check)

@@ -824,3 +824,98 @@ Alle console-Aufrufe in `aiService.ts` sind hinter `__DEV__` (Z.29, 31, 34, 56, 
 **TypeScript-Check:** Bestanden — 0 Fehler.
 
 **Naechster Schritt:** QA-037, QA-043, QA-044 sind Mittelfunde — Brian entscheidet. QA-040/041 (fontWeight ohne fontFamily) als Batch vor Go-Live fixen.
+
+---
+
+## Review 9: Demo-Readiness-Check — 2026-04-09
+
+**Anlass:** MVP-Demo mit Kunde Dragan um 16:00. Vollstaendiger Automatisierter Check + Code-Review.
+
+**Automatisierte Checks:**
+- `npx tsc --noEmit` — 0 Fehler
+- `npm test` — 11/11 Tests gruen
+- `npx expo install --check` — 3 Dev-Dependencies leicht veraltet (babel-preset-expo, @types/jest, jest-expo) — nicht demo-relevant
+
+**Geprueft:** AppNavigator.tsx, AIAssistantScreen.tsx, aiService.ts, SubscriptionContext.tsx, HomeScreen.tsx, OnboardingScreen.tsx, PetContext.tsx, AddEventScreen.tsx, RemindersScreen.tsx, fileUpload.ts
+
+---
+
+### QA-045 — togglePro() ohne Rollback bei DB-Fehler — Schwere: Mittel
+
+- **Beschreibung:** `togglePro()` setzt `isPro` optimistisch auf den neuen Wert, aber wenn der Supabase-Update fehlschlaegt (Netzwerkfehler, RLS), bleibt der lokale State falsch. Nach App-Neustart oder Re-Fetch ist Pro weg.
+- **Wo:** `src/context/SubscriptionContext.tsx` Z.50-58
+- **Fix:** Rollback bei error: `if (error) setIsPro(!newValue);`
+- **Entscheidung:** Gefixt (2026-04-09)
+
+---
+
+### QA-046 — fileUpload contentType 'multipart/form-data' statt echtem MIME-Type — Schwere: Mittel
+
+- **Beschreibung:** Foto-Upload und Dokument-Upload setzen `contentType: 'multipart/form-data'` als Storage-MIME-Type. Das ist der HTTP-Container-Type, nicht der eigentliche Dateityp. Supabase Storage speichert die Datei mit falschem MIME-Type-Metadatum.
+- **Wo:** `src/utils/fileUpload.ts` Z.35 (Foto) und Z.100 (Dokument)
+- **Fix:** Foto: `contentType: 'image/jpeg'`. Dokument: `contentType: mimeType || 'application/octet-stream'`.
+- **Entscheidung:** Gefixt (2026-04-09)
+
+---
+
+### QA-047 — Signed URL TTL nur 1 Stunde — Schwere: Niedrig
+
+- **Beschreibung:** Pet-Foto-URLs laufen nach 1 Stunde ab. Kein automatischer Refresh. Nach 1h zeigen alle Fotos broken images.
+- **Wo:** `src/utils/fileUpload.ts` Z.50
+- **Fix:** TTL von 3600 auf 604800 (7 Tage) erhoehen.
+- **Entscheidung:** Gefixt (2026-04-09)
+
+---
+
+### QA-048 — aiService Token-Refresh bei jedem Request — Schwere: Niedrig
+
+- **Beschreibung:** `supabase.auth.refreshSession()` wird bei jedem Chat-Request aufgerufen, nicht nur wenn der Token abgelaufen ist. Verdoppelt Latenz und erhoeht Fehler-Surface bei instabilem Netz.
+- **Wo:** `src/services/aiService.ts` Z.26
+- **Fix:** Token-Expiry pruefen vor Refresh.
+- **Entscheidung:** Offen — nach Demo fixen
+
+---
+
+### QA-049 — AIAssistantScreen Paywall-Reset bei Tab-Verlassen — Schwere: Niedrig
+
+- **Beschreibung:** `paywallShown.current` wird im useFocusEffect-Cleanup auf `false` zurueckgesetzt. Bei schnellem Tab-Wechsel koennte die Paywall erneut aufpoppen, obwohl Pro aktiv ist. In der Praxis schuetzt der optimistic Update von togglePro(), weil `isPro` sofort true ist.
+- **Wo:** `src/screens/AIAssistantScreen.tsx` Z.118
+- **Fix:** Cleanup nur resetten wenn `!isPro`.
+- **Entscheidung:** Offen — niedriges Risiko
+
+---
+
+### QA-050 — AddEventScreen startet auf 'config' ohne selectedPetId — Schwere: Niedrig
+
+- **Beschreibung:** Wenn `preselectedEventType` gesetzt ist aber kein `preselectedPetId`, startet der Screen auf Step 3 ohne ausgewaehltes Tier. Save zeigt "Kein Tier ausgewaehlt" ohne Zurueck-Option.
+- **Wo:** `src/screens/AddEventScreen.tsx` Z.44-52
+- **Fix:** `initialStep()` pruefen ob auch `selectedPetId` vorhanden ist.
+- **Entscheidung:** Offen — Edge Case, nicht demo-relevant
+
+---
+
+### QA-051 — HomeScreen Timeline-Deduplication fragil — Schwere: Niedrig
+
+- **Beschreibung:** `nextAppointment` wird via Titel+Datum-Vergleich aus der Timeline gefiltert. Bei identischen Events (z.B. "Impfung" fuer 2 Tiere am selben Tag) werden beide rausgefiltert.
+- **Wo:** `src/screens/HomeScreen.tsx` Z.126
+- **Fix:** Dedup via ID statt Titel+Datum.
+- **Entscheidung:** Offen — nach Demo
+
+---
+
+### Zusammenfassung Review 9
+
+| ID | Schwere | Beschreibung | Status |
+|---|---|---|---|
+| QA-045 | Mittel | togglePro ohne Rollback bei DB-Fehler | GEFIXT |
+| QA-046 | Mittel | fileUpload contentType falsch (multipart/form-data) | GEFIXT |
+| QA-047 | Niedrig | Signed URL TTL nur 1h | GEFIXT |
+| QA-048 | Niedrig | aiService Token-Refresh bei jedem Request | OFFEN |
+| QA-049 | Niedrig | AIAssistantScreen Paywall-Reset bei Tab-Verlassen | OFFEN |
+| QA-050 | Niedrig | AddEventScreen startet ohne Pet auf config-Step | OFFEN |
+| QA-051 | Niedrig | HomeScreen Timeline-Dedup fragil | OFFEN |
+
+**TypeScript-Check nach Fixes:** Bestanden — 0 Fehler.
+**Unit-Tests nach Fixes:** 11/11 gruen.
+
+**Fazit:** 3 von 7 Findings sofort gefixt. Restliche 4 sind Niedrig-Schwere und nicht demo-relevant.
