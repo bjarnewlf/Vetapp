@@ -1,0 +1,1389 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VetApp — KI-Assistent Redesign Spec</title>
+
+  <!-- Google Fonts: DM Sans (Headlines) + Inter (Body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* =============================================
+       DESIGN SYSTEM TOKENS
+       Exakt aus VetApp src/theme/colors.ts +
+       spacing/borderRadius aus src/theme/index.ts
+       ============================================= */
+    :root {
+      /* Colors */
+      --color-primary:        #1B6B5A;
+      --color-primary-dark:   #145244;
+      --color-primary-light:  #E8F5F1;
+      --color-primary-mid:    #2D8A73;
+      --color-primary-grad:   #3AA08A;
+      --color-primary-border: #B8DDD4;
+      --color-accent:         #CC6B3D;
+      --color-accent-light:   #F5D0B9;
+      --color-background:     #FAF6F1;
+      --color-surface:        #FFFFFF;
+      --color-surface-light:  #FFF8F2;
+      --color-text:           #1A1A1A;
+      --color-text-secondary: #6B6B6B;
+      --color-text-light:     #999999;
+      --color-text-on-primary:#FFFFFF;
+      --color-border:         #E8E0D8;
+      --color-border-light:   #F0EBE5;
+      --color-error:          #D94040;
+      --color-card-shadow:    rgba(0,0,0,0.08);
+
+      /* Spacing */
+      --space-xs:  4px;
+      --space-sm:  8px;
+      --space-smd: 12px;
+      --space-md:  16px;
+      --space-lg:  24px;
+      --space-xl:  32px;
+      --space-xxl: 48px;
+
+      /* Border Radius */
+      --radius-sm:   8px;
+      --radius-md:   12px;
+      --radius-lg:   16px;
+      --radius-xl:   24px;
+      --radius-full: 999px;
+
+      /* Typography */
+      --font-heading: 'DM Sans', sans-serif;
+      --font-body:    'Inter', sans-serif;
+    }
+
+    /* =============================================
+       RESET + PAGE LAYOUT
+       ============================================= */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #E5E0D8;
+      font-family: var(--font-body);
+      color: var(--color-text);
+      min-height: 100vh;
+      padding: 32px 16px 48px;
+    }
+
+    /* Page heading */
+    .page-title {
+      font-family: var(--font-heading);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #888;
+      text-align: center;
+      margin-bottom: 8px;
+    }
+    .page-subtitle {
+      font-family: var(--font-body);
+      font-size: 12px;
+      color: #aaa;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    /* State labels */
+    .state-label {
+      font-family: var(--font-heading);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #999;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    /* Two-column layout for both states side by side */
+    .screens-wrapper {
+      display: flex;
+      gap: 48px;
+      justify-content: center;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .screen-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* =============================================
+       PHONE SHELL — 390px wide, like iPhone 14
+       ============================================= */
+    .phone {
+      width: 390px;
+      height: 844px;
+      background: var(--color-background);
+      border-radius: 44px;
+      overflow: hidden;
+      position: relative;
+      box-shadow:
+        0 0 0 8px #1A1A1A,
+        0 0 0 10px #333,
+        0 32px 64px rgba(0,0,0,0.35);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Notch */
+    .phone::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 126px;
+      height: 34px;
+      background: #1A1A1A;
+      border-radius: 0 0 20px 20px;
+      z-index: 100;
+    }
+
+    /* =============================================
+       STATUS BAR
+       ============================================= */
+    .status-bar {
+      height: 50px;
+      padding: 14px 28px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+      background: var(--color-surface);
+      position: relative;
+      z-index: 10;
+    }
+
+    .status-time {
+      font-family: var(--font-heading);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-icons svg {
+      color: var(--color-text);
+    }
+
+    /* =============================================
+       HEADER — zentral, Sparkles-Icon + Titel +
+       Papierkorb rechts
+       ============================================= */
+    .app-header {
+      height: 56px;
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      padding: 0 var(--space-md);
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    /* Left spacer to balance the right icon button */
+    .header-spacer {
+      width: 44px;
+      flex-shrink: 0;
+    }
+
+    .header-title-group {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+    }
+
+    .header-sparkles {
+      color: var(--color-primary);
+      width: 16px;
+      height: 16px;
+    }
+
+    .header-title {
+      font-family: var(--font-heading);
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    /* Trash icon slot — only visible in chat state */
+    .header-btn-slot {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-shrink: 0;
+    }
+
+    .header-icon-btn {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-full);
+      cursor: pointer;
+    }
+
+    .header-icon-btn svg {
+      color: var(--color-text-secondary);
+      width: 20px;
+      height: 20px;
+    }
+
+    /* =============================================
+       SCREEN BODY — flex grow, scrollable
+       ============================================= */
+    .screen-body {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* =============================================
+       EMPTY STATE
+       ============================================= */
+    .empty-state-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-xl) var(--space-lg) var(--space-lg);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* --- Hero Block --- */
+    .hero-block {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: var(--space-lg);
+    }
+
+    /*
+      Hero Badge: Runder Container mit Teal-Glow.
+      Kein Text drin — nur das Sparkles-SVG.
+      80x80px, Shadow auf primary.
+    */
+    .hero-badge {
+      width: 80px;
+      height: 80px;
+      border-radius: 40px;
+      background: var(--color-primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(27,107,90,0.22);
+    }
+
+    .hero-badge svg {
+      color: var(--color-primary);
+      width: 36px;
+      height: 36px;
+    }
+
+    .hero-title {
+      font-family: var(--font-heading);
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--color-text);
+      text-align: center;
+      margin-top: var(--space-md);
+      line-height: 28px;
+    }
+
+    .hero-subtitle {
+      font-size: 16px;
+      font-family: var(--font-body);
+      color: var(--color-text-secondary);
+      text-align: center;
+      margin-top: var(--space-sm);
+      line-height: 22px;
+    }
+
+    /* --- Feature Cards --- */
+    /*
+      Drei gleichbreite Cards nebeneinander.
+      Surface BG, leichter Shadow, kein Border.
+    */
+    .feature-row {
+      display: flex;
+      gap: var(--space-sm);
+      margin-top: var(--space-xl);
+    }
+
+    .feature-card {
+      flex: 1;
+      background: var(--color-surface);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-xs);
+      box-shadow: 0 2px 8px var(--color-card-shadow);
+    }
+
+    .feature-card svg {
+      color: var(--color-primary);
+      width: 22px;
+      height: 22px;
+    }
+
+    .feature-label {
+      font-size: 12px;
+      font-family: var(--font-body);
+      color: var(--color-text-secondary);
+      text-align: center;
+      line-height: 16px;
+    }
+
+    /* --- Quick Actions --- */
+    /*
+      Section-Label: uppercase caption, tracking 0.5px
+    */
+    .quick-actions-label {
+      margin-top: var(--space-xl);
+      margin-bottom: var(--space-md);
+      font-size: 12px;
+      font-family: var(--font-body);
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--color-text-light);
+    }
+
+    .quick-actions-column {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    /*
+      Quick-Action Chips: Surface BG, border, border-radius xl.
+      Row layout: lead-icon + label (flex 1) + arrow
+      Touch-Target: paddingVertical=16px → mindestens 44px Höhe
+    */
+    .quick-action-chip {
+      display: flex;
+      align-items: center;
+      background: var(--color-surface);
+      border-radius: var(--radius-xl);
+      padding: var(--space-md) var(--space-md);
+      border: 1px solid var(--color-border);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+      gap: var(--space-sm);
+      cursor: pointer;
+      transition: background 0.15s ease;
+      min-height: 52px;
+    }
+
+    .quick-action-chip:hover {
+      background: var(--color-primary-light);
+      border-color: var(--color-primary-border);
+    }
+
+    .chip-lead-icon svg {
+      color: var(--color-primary);
+      width: 16px;
+      height: 16px;
+    }
+
+    .chip-label {
+      flex: 1;
+      font-size: 14px;
+      font-family: var(--font-body);
+      font-weight: 600;
+      color: var(--color-text);
+      line-height: 20px;
+    }
+
+    .chip-trail-icon svg {
+      color: var(--color-text-light);
+      width: 16px;
+      height: 16px;
+    }
+
+    /* =============================================
+       CHAT LIST
+       ============================================= */
+    .chat-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: var(--space-lg) var(--space-md) var(--space-sm);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    /* --- User Bubble --- */
+    /*
+      Rechts ausgerichtet. Primary BG, weiße Schrift.
+      Asymmetrischer Radius: TL=24, TR=24, BR=8, BL=24
+      Max-width 80%, subtiler Shadow auf primary
+    */
+    .user-msg-group {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .user-bubble {
+      align-self: flex-end;
+      background: var(--color-primary);
+      border-radius: 24px 24px 8px 24px;
+      padding: var(--space-sm) var(--space-md);
+      max-width: 80%;
+      box-shadow: 0 2px 8px rgba(27,107,90,0.20);
+    }
+
+    .user-bubble p {
+      font-size: 16px;
+      font-family: var(--font-body);
+      color: var(--color-text-on-primary);
+      line-height: 22px;
+    }
+
+    /* --- AI Bubble Wrapper --- */
+    /*
+      Links ausgerichtet. Avatar-Badge (28px) links,
+      dann Bubble mit flex-Breite.
+      Badge sitzt auf Bubble-Unterkante (align-items: flex-end).
+    */
+    .ai-bubble-wrapper {
+      display: flex;
+      align-items: flex-end;
+      align-self: flex-start;
+      max-width: 85%;
+      gap: var(--space-xs);
+    }
+
+    /*
+      AI Avatar Badge: 28x28px, primaryLight BG, Sparkles-Icon.
+      Kein Label — rein ikonisch, cleaner als Text-Kürzel.
+    */
+    .ai-avatar-badge {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--color-primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-bottom: 2px; /* visuelle Ausrichtung auf Bubble-Unterkante */
+    }
+
+    .ai-avatar-badge svg {
+      color: var(--color-primary);
+      width: 14px;
+      height: 14px;
+    }
+
+    /*
+      AI Bubble: Surface BG, Border, asymm. Radius TL=24, TR=24, BR=24, BL=8
+      WICHTIG: Kein max-width Constraint hier — der wrapper limitiert bereits.
+      Padding großzügig für Lesbarkeit.
+    */
+    .ai-bubble {
+      flex: 1;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 24px 24px 24px 8px;
+      padding: var(--space-smd) var(--space-md);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    /* =============================================
+       MARKDOWN RENDERING IN AI-BUBBLES
+       ============================================= */
+
+    /*
+      Basis-Text in AI-Bubbles: Inter Regular, 16px/22px
+    */
+    .ai-bubble p {
+      font-size: 15px;
+      font-family: var(--font-body);
+      color: var(--color-text);
+      line-height: 22px;
+      margin: 0 0 8px 0;
+    }
+
+    .ai-bubble p:last-child {
+      margin-bottom: 0;
+    }
+
+    /*
+      Markdown H3 in AI-Antworten: DM Sans SemiBold, leicht größer als body.
+      Oberer Abstand gibt Atemraum wenn nach einem Paragraphen.
+    */
+    .ai-bubble h3 {
+      font-family: var(--font-heading);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-text);
+      line-height: 20px;
+      margin: 10px 0 4px 0;
+    }
+
+    .ai-bubble h3:first-child {
+      margin-top: 0;
+    }
+
+    /*
+      Bold: Inter SemiBold, gleiche Farbe — Kontrast durch Gewicht,
+      nicht durch Farbe. Dezent, nicht dominant.
+    */
+    .ai-bubble strong {
+      font-weight: 600;
+      font-family: var(--font-body);
+      color: var(--color-text);
+    }
+
+    /*
+      Ungeordnete Liste: Bullet-Points mit Teal-Farbe.
+      Listenpunkte fühlen sich im Chat an wie Bullets in einem
+      handgeschriebenen Protokoll — nah am Text, nicht eingerückt wie in Docs.
+    */
+    .ai-bubble ul {
+      list-style: none;
+      margin: 6px 0 8px 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .ai-bubble ul li {
+      font-size: 15px;
+      font-family: var(--font-body);
+      color: var(--color-text);
+      line-height: 21px;
+      padding-left: 14px;
+      position: relative;
+    }
+
+    /*
+      Bullet: kleiner Teal-Kreis, vertikal mittig auf erster Textzeile.
+      4px Durchmesser — sichtbar aber nicht aufdringlich.
+    */
+    .ai-bubble ul li::before {
+      content: '';
+      position: absolute;
+      left: 2px;
+      top: 8px;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--color-primary);
+    }
+
+    /*
+      Nummerierte Liste: Auto-Counter, Teal-Zahl.
+    */
+    .ai-bubble ol {
+      list-style: none;
+      margin: 6px 0 8px 0;
+      padding: 0;
+      counter-reset: ai-list;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .ai-bubble ol li {
+      font-size: 15px;
+      font-family: var(--font-body);
+      color: var(--color-text);
+      line-height: 21px;
+      padding-left: 20px;
+      position: relative;
+      counter-increment: ai-list;
+    }
+
+    .ai-bubble ol li::before {
+      content: counter(ai-list) ".";
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-size: 13px;
+      font-weight: 600;
+      font-family: var(--font-heading);
+      color: var(--color-primary);
+      line-height: 21px;
+    }
+
+    /*
+      Inline-Code: Leicht getönter Hintergrund, Monospace.
+      Wirkt wie eine Hervorhebung ohne störenden Rahmen.
+    */
+    .ai-bubble code {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      background: var(--color-primary-light);
+      color: var(--color-primary-dark);
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+
+    /*
+      Emphasis (italic): leichte Teal-Tönung als sanfte Hervorhebung.
+      Besser als pure Kursivschrift in App-Kontext.
+    */
+    .ai-bubble em {
+      font-style: italic;
+      color: var(--color-primary-dark);
+    }
+
+    /* =============================================
+       TYPING INDICATOR
+       ============================================= */
+    /*
+      Drei Dots in der AI-Bubble-Form.
+      Animation: sanftes Auf-Ab, phasenverschoben.
+      Rhythm: 1.2s, sanft und ruhig — kein Gehetze.
+    */
+    .typing-indicator {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 2px;
+    }
+
+    .typing-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--color-primary-mid);
+      animation: typingBounce 1.2s ease-in-out infinite;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: 0s; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingBounce {
+      0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.5;
+      }
+      30% {
+        transform: translateY(-5px);
+        opacity: 1;
+      }
+    }
+
+    /* =============================================
+       DISCLAIMER STRIP
+       ============================================= */
+    /*
+      Subtil wie eine Fußnote. Kein voller Border-Box.
+      Nur ein leichter top-border und warmes BG.
+    */
+    .disclaimer-strip {
+      background: var(--color-background);
+      border-top: 1px solid var(--color-border-light);
+      padding: var(--space-xs) var(--space-md);
+      flex-shrink: 0;
+    }
+
+    .disclaimer-text {
+      font-size: 11px;
+      font-family: var(--font-body);
+      color: var(--color-text-light);
+      text-align: center;
+      line-height: 15px;
+    }
+
+    /* =============================================
+       INPUT BAR
+       ============================================= */
+    /*
+      Input-Bar: Surface BG, top-border.
+      Row: [TextInput-Pill] [Send-Button]
+      Padding unten großzügig (Tab-Bar Offset).
+    */
+    .input-bar {
+      background: var(--color-surface);
+      border-top: 1px solid var(--color-border);
+      padding: var(--space-sm) var(--space-md);
+      padding-bottom: 80px; /* TAB_BAR_HEIGHT approximation */
+      display: flex;
+      align-items: flex-end;
+      gap: var(--space-sm);
+      flex-shrink: 0;
+    }
+
+    /*
+      Text-Input Pill: Warm background, border, border-radius xl.
+      Multiline-ready — wächst mit dem Inhalt.
+    */
+    .input-inner {
+      flex: 1;
+      background: var(--color-background);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-sm) var(--space-md);
+      display: flex;
+      align-items: flex-end;
+    }
+
+    .text-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      font-size: 16px;
+      font-family: var(--font-body);
+      color: var(--color-text);
+      line-height: 22px;
+      min-height: 40px;
+      resize: none;
+    }
+
+    .text-input::placeholder {
+      color: var(--color-text-light);
+    }
+
+    /*
+      Send Button: 44x44px Touch-Target, Accent-Farbe.
+      Disabled: 50% opacity.
+    */
+    .send-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-full);
+      background: var(--color-accent);
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      align-self: flex-end;
+      transition: opacity 0.15s ease, transform 0.1s ease;
+    }
+
+    .send-btn:active {
+      transform: scale(0.94);
+    }
+
+    .send-btn svg {
+      color: white;
+      width: 18px;
+      height: 18px;
+    }
+
+    .send-btn.disabled {
+      opacity: 0.45;
+      cursor: default;
+    }
+
+    /* =============================================
+       TAB BAR HINT (decorative, nur Kontext)
+       ============================================= */
+    .tab-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 80px;
+      background: var(--color-surface);
+      border-top: 1px solid var(--color-border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-around;
+      padding-top: 10px;
+    }
+
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .tab-item svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .tab-item.inactive svg { color: #999; }
+    .tab-item.active svg { color: var(--color-accent); }
+
+    .tab-label {
+      font-size: 10px;
+      font-family: var(--font-body);
+    }
+
+    .tab-item.inactive .tab-label { color: #999; }
+    .tab-item.active .tab-label { color: var(--color-accent); font-weight: 600; }
+
+    /* =============================================
+       DESIGN NOTES PANEL
+       ============================================= */
+    .notes-panel {
+      max-width: 900px;
+      margin: 48px auto 0;
+      background: white;
+      border-radius: 16px;
+      padding: 28px 32px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+
+    .notes-panel h2 {
+      font-family: var(--font-heading);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--color-text);
+      margin-bottom: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .notes-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .note-block h3 {
+      font-family: var(--font-heading);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      margin-bottom: 8px;
+    }
+
+    .note-block ul {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .note-block ul li {
+      font-size: 13px;
+      font-family: var(--font-body);
+      color: var(--color-text-secondary);
+      line-height: 18px;
+      padding-left: 12px;
+      position: relative;
+    }
+
+    .note-block ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--color-primary);
+      font-size: 11px;
+    }
+
+    .tag {
+      display: inline-block;
+      background: var(--color-primary-light);
+      color: var(--color-primary-dark);
+      font-size: 11px;
+      font-family: var(--font-body);
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 4px;
+      margin: 2px 2px 0 0;
+    }
+
+    .tag.accent {
+      background: var(--color-accent-light);
+      color: var(--color-accent);
+    }
+  </style>
+</head>
+<body>
+
+  <p class="page-title">VetApp — KI-Assistent · Design Spec</p>
+  <p class="page-subtitle">390px Mobile Viewport · iPhone 14 Shell · Beide States nebeneinander · Stand: 2026-04-07</p>
+
+  <div class="screens-wrapper">
+
+    <!-- ==========================================
+         STATE 1: EMPTY STATE
+         ========================================== -->
+    <div class="screen-column">
+      <p class="state-label">State 1 — Leerer Chat</p>
+
+      <div class="phone">
+        <!-- Status Bar -->
+        <div class="status-bar">
+          <span class="status-time">9:41</span>
+          <div class="status-icons">
+            <!-- Signal -->
+            <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor">
+              <rect x="0" y="6" width="3" height="6" rx="1"/>
+              <rect x="4.5" y="4" width="3" height="8" rx="1"/>
+              <rect x="9" y="2" width="3" height="10" rx="1"/>
+              <rect x="13.5" y="0" width="3" height="12" rx="1"/>
+            </svg>
+            <!-- WiFi -->
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+              <path d="M8 10.5a1 1 0 100-2 1 1 0 000 2z" fill="currentColor"/>
+              <path d="M4.5 7.5C5.5 6.5 6.7 6 8 6s2.5.5 3.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+              <path d="M1.5 4.5C3.2 2.8 5.5 2 8 2s4.8.8 6.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            </svg>
+            <!-- Battery -->
+            <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor">
+              <rect x="0" y="0" width="22" height="12" rx="3" stroke="currentColor" stroke-width="1" fill="none"/>
+              <rect x="1.5" y="1.5" width="17" height="9" rx="2" fill="currentColor"/>
+              <path d="M23 4v4c.8-.4 1.2-1 1.2-2s-.4-1.6-1.2-2z"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Header (kein Trash — noch kein Chat) -->
+        <div class="app-header">
+          <div class="header-spacer"></div>
+          <div class="header-title-group">
+            <!-- Sparkles Icon -->
+            <svg class="header-sparkles" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2zm6 10l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2L15 13l2.2-.8L18 10zm-12 0l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2L5 13l2.2-.8L8 10z"/>
+            </svg>
+            <span class="header-title">KI-Assistent</span>
+          </div>
+          <!-- Leer — kein Chat vorhanden -->
+          <div class="header-btn-slot"></div>
+        </div>
+
+        <!-- Screen Body: Empty State -->
+        <div class="screen-body">
+          <div class="empty-state-scroll">
+
+            <!-- Hero Block -->
+            <div class="hero-block">
+              <div class="hero-badge">
+                <!-- Sparkles, größer -->
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2zm6 10l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2L15 13l2.2-.8L18 10zm-12 0l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2L5 13l2.2-.8L8 10z"/>
+                </svg>
+              </div>
+              <h2 class="hero-title">Wie kann ich helfen?</h2>
+              <p class="hero-subtitle">
+                Ich kenne deine Tiere und beantworte<br>Gesundheitsfragen persönlich für dich.
+              </p>
+            </div>
+
+            <!-- Feature Cards -->
+            <div class="feature-row">
+              <div class="feature-card">
+                <!-- medical-outline -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M9 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2h-2"/>
+                  <rect x="9" y="1" width="6" height="4" rx="1"/>
+                  <path d="M12 11v4M10 13h4" stroke-linecap="round"/>
+                </svg>
+                <span class="feature-label">Gesundheit</span>
+              </div>
+              <div class="feature-card">
+                <!-- nutrition-outline -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <path d="M18 8h1a4 4 0 010 8h-1"/>
+                  <path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/>
+                  <line x1="6" y1="1" x2="6" y2="4" stroke-linecap="round"/>
+                  <line x1="10" y1="1" x2="10" y2="4" stroke-linecap="round"/>
+                  <line x1="14" y1="1" x2="14" y2="4" stroke-linecap="round"/>
+                </svg>
+                <span class="feature-label">Ernährung</span>
+              </div>
+              <div class="feature-card">
+                <!-- pulse-outline -->
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <span class="feature-label">Vorsorge</span>
+              </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <p class="quick-actions-label">Direkt loslegen</p>
+            <div class="quick-actions-column">
+
+              <div class="quick-action-chip">
+                <span class="chip-lead-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                <span class="chip-label">Was sollte ich bei Luna beachten?</span>
+                <span class="chip-trail-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="12" x2="19" y2="12" stroke-linecap="round"/>
+                    <polyline points="12 5 19 12 12 19" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
+
+              <div class="quick-action-chip">
+                <span class="chip-lead-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                <span class="chip-label">Impfplan erklären</span>
+                <span class="chip-trail-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="12" x2="19" y2="12" stroke-linecap="round"/>
+                    <polyline points="12 5 19 12 12 19" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
+
+              <div class="quick-action-chip">
+                <span class="chip-lead-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                <span class="chip-label">Symptome einschätzen</span>
+                <span class="chip-trail-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="12" x2="19" y2="12" stroke-linecap="round"/>
+                    <polyline points="12 5 19 12 12 19" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
+
+              <div class="quick-action-chip">
+                <span class="chip-lead-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+                <span class="chip-label">Ernährungsempfehlungen</span>
+                <span class="chip-trail-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="5" y1="12" x2="19" y2="12" stroke-linecap="round"/>
+                    <polyline points="12 5 19 12 12 19" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Disclaimer Strip -->
+          <div class="disclaimer-strip">
+            <p class="disclaimer-text">KI-Antworten sind keine tierärztliche Beratung.</p>
+          </div>
+
+          <!-- Input Bar -->
+          <div class="input-bar">
+            <div class="input-inner">
+              <textarea class="text-input" rows="1" placeholder="Frage stellen..."></textarea>
+            </div>
+            <button class="send-btn disabled" disabled>
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+          <div class="tab-item inactive">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span class="tab-label">Home</span>
+          </div>
+          <div class="tab-item inactive">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16" stroke-linecap="round" stroke-width="2.5"/></svg>
+            <span class="tab-label">Erinnerungen</span>
+          </div>
+          <div class="tab-item active">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2z"/>
+            </svg>
+            <span class="tab-label">KI</span>
+          </div>
+          <div class="tab-item inactive">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span class="tab-label">Profil</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ==========================================
+         STATE 2: AKTIVER CHAT (mit Markdown-Antwort)
+         ========================================== -->
+    <div class="screen-column">
+      <p class="state-label">State 2 — Aktiver Chat + Markdown + Typing</p>
+
+      <div class="phone">
+        <!-- Status Bar -->
+        <div class="status-bar">
+          <span class="status-time">9:43</span>
+          <div class="status-icons">
+            <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor">
+              <rect x="0" y="6" width="3" height="6" rx="1"/>
+              <rect x="4.5" y="4" width="3" height="8" rx="1"/>
+              <rect x="9" y="2" width="3" height="10" rx="1"/>
+              <rect x="13.5" y="0" width="3" height="12" rx="1"/>
+            </svg>
+            <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+              <path d="M8 10.5a1 1 0 100-2 1 1 0 000 2z" fill="currentColor"/>
+              <path d="M4.5 7.5C5.5 6.5 6.7 6 8 6s2.5.5 3.5 1.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+              <path d="M1.5 4.5C3.2 2.8 5.5 2 8 2s4.8.8 6.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+            </svg>
+            <svg width="25" height="12" viewBox="0 0 25 12" fill="currentColor">
+              <rect x="0" y="0" width="22" height="12" rx="3" stroke="currentColor" stroke-width="1" fill="none"/>
+              <rect x="1.5" y="1.5" width="17" height="9" rx="2" fill="currentColor"/>
+              <path d="M23 4v4c.8-.4 1.2-1 1.2-2s-.4-1.6-1.2-2z"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Header (mit Trash-Button — Chat aktiv) -->
+        <div class="app-header">
+          <div class="header-spacer"></div>
+          <div class="header-title-group">
+            <svg class="header-sparkles" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2zm6 10l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2L15 13l2.2-.8L18 10zm-12 0l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2L5 13l2.2-.8L8 10z"/>
+            </svg>
+            <span class="header-title">KI-Assistent</span>
+          </div>
+          <!-- Trash-Icon — nur wenn Chat existiert -->
+          <div class="header-btn-slot">
+            <div class="header-icon-btn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M10 11v6M14 11v6" stroke-linecap="round"/>
+                <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Screen Body: Chat -->
+        <div class="screen-body">
+          <div class="chat-list">
+
+            <!-- MSG 1: User-Frage -->
+            <div class="user-msg-group">
+              <div class="user-bubble">
+                <p>Meine Katze Luna frisst seit gestern wenig und wirkt müde. Soll ich mir Sorgen machen?</p>
+              </div>
+            </div>
+
+            <!-- MSG 2: AI-Antwort mit reichem Markdown -->
+            <!--
+              DEVELOPER-HINWEIS:
+              Dieser Block zeigt das gewünschte Rendering von Markdown-Inhalten.
+              In React Native: react-native-markdown-display oder custom-Renderer verwenden.
+              Wichtig: Kein <Text>-Wrapping der gesamten Antwort — stattdessen
+              jedes Markdown-Element in eigene <Text>/<View>-Hierachie übersetzen.
+            -->
+            <div class="ai-bubble-wrapper">
+              <div class="ai-avatar-badge">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2zm6 10l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2L15 13l2.2-.8L18 10z"/>
+                </svg>
+              </div>
+              <div class="ai-bubble">
+                <h3>Mögliche Ursachen</h3>
+                <p>Kurzzeitige Appetitlosigkeit kann bei Katzen viele harmlose Gründe haben. Ich schau mir das für Luna kurz an.</p>
+                <p><strong>Häufige, harmlose Auslöser:</strong></p>
+                <ul>
+                  <li>Stress durch Veränderungen im Haushalt</li>
+                  <li>Zu warmes Wetter — Hitzelethargie</li>
+                  <li>Nahrungswechsel oder neues Futter</li>
+                </ul>
+                <p><strong>Wann zum Tierarzt?</strong> Spätestens nach <em>48 Stunden</em> ohne Fressen oder bei diesen Zeichen:</p>
+                <ol>
+                  <li>Erbrechen mehr als zweimal täglich</li>
+                  <li>Sichtbarer Gewichtsverlust</li>
+                  <li>Veränderte Atmung oder Haltung</li>
+                </ol>
+                <p>Lunas letzte Impfung war vor <code>11 Monaten</code> — das ist aktuell kein Faktor, aber behalte das im Blick.</p>
+              </div>
+            </div>
+
+            <!-- MSG 3: Follow-up User -->
+            <div class="user-msg-group">
+              <div class="user-bubble">
+                <p>Danke! Was kann ich ihr jetzt geben damit sie wieder frisst?</p>
+              </div>
+            </div>
+
+            <!-- MSG 4: Typing Indicator -->
+            <!--
+              DEVELOPER-HINWEIS:
+              isTyping === true → dieses Bubble rendern statt echter Content.
+              Animation über Animated.loop() + staggered Delay je Dot.
+              Drei Views mit Animated.Value(0) → interpolate Y: 0 → -5 → 0
+            -->
+            <div class="ai-bubble-wrapper">
+              <div class="ai-avatar-badge">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2zm6 10l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2L15 13l2.2-.8L18 10z"/>
+                </svg>
+              </div>
+              <div class="ai-bubble">
+                <div class="typing-indicator">
+                  <div class="typing-dot"></div>
+                  <div class="typing-dot"></div>
+                  <div class="typing-dot"></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Disclaimer Strip -->
+          <div class="disclaimer-strip">
+            <p class="disclaimer-text">KI-Antworten sind keine tierärztliche Beratung.</p>
+          </div>
+
+          <!-- Input Bar (mit Text → Send-Button aktiv) -->
+          <div class="input-bar">
+            <div class="input-inner">
+              <textarea class="text-input" rows="1" placeholder="Frage stellen...">Was kann ich Luna geben?</textarea>
+            </div>
+            <button class="send-btn">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab Bar -->
+        <div class="tab-bar">
+          <div class="tab-item inactive">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span class="tab-label">Home</span>
+          </div>
+          <div class="tab-item inactive">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16" stroke-linecap="round" stroke-width="2.5"/></svg>
+            <span class="tab-label">Erinnerungen</span>
+          </div>
+          <div class="tab-item active">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2z"/>
+            </svg>
+            <span class="tab-label">KI</span>
+          </div>
+          <div class="tab-item inactive">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span class="tab-label">Profil</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /.screens-wrapper -->
+
+
+  <!-- ==========================================
+       DESIGN NOTES FÜR DEN DEVELOPER
+       ========================================== -->
+  <div class="notes-panel">
+    <h2>Developer Handoff Notes</h2>
+    <div class="notes-grid">
+
+      <div class="note-block">
+        <h3>Markdown in AI-Bubbles</h3>
+        <ul>
+          <li>Package-Empfehlung: <strong>react-native-markdown-display</strong></li>
+          <li>Custom StyleSheet übergeben — alle Farben aus theme/colors.ts</li>
+          <li>h3: DM Sans SemiBold 15px, color text</li>
+          <li>strong: Inter 600, gleiche Farbe — kein Color-Change</li>
+          <li>ul bullet: 5px Teal-Kreis (#1B6B5A), position absolute left 2px</li>
+          <li>ol counter: Teal, DM Sans 600 13px</li>
+          <li>code: bg primaryLight, color primaryDark, padding 1px 5px, radius 4px</li>
+          <li>Zeilenabstand immer 21-22px — nie enger</li>
+        </ul>
+      </div>
+
+      <div class="note-block">
+        <h3>Typing Indicator (isTyping)</h3>
+        <ul>
+          <li>3x Animated.Value, loop, staggered: 0ms / 200ms / 400ms delay</li>
+          <li>Y-Translation: 0 → -5px → 0, Dauer 600ms je Cycle</li>
+          <li>Opacity: 0.5 → 1.0 → 0.5 synchron zur Y-Animation</li>
+          <li>Dot-Farbe: primaryMid (#2D8A73), 7px Durchmesser</li>
+          <li>Gap zwischen Dots: 4px</li>
+        </ul>
+      </div>
+
+      <div class="note-block">
+        <h3>Bubble Radii (asymmetrisch)</h3>
+        <ul>
+          <li>User: TL=24, TR=24, BR=8, BL=24 — "Schweif" unten rechts</li>
+          <li>AI: TL=24, TR=24, BR=24, BL=8 — "Schweif" unten links</li>
+          <li>Kein borderTopLeftRadius auf erstem Bubble einer Gruppe anpassen — einheitlich halten</li>
+          <li>User max-width: 80% des Container-Breite</li>
+          <li>AI wrapper max-width: 85% (Avatar nimmt 28px + 4px gap ab)</li>
+        </ul>
+      </div>
+
+      <div class="note-block">
+        <h3>Spacing & Touch-Targets</h3>
+        <ul>
+          <li>Nachrichten-Gap in FlatList: spacing.md (16px)</li>
+          <li>Header-Button: 44x44px — immer</li>
+          <li>Send-Button: 44x44px, accent BG (#CC6B3D)</li>
+          <li>Quick-Action-Chips: min-height 52px (paddingV 16px + text 20px)</li>
+          <li>AI Avatar Badge: 28x28px, margin-bottom 2px für visuelle Baseline</li>
+          <li>Input padding: sm (8px) vertikal, md (16px) horizontal</li>
+        </ul>
+      </div>
+
+      <div class="note-block">
+        <h3>Tokens verwendet</h3>
+        <ul>
+          <li><span class="tag">primary #1B6B5A</span> <span class="tag">primaryLight #E8F5F1</span></li>
+          <li><span class="tag">primaryMid #2D8A73</span> <span class="tag">primaryDark #145244</span></li>
+          <li><span class="tag accent">accent #CC6B3D</span></li>
+          <li><span class="tag">background #FAF6F1</span> <span class="tag">surface #FFFFFF</span></li>
+          <li><span class="tag">border #E8E0D8</span> <span class="tag">borderLight #F0EBE5</span></li>
+          <li><span class="tag">textLight #999</span> <span class="tag">textSecondary #6B6B6B</span></li>
+        </ul>
+      </div>
+
+      <div class="note-block">
+        <h3>Was noch fehlt (offen)</h3>
+        <ul>
+          <li>Fehler-State (retry-Row) — nicht in diesem Mockup</li>
+          <li>Scroll-to-bottom Behavior bei neuer Nachricht</li>
+          <li>Keyboard-Avoiding-Offset — iOS vs Android testen</li>
+          <li>Langer Text in Bubbles: Zeilenumbruch korrekt? Testen mit 300+ Zeichen</li>
+          <li>Accessibility: accessibilityLabel auf Avatar-Badge setzen ("KI-Antwort")</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

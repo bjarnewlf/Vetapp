@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VetApp — Logo Entwurf v2 · Variante B Iteration</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+      background: #F2EDE8;
+      color: #1A1A1A;
+      padding: 48px 40px;
+    }
+
+    header {
+      margin-bottom: 16px;
+    }
+
+    header .eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #1B6B5A;
+      margin-bottom: 8px;
+    }
+
+    header h1 {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1A1A1A;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      font-size: 14px;
+      color: #777;
+      line-height: 1.6;
+      max-width: 520px;
+    }
+
+    .iteration-note {
+      display: inline-block;
+      margin-top: 16px;
+      margin-bottom: 40px;
+      background: #1B6B5A;
+      color: white;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      padding: 6px 14px;
+      border-radius: 100px;
+    }
+
+    /* ——— Grid ——— */
+    .variants {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    .variant {
+      background: white;
+      border-radius: 24px;
+      padding: 36px 28px 32px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    }
+
+    .variant-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #1B6B5A;
+      margin-bottom: 4px;
+    }
+
+    .variant-name {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1A1A1A;
+      letter-spacing: -0.02em;
+      margin-bottom: 6px;
+    }
+
+    .variant-desc {
+      font-size: 13px;
+      color: #777;
+      line-height: 1.6;
+      margin-bottom: 28px;
+    }
+
+    /* ——— Icon Showcase ——— */
+    .showcase {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .showcase-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+    }
+
+    .showcase-row-label {
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #BBB;
+      margin-bottom: 20px;
+    }
+
+    .icon-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .cell-label {
+      font-size: 10px;
+      color: #BBB;
+      letter-spacing: 0.06em;
+    }
+
+    /* Hintergruende */
+    .bg-teal {
+      background: #1B6B5A;
+      border-radius: 22%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bg-white {
+      background: #FFFFFF;
+      border-radius: 22%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #EEE9E4;
+    }
+
+    /* Groessen */
+    .sz-256 { width: 120px; height: 120px; border-radius: 26px; }
+    .sz-60  { width: 60px;  height: 60px;  border-radius: 13px; }
+
+    .divider {
+      height: 1px;
+      background: #F0EBE5;
+      margin: 20px 0;
+    }
+
+    /* ——— Design Notes ——— */
+    .design-notes {
+      margin-top: 36px;
+      background: white;
+      border-radius: 24px;
+      padding: 36px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.07);
+    }
+
+    .design-notes h3 {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #BBB;
+      margin-bottom: 24px;
+    }
+
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    .note h4 {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1B6B5A;
+      letter-spacing: -0.01em;
+      margin-bottom: 6px;
+    }
+
+    .note p {
+      font-size: 13px;
+      color: #777;
+      line-height: 1.65;
+    }
+
+    .recommended-badge {
+      display: inline-block;
+      background: #FAF0E8;
+      color: #CC6B3D;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="eyebrow">VetApp — Logo</div>
+    <h1>Variante B · Iteration 2</h1>
+    <p>Mehr Charakter, mehr Eigenstaendigkeit. Drei Richtungen — jede loest das "zu generisch"-Problem anders.</p>
+    <div class="iteration-note">Auf Basis von Claas' Feedback: V1 zu simpel, braucht Persoenlichkeit</div>
+  </header>
+
+  <div class="variants">
+
+    <!-- ——————————————————————————————— B1: SCHRAEGER KOPF ——————————————————————————————— -->
+    <div class="variant">
+      <div class="variant-label">B1</div>
+      <div class="variant-name">Schraeger Kopf</div>
+      <div class="variant-desc">Der Hund neigt den Kopf — die universelle "Was meinst du?" Pose. Asymmetrie gibt Emotion. Das linke Ohr haengt tiefer, der Kopf kippt leicht nach rechts.</div>
+
+      <div class="showcase">
+        <!-- Gross auf Teal -->
+        <div style="display:flex;gap:16px;align-items:flex-end;">
+          <div class="icon-cell">
+            <div class="bg-teal sz-256">
+              <svg width="88" height="88" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!--
+                  B1: Kopf leicht nach rechts geneigt (ca. 12 Grad)
+                  Linkes Ohr haengt tiefer durch die Neigung
+                  Alles rotiert um Mittelpunkt des Kopfes (50, 52)
+                -->
+                <!-- Linkes Ohr — haengt tiefer/weiter wegen Neigung -->
+                <ellipse cx="28" cy="44" rx="11" ry="18"
+                  transform="rotate(-8 28 44)"
+                  fill="white" opacity="0.6"/>
+                <!-- Rechtes Ohr — steht etwas aufrechter -->
+                <ellipse cx="72" cy="36" rx="10" ry="16"
+                  transform="rotate(6 72 36)"
+                  fill="white" opacity="0.6"/>
+                <!-- Kopf — leicht oval, nach rechts gekippt -->
+                <ellipse cx="50" cy="52" rx="24" ry="22"
+                  transform="rotate(8 50 52)"
+                  fill="white"/>
+                <!-- Linkes Auge — durch Neigung etwas tiefer -->
+                <circle cx="41" cy="47" r="4.5" fill="#1B6B5A"/>
+                <circle cx="43" cy="45.5" r="1.5" fill="white"/>
+                <!-- Rechtes Auge -->
+                <circle cx="59" cy="44" r="4.5" fill="#1B6B5A"/>
+                <circle cx="61" cy="42.5" r="1.5" fill="white"/>
+                <!-- Nase — etwas nach rechts versetzt durch Neigung -->
+                <ellipse cx="51" cy="57" rx="6" ry="4.5"
+                  transform="rotate(8 51 57)"
+                  fill="#1B6B5A"/>
+                <!-- Nase-Nostrils -->
+                <ellipse cx="48.5" cy="57.5" rx="1.5" ry="1" fill="white"/>
+                <ellipse cx="53.5" cy="57.5" rx="1.5" ry="1" fill="white"/>
+                <!-- Mundwinkel — kleines Laecheln -->
+                <path d="M 44 64 Q 50 68 57 64"
+                  fill="none" stroke="#1B6B5A" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span class="cell-label">Teal · gross</span>
+          </div>
+          <div class="icon-cell">
+            <div class="bg-white sz-256">
+              <svg width="88" height="88" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="28" cy="44" rx="11" ry="18"
+                  transform="rotate(-8 28 44)"
+                  fill="#A8D4C8"/>
+                <ellipse cx="72" cy="36" rx="10" ry="16"
+                  transform="rotate(6 72 36)"
+                  fill="#A8D4C8"/>
+                <ellipse cx="50" cy="52" rx="24" ry="22"
+                  transform="rotate(8 50 52)"
+                  fill="#1B6B5A"/>
+                <circle cx="41" cy="47" r="4.5" fill="white"/>
+                <circle cx="43" cy="45.5" r="1.5" fill="#1B6B5A"/>
+                <circle cx="59" cy="44" r="4.5" fill="white"/>
+                <circle cx="61" cy="42.5" r="1.5" fill="#1B6B5A"/>
+                <ellipse cx="51" cy="57" rx="6" ry="4.5"
+                  transform="rotate(8 51 57)"
+                  fill="white"/>
+                <ellipse cx="48.5" cy="57.5" rx="1.5" ry="1" fill="#1B6B5A"/>
+                <ellipse cx="53.5" cy="57.5" rx="1.5" ry="1" fill="#1B6B5A"/>
+                <path d="M 44 64 Q 50 68 57 64"
+                  fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <span class="cell-label">Weiss · gross</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Klein 60px -->
+        <div style="display:flex;gap:14px;align-items:flex-end;">
+          <div class="icon-cell">
+            <div class="bg-teal sz-60">
+              <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="28" cy="44" rx="11" ry="18" transform="rotate(-8 28 44)" fill="white" opacity="0.6"/>
+                <ellipse cx="72" cy="36" rx="10" ry="16" transform="rotate(6 72 36)" fill="white" opacity="0.6"/>
+                <ellipse cx="50" cy="52" rx="24" ry="22" transform="rotate(8 50 52)" fill="white"/>
+                <circle cx="41" cy="47" r="4.5" fill="#1B6B5A"/>
+                <circle cx="59" cy="44" r="4.5" fill="#1B6B5A"/>
+                <ellipse cx="51" cy="57" rx="6" ry="4.5" transform="rotate(8 51 57)" fill="#1B6B5A"/>
+              </svg>
+            </div>
+            <span class="cell-label">60px Teal</span>
+          </div>
+          <div class="icon-cell">
+            <div class="bg-white sz-60">
+              <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="28" cy="44" rx="11" ry="18" transform="rotate(-8 28 44)" fill="#A8D4C8"/>
+                <ellipse cx="72" cy="36" rx="10" ry="16" transform="rotate(6 72 36)" fill="#A8D4C8"/>
+                <ellipse cx="50" cy="52" rx="24" ry="22" transform="rotate(8 50 52)" fill="#1B6B5A"/>
+                <circle cx="41" cy="47" r="4.5" fill="white"/>
+                <circle cx="59" cy="44" r="4.5" fill="white"/>
+                <ellipse cx="51" cy="57" rx="6" ry="4.5" transform="rotate(8 51 57)" fill="white"/>
+              </svg>
+            </div>
+            <span class="cell-label">60px Weiss</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ——————————————————————————————— B2: PROFIL-SILHOUETTE ——————————————————————————————— -->
+    <div class="variant">
+      <div class="variant-label">B2</div>
+      <div class="variant-name">Profil-Silhouette</div>
+      <div class="variant-desc">Seitliche Ansicht, Scherenschnitt-Logik. Nase, Stirn, ein Ohr — wenige Punkte, sofort erkennbar. Der eleganteste Ansatz.</div>
+
+      <div class="showcase">
+        <div style="display:flex;gap:16px;align-items:flex-end;">
+          <div class="icon-cell">
+            <div class="bg-teal sz-256">
+              <!--
+                B2: Hund-Profil nach links schauend.
+                Markante Schnauze, flaches Stirnprofil, ein aufgestelltes Ohr.
+                Nur eine geschlossene Silhouetten-Form — reine Flaeche.
+              -->
+              <svg width="88" height="88" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Haupt-Silhouette: Hund schaut nach links -->
+                <path d="
+                  M 62 18
+                  C 62 18, 52 14, 44 18
+                  C 38 20, 35 26, 38 32
+                  L 34 30
+                  C 28 28, 24 32, 26 38
+                  C 22 40, 20 46, 22 52
+                  C 20 56, 22 64, 28 68
+                  C 32 72, 42 74, 52 72
+                  C 62 70, 68 64, 68 56
+                  C 72 52, 72 44, 68 38
+                  C 70 32, 68 22, 62 18
+                  Z
+                " fill="white"/>
+                <!-- Ohr — aufgestellt, spitz, Dreieck-Linie fuer Innen-Kontur -->
+                <path d="
+                  M 56 20
+                  C 58 14, 66 10, 68 16
+                  C 66 20, 60 22, 56 20
+                  Z
+                " fill="white"/>
+                <!-- Innen-Ohr: leicht dunkler fuer Tiefe -->
+                <path d="
+                  M 58 20
+                  C 60 16, 64 13, 66 16
+                  C 64 19, 60 21, 58 20
+                  Z
+                " fill="#1B6B5A" opacity="0.3"/>
+                <!-- Auge — ein Kreis, positioniert im oberen Kopf-Bereich -->
+                <circle cx="55" cy="38" r="5" fill="#1B6B5A"/>
+                <circle cx="57" cy="36.5" r="1.8" fill="white"/>
+                <!-- Nase an der Schnauze — kleine Ellipse -->
+                <ellipse cx="24" cy="52" rx="3.5" ry="2.5" fill="#1B6B5A"/>
+              </svg>
+            </div>
+            <span class="cell-label">Teal · gross</span>
+          </div>
+          <div class="icon-cell">
+            <div class="bg-white sz-256">
+              <svg width="88" height="88" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="
+                  M 62 18
+                  C 62 18, 52 14, 44 18
+                  C 38 20, 35 26, 38 32
+                  L 34 30
+                  C 28 28, 24 32, 26 38
+                  C 22 40, 20 46, 22 52
+                  C 20 56, 22 64, 28 68
+                  C 32 72, 42 74, 52 72
+                  C 62 70, 68 64, 68 56
+                  C 72 52, 72 44, 68 38
+                  C 70 32, 68 22, 62 18
+                  Z
+                " fill="#1B6B5A"/>
+                <path d="
+                  M 56 20
+                  C 58 14, 66 10, 68 16
+                  C 66 20, 60 22, 56 20
+                  Z
+                " fill="#1B6B5A"/>
+                <path d="
+                  M 58 20
+                  C 60 16, 64 13, 66 16
+                  C 64 19, 60 21, 58 20
+                  Z
+                " fill="white" opacity="0.2"/>
+                <circle cx="55" cy="38" r="5" fill="white"/>
+                <circle cx="57" cy="36.5" r="1.8" fill="#1B6B5A"/>
+                <ellipse cx="24" cy="52" rx="3.5" ry="2.5" fill="white"/>
+              </svg>
+            </div>
+            <span class="cell-label">Weiss · gross</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div style="display:flex;gap:14px;align-items:flex-end;">
+          <div class="icon-cell">
+            <div class="bg-teal sz-60">
+              <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 62 18 C 62 18, 52 14, 44 18 C 38 20, 35 26, 38 32 L 34 30 C 28 28, 24 32, 26 38 C 22 40, 20 46, 22 52 C 20 56, 22 64, 28 68 C 32 72, 42 74, 52 72 C 62 70, 68 64, 68 56 C 72 52, 72 44, 68 38 C 70 32, 68 22, 62 18 Z" fill="white"/>
+                <path d="M 56 20 C 58 14, 66 10, 68 16 C 66 20, 60 22, 56 20 Z" fill="white"/>
+                <circle cx="55" cy="38" r="5" fill="#1B6B5A"/>
+                <circle cx="57" cy="36.5" r="2" fill="white"/>
+                <ellipse cx="24" cy="52" rx="3.5" ry="2.5" fill="#1B6B5A"/>
+              </svg>
+            </div>
+            <span class="cell-label">60px Teal</span>
+          </div>
+          <div class="icon-cell">
+            <div class="bg-white sz-60">
+              <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 62 18 C 62 18, 52 14, 44 18 C 38 20, 35 26, 38 32 L 34 30 C 28 28, 24 32, 26 38 C 22 40, 20 46, 22 52 C 20 56, 22 64, 28 68 C 32 72, 42 74, 52 72 C 62 70, 68 64, 68 56 C 72 52, 72 44, 68 38 C 70 32, 68 22, 62 18 Z" fill="#1B6B5A"/>
+                <path d="M 56 20 C 58 14, 66 10, 68 16 C 66 20, 60 22, 56 20 Z" fill="#1B6B5A"/>
+                <circle cx="55" cy="38" r="5" fill="white"/>
+                <ellipse cx="24" cy="52" rx="3.5" ry="2.5" fill="white"/>
+              </svg>
+            </div>
+            <span class="cell-label">60px Weiss</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ——————————————————————————————— B3: HUND + SCHILD ——————————————————————————————— -->
+    <div class="variant">
+      <div class="variant-label">B3</div>
+      <div class="variant-name">Hund + Schild</div>
+      <div class="variant-desc">Der geometrische Hund sitzt in einem abgerundeten Schild. Kommuniziert Schutz und Gesundheit. Das Schild gibt dem Icon Gewicht und Struktur.</div>
+
+      <div class="showcase">
+        <div style="display:flex;gap:16px;align-items:flex-end;">
+          <div class="icon-cell">
+            <div class="bg-teal sz-256">
+              <!--
+                B3: Schild-Form mit Hund darin.
+                Schild: abgerundetes Pentagon, klassisch aber weich.
+                Hund: vereinfachte Frontalansicht (kleiner als Schild, zentriert).
+              -->
+              <svg width="88" height="88" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Schild-Form: abgerundetes Pentagon -->
+                <path d="
+                  M 50 8
+                  C 50 8, 82 16, 84 20
+                  L 84 54
+                  C 84 68, 68 80, 50 88
+                  C 32 80, 16 68, 16 54
+                  L 16 20
+                  C 18 16, 50 8, 50 8
+                  Z
+                " fill="white" opacity="0.15"/>
+                <!-- Schild-Outline fuer Klarheit -->
+                <path d="
+                  M 50 8
+                  C 50 8, 82 16, 84 20
+                  L 84 54
+                  C 84 68, 68 80, 50 88
+                  C 32 80, 16 68, 16 54
+                  L 16 20
+                  C 18 16, 50 8, 50 8
+                  Z
+                " fill="none" stroke="white" stroke-width="3" opacity="0.5"/>
+
+                <!-- Hund-Silhouette im Schild: Ohren -->
+                <ellipse cx="35" cy="40" rx="8" ry="13" fill="white" opacity="0.7"/>
+                <ellipse cx="65" cy="40" rx="8" ry="13" fill="white" opacity="0.7"/>
+                <!-- Hund-Kopf -->
+                <circle cx="50" cy="50" r="18" fill="white"/>
+                <!-- Augen -->
+                <circle cx="43" cy="47" r="3.5" fill="#1B6B5A"/>
+                <circle cx="44.5" cy="45.8" r="1.2" fill="white"/>
+                <circle cx="57" cy="47" r="3.5" fill="#1B6B5A"/>
+                <circle cx="58.5" cy="45.8" r="1.2" fill="white"/>
+                <!-- Nase -->
+                <ellipse cx="50" cy="55" rx="4.5" ry="3.5" fill="#1B6B5A"/>
+                <ellipse cx="48" cy="55.5" rx="1.2" ry="0.8" fill="white"/>
+                <ellipse cx="52" cy="55.5" rx="1.2" ry="0.8" fill="white"/>
+              </svg>
+            </div>
+            <span class="cell-label">Teal · gross</span>
+          </div>
+          <div class="icon-cell">
+            <div class="bg-white sz-256">
+              <svg width="88" height="88" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Schild gefuellt -->
+                <path d="M 50 8 C 50 8, 82 16, 84 20 L 84 54 C 84 68, 68 80, 50 88 C 32 80, 16 68, 16 54 L 16 20 C 18 16, 50 8, 50 8 Z" fill="#1B6B5A"/>
+                <!-- Ohren -->
+                <ellipse cx="35" cy="40" rx="8" ry="13" fill="white" opacity="0.35"/>
+                <ellipse cx="65" cy="40" rx="8" ry="13" fill="white" opacity="0.35"/>
+                <!-- Kopf -->
+                <circle cx="50" cy="50" r="18" fill="white"/>
+                <!-- Augen -->
+                <circle cx="43" cy="47" r="3.5" fill="#1B6B5A"/>
+                <circle cx="44.5" cy="45.8" r="1.2" fill="white"/>
+                <circle cx="57" cy="47" r="3.5" fill="#1B6B5A"/>
+                <circle cx="58.5" cy="45.8" r="1.2" fill="white"/>
+                <!-- Nase -->
+                <ellipse cx="50" cy="55" rx="4.5" ry="3.5" fill="#1B6B5A"/>
+                <ellipse cx="48" cy="55.5" rx="1.2" ry="0.8" fill="white"/>
+                <ellipse cx="52" cy="55.5" rx="1.2" ry="0.8" fill="white"/>
+              </svg>
+            </div>
+            <span class="cell-label">Weiss · gross</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div style="display:flex;gap:14px;align-items:flex-end;">
+          <div class="icon-cell">
+            <div class="bg-teal sz-60">
+              <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 50 8 C 50 8, 82 16, 84 20 L 84 54 C 84 68, 68 80, 50 88 C 32 80, 16 68, 16 54 L 16 20 C 18 16, 50 8, 50 8 Z" fill="white" opacity="0.18"/>
+                <path d="M 50 8 C 50 8, 82 16, 84 20 L 84 54 C 84 68, 68 80, 50 88 C 32 80, 16 68, 16 54 L 16 20 C 18 16, 50 8, 50 8 Z" fill="none" stroke="white" stroke-width="3" opacity="0.5"/>
+                <ellipse cx="35" cy="40" rx="8" ry="13" fill="white" opacity="0.7"/>
+                <ellipse cx="65" cy="40" rx="8" ry="13" fill="white" opacity="0.7"/>
+                <circle cx="50" cy="50" r="18" fill="white"/>
+                <circle cx="43" cy="47" r="3.5" fill="#1B6B5A"/>
+                <circle cx="57" cy="47" r="3.5" fill="#1B6B5A"/>
+                <ellipse cx="50" cy="55" rx="4.5" ry="3.5" fill="#1B6B5A"/>
+              </svg>
+            </div>
+            <span class="cell-label">60px Teal</span>
+          </div>
+          <div class="icon-cell">
+            <div class="bg-white sz-60">
+              <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M 50 8 C 50 8, 82 16, 84 20 L 84 54 C 84 68, 68 80, 50 88 C 32 80, 16 68, 16 54 L 16 20 C 18 16, 50 8, 50 8 Z" fill="#1B6B5A"/>
+                <ellipse cx="35" cy="40" rx="8" ry="13" fill="white" opacity="0.35"/>
+                <ellipse cx="65" cy="40" rx="8" ry="13" fill="white" opacity="0.35"/>
+                <circle cx="50" cy="50" r="18" fill="white"/>
+                <circle cx="43" cy="47" r="3.5" fill="#1B6B5A"/>
+                <circle cx="57" cy="47" r="3.5" fill="#1B6B5A"/>
+                <ellipse cx="50" cy="55" rx="4.5" ry="3.5" fill="#1B6B5A"/>
+              </svg>
+            </div>
+            <span class="cell-label">60px Weiss</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ——— Design Notes ——— -->
+  <div class="design-notes">
+    <h3>Design-Entscheidungen · V2</h3>
+    <div class="notes-grid">
+
+      <div class="note">
+        <div class="recommended-badge">Mein Favorit</div>
+        <h4>B1 — Schraeger Kopf</h4>
+        <p>Die Neigung ist minimal (8 Grad) aber sie reicht. Das linke Ohr haengt tiefer, die Augen sitzen asymmetrisch — das Gehirn liest sofort "Persoenlichkeit". Auf 60px verliert man den Mund, aber Kopf-Neigung und Augen halten den Charakter. Skaliert am besten von allen dreien.</p>
+      </div>
+
+      <div class="note">
+        <h4>B2 — Profil-Silhouette</h4>
+        <p>Der eleganteste Ansatz — ein Pfad, eine Silhouette, kein Kitch. Wirkt wie ein Premium-Produkt aus dem Veterinarbereich. Auf 60px verliert man Nuancen, aber die Silhouette bleibt erkennbar. Risiko: wirkt ohne Farb-Kontrast zu abstrakt — muss immer auf Teal getestet werden.</p>
+      </div>
+
+      <div class="note">
+        <h4>B3 — Hund + Schild</h4>
+        <p>Das Schild kommuniziert "Schutz" ohne ein Wort. Gut fuer den Healthcare-Kontext — Bestaendigkeit, Vertrauen. Die transparente Schild-Flaeche auf Teal gibt Tiefe ohne Gewicht. Auf 60px wird das Schild reduziert auf seinen Umriss — das Icon bleibt verankert.</p>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>

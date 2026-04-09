@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VetApp — Logo Entwurf v1</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', sans-serif;
+      background: #F2EDE8;
+      color: #1A1A1A;
+      padding: 48px 40px;
+    }
+
+    header {
+      margin-bottom: 48px;
+    }
+
+    header h1 {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 8px;
+    }
+
+    header h2 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1A1A1A;
+      letter-spacing: -0.02em;
+    }
+
+    .variants {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+
+    .variant {
+      background: white;
+      border-radius: 20px;
+      padding: 36px 28px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .variant-header {
+      margin-bottom: 28px;
+    }
+
+    .variant-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #1B6B5A;
+      margin-bottom: 6px;
+    }
+
+    .variant-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1A1A1A;
+      letter-spacing: -0.01em;
+      margin-bottom: 4px;
+    }
+
+    .variant-desc {
+      font-size: 13px;
+      color: #6B6B6B;
+      line-height: 1.5;
+    }
+
+    /* Size row */
+    .size-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 16px;
+    }
+
+    .size-label {
+      font-size: 11px;
+      color: #999;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      width: 36px;
+      flex-shrink: 0;
+    }
+
+    /* Background variants */
+    .bg-row {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .icon-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .icon-cell-label {
+      font-size: 10px;
+      color: #999;
+      letter-spacing: 0.06em;
+    }
+
+    .icon-bg-white {
+      background: #FFFFFF;
+      border-radius: 20%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #F0EBE5;
+    }
+
+    .icon-bg-teal {
+      background: #1B6B5A;
+      border-radius: 20%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .icon-bg-dark {
+      background: #1A1A1A;
+      border-radius: 20%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Large: 256px, border-radius ~51px (20%) */
+    .size-large { width: 128px; height: 128px; border-radius: 26px; }
+    .size-small { width: 60px; height: 60px; border-radius: 12px; }
+
+    .divider {
+      height: 1px;
+      background: #F0EBE5;
+      margin: 24px 0;
+    }
+
+    .design-notes {
+      margin-top: 40px;
+      background: white;
+      border-radius: 20px;
+      padding: 32px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    }
+
+    .design-notes h3 {
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #999;
+      margin-bottom: 20px;
+    }
+
+    .notes-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .note-item h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: #1B6B5A;
+      margin-bottom: 6px;
+    }
+
+    .note-item p {
+      font-size: 13px;
+      color: #6B6B6B;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>VetApp — Logo Entwurf</h1>
+    <h2>Version 1 · 3 Varianten</h2>
+  </header>
+
+  <div class="variants">
+
+    <!-- VARIANTE A: PFOTE + PULS -->
+    <div class="variant">
+      <div class="variant-header">
+        <div class="variant-label">Variante A</div>
+        <div class="variant-name">Pfote + Puls</div>
+        <div class="variant-desc">Stilisierte Pfote, bei der der obere Ballen durch eine EKG-Linie ersetzt wird. Health + Tier in einer Form.</div>
+      </div>
+
+      <div class="bg-row">
+        <div class="icon-cell">
+          <div class="icon-bg-teal size-large">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Pfotenballen unten: 3 runde Zehen -->
+              <ellipse cx="22" cy="58" rx="9" ry="10" fill="white"/>
+              <ellipse cx="40" cy="61" rx="10" ry="11" fill="white"/>
+              <ellipse cx="58" cy="58" rx="9" ry="10" fill="white"/>
+              <!-- Hauptballen (gross) -->
+              <ellipse cx="40" cy="46" rx="16" ry="13" fill="white"/>
+              <!-- EKG-Linie als oberer "Ballen" — daruebergelegt in Teal -->
+              <rect x="20" y="21" width="40" height="16" rx="8" fill="#1B6B5A"/>
+              <!-- EKG Kurve in Weiss -->
+              <polyline
+                points="22,29 28,29 31,22 34,36 37,24 40,29 46,29 49,23 52,35 55,29 58,29"
+                fill="none"
+                stroke="white"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+          <span class="icon-cell-label">Teal</span>
+        </div>
+        <div class="icon-cell">
+          <div class="icon-bg-white size-large">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="22" cy="58" rx="9" ry="10" fill="#1B6B5A"/>
+              <ellipse cx="40" cy="61" rx="10" ry="11" fill="#1B6B5A"/>
+              <ellipse cx="58" cy="58" rx="9" ry="10" fill="#1B6B5A"/>
+              <ellipse cx="40" cy="46" rx="16" ry="13" fill="#1B6B5A"/>
+              <rect x="20" y="21" width="40" height="16" rx="8" fill="#1B6B5A"/>
+              <polyline
+                points="22,29 28,29 31,22 34,36 37,24 40,29 46,29 49,23 52,35 55,29 58,29"
+                fill="none"
+                stroke="white"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+          <span class="icon-cell-label">Weiss</span>
+        </div>
+        <div class="icon-cell">
+          <div class="icon-bg-dark size-large">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="22" cy="58" rx="9" ry="10" fill="#3AA08A"/>
+              <ellipse cx="40" cy="61" rx="10" ry="11" fill="#3AA08A"/>
+              <ellipse cx="58" cy="58" rx="9" ry="10" fill="#3AA08A"/>
+              <ellipse cx="40" cy="46" rx="16" ry="13" fill="#3AA08A"/>
+              <rect x="20" y="21" width="40" height="16" rx="8" fill="#3AA08A"/>
+              <polyline
+                points="22,29 28,29 31,22 34,36 37,24 40,29 46,29 49,23 52,35 55,29 58,29"
+                fill="none"
+                stroke="#1A1A1A"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+          <span class="icon-cell-label">Dark</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="size-row">
+        <span class="size-label">60px</span>
+        <div class="icon-bg-teal size-small">
+          <svg width="36" height="36" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="22" cy="58" rx="9" ry="10" fill="white"/>
+            <ellipse cx="40" cy="61" rx="10" ry="11" fill="white"/>
+            <ellipse cx="58" cy="58" rx="9" ry="10" fill="white"/>
+            <ellipse cx="40" cy="46" rx="16" ry="13" fill="white"/>
+            <rect x="20" y="21" width="40" height="16" rx="8" fill="#1B6B5A"/>
+            <polyline points="22,29 28,29 31,22 34,36 37,24 40,29 46,29 49,23 52,35 55,29 58,29" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="icon-bg-white size-small">
+          <svg width="36" height="36" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="22" cy="58" rx="9" ry="10" fill="#1B6B5A"/>
+            <ellipse cx="40" cy="61" rx="10" ry="11" fill="#1B6B5A"/>
+            <ellipse cx="58" cy="58" rx="9" ry="10" fill="#1B6B5A"/>
+            <ellipse cx="40" cy="46" rx="16" ry="13" fill="#1B6B5A"/>
+            <rect x="20" y="21" width="40" height="16" rx="8" fill="#1B6B5A"/>
+            <polyline points="22,29 28,29 31,22 34,36 37,24 40,29 46,29 49,23 52,35 55,29 58,29" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- VARIANTE B: HUND-KOPF GEOMETRISCH -->
+    <div class="variant">
+      <div class="variant-header">
+        <div class="variant-label">Variante B</div>
+        <div class="variant-name">Hund — Geometrisch</div>
+        <div class="variant-desc">Frontal-Silhouette eines Hundes. Nur Kreise und Boegen. Reduziert bis aufs Wesentliche — Charakter ohne Details.</div>
+      </div>
+
+      <div class="bg-row">
+        <div class="icon-cell">
+          <div class="icon-bg-teal size-large">
+            <svg width="86" height="86" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Ohren (haengende, tropfenfoermig) -->
+              <ellipse cx="26" cy="38" rx="12" ry="20" fill="white" opacity="0.75"/>
+              <ellipse cx="74" cy="38" rx="12" ry="20" fill="white" opacity="0.75"/>
+              <!-- Kopf -->
+              <circle cx="50" cy="48" r="26" fill="white"/>
+              <!-- Augen -->
+              <circle cx="41" cy="44" r="4.5" fill="#1B6B5A"/>
+              <circle cx="59" cy="44" r="4.5" fill="#1B6B5A"/>
+              <!-- Augen-Highlight -->
+              <circle cx="42.5" cy="42.5" r="1.5" fill="white"/>
+              <circle cx="60.5" cy="42.5" r="1.5" fill="white"/>
+              <!-- Nase -->
+              <ellipse cx="50" cy="54" rx="6" ry="4.5" fill="#1B6B5A"/>
+              <!-- Nostrils -->
+              <ellipse cx="47.5" cy="54.5" rx="1.5" ry="1" fill="white"/>
+              <ellipse cx="52.5" cy="54.5" rx="1.5" ry="1" fill="white"/>
+            </svg>
+          </div>
+          <span class="icon-cell-label">Teal</span>
+        </div>
+        <div class="icon-cell">
+          <div class="icon-bg-white size-large">
+            <svg width="86" height="86" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="26" cy="38" rx="12" ry="20" fill="#B8DDD4"/>
+              <ellipse cx="74" cy="38" rx="12" ry="20" fill="#B8DDD4"/>
+              <circle cx="50" cy="48" r="26" fill="#1B6B5A"/>
+              <circle cx="41" cy="44" r="4.5" fill="white"/>
+              <circle cx="59" cy="44" r="4.5" fill="white"/>
+              <circle cx="42.5" cy="42.5" r="1.5" fill="#1B6B5A"/>
+              <circle cx="60.5" cy="42.5" r="1.5" fill="#1B6B5A"/>
+              <ellipse cx="50" cy="54" rx="6" ry="4.5" fill="white"/>
+              <ellipse cx="47.5" cy="54.5" rx="1.5" ry="1" fill="#1B6B5A"/>
+              <ellipse cx="52.5" cy="54.5" rx="1.5" ry="1" fill="#1B6B5A"/>
+            </svg>
+          </div>
+          <span class="icon-cell-label">Weiss</span>
+        </div>
+        <div class="icon-cell">
+          <div class="icon-bg-dark size-large">
+            <svg width="86" height="86" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <ellipse cx="26" cy="38" rx="12" ry="20" fill="#145244"/>
+              <ellipse cx="74" cy="38" rx="12" ry="20" fill="#145244"/>
+              <circle cx="50" cy="48" r="26" fill="#3AA08A"/>
+              <circle cx="41" cy="44" r="4.5" fill="white"/>
+              <circle cx="59" cy="44" r="4.5" fill="white"/>
+              <circle cx="42.5" cy="42.5" r="1.5" fill="#3AA08A"/>
+              <circle cx="60.5" cy="42.5" r="1.5" fill="#3AA08A"/>
+              <ellipse cx="50" cy="54" rx="6" ry="4.5" fill="white"/>
+              <ellipse cx="47.5" cy="54.5" rx="1.5" ry="1" fill="#3AA08A"/>
+              <ellipse cx="52.5" cy="54.5" rx="1.5" ry="1" fill="#3AA08A"/>
+            </svg>
+          </div>
+          <span class="icon-cell-label">Dark</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="size-row">
+        <span class="size-label">60px</span>
+        <div class="icon-bg-teal size-small">
+          <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="26" cy="38" rx="12" ry="20" fill="white" opacity="0.75"/>
+            <ellipse cx="74" cy="38" rx="12" ry="20" fill="white" opacity="0.75"/>
+            <circle cx="50" cy="48" r="26" fill="white"/>
+            <circle cx="41" cy="44" r="4.5" fill="#1B6B5A"/>
+            <circle cx="59" cy="44" r="4.5" fill="#1B6B5A"/>
+            <ellipse cx="50" cy="54" rx="6" ry="4.5" fill="#1B6B5A"/>
+          </svg>
+        </div>
+        <div class="icon-bg-white size-small">
+          <svg width="42" height="42" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="26" cy="38" rx="12" ry="20" fill="#B8DDD4"/>
+            <ellipse cx="74" cy="38" rx="12" ry="20" fill="#B8DDD4"/>
+            <circle cx="50" cy="48" r="26" fill="#1B6B5A"/>
+            <circle cx="41" cy="44" r="4.5" fill="white"/>
+            <circle cx="59" cy="44" r="4.5" fill="white"/>
+            <ellipse cx="50" cy="54" rx="6" ry="4.5" fill="white"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- VARIANTE C: V MIT TIER-OHR -->
+    <div class="variant">
+      <div class="variant-header">
+        <div class="variant-label">Variante C</div>
+        <div class="variant-name">V — Monogramm</div>
+        <div class="variant-desc">Das "V" als Fundament, der linke Schenkel gebogen wie ein Tier-Ohr. Brandable, einpraeglich, 60px-tauglich.</div>
+      </div>
+
+      <div class="bg-row">
+        <div class="icon-cell">
+          <div class="icon-bg-teal size-large">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- Hintergrund-Kreis fuer Breathing-Room -->
+              <!-- V-Form: linker Schenkel mit Ohr-Kurve oben -->
+              <!-- Linker Schenkel: von oben-links nach Mitte-unten, mit nach-aussen-gebogenem Ohr -->
+              <path
+                d="M 18 16
+                   C 14 16, 10 22, 14 30
+                   L 40 64
+                   L 66 16"
+                fill="none"
+                stroke="white"
+                stroke-width="9"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <!-- Ohr: eine separate geschwungene Spitze links oben -->
+              <path
+                d="M 18 16 C 18 10, 12 8, 10 14"
+                fill="none"
+                stroke="white"
+                stroke-width="7"
+                stroke-linecap="round"
+              />
+            </svg>
+          </div>
+          <span class="icon-cell-label">Teal</span>
+        </div>
+        <div class="icon-cell">
+          <div class="icon-bg-white size-large">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M 18 16
+                   C 14 16, 10 22, 14 30
+                   L 40 64
+                   L 66 16"
+                fill="none"
+                stroke="#1B6B5A"
+                stroke-width="9"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M 18 16 C 18 10, 12 8, 10 14"
+                fill="none"
+                stroke="#1B6B5A"
+                stroke-width="7"
+                stroke-linecap="round"
+              />
+            </svg>
+          </div>
+          <span class="icon-cell-label">Weiss</span>
+        </div>
+        <div class="icon-cell">
+          <div class="icon-bg-dark size-large">
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M 18 16
+                   C 14 16, 10 22, 14 30
+                   L 40 64
+                   L 66 16"
+                fill="none"
+                stroke="#3AA08A"
+                stroke-width="9"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M 18 16 C 18 10, 12 8, 10 14"
+                fill="none"
+                stroke="#3AA08A"
+                stroke-width="7"
+                stroke-linecap="round"
+              />
+            </svg>
+          </div>
+          <span class="icon-cell-label">Dark</span>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="size-row">
+        <span class="size-label">60px</span>
+        <div class="icon-bg-teal size-small">
+          <svg width="36" height="36" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 18 16 C 14 16, 10 22, 14 30 L 40 64 L 66 16" fill="none" stroke="white" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 18 16 C 18 10, 12 8, 10 14" fill="none" stroke="white" stroke-width="7" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="icon-bg-white size-small">
+          <svg width="36" height="36" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 18 16 C 14 16, 10 22, 14 30 L 40 64 L 66 16" fill="none" stroke="#1B6B5A" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M 18 16 C 18 10, 12 8, 10 14" fill="none" stroke="#1B6B5A" stroke-width="7" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Design Notes -->
+  <div class="design-notes">
+    <h3>Design-Entscheidungen</h3>
+    <div class="notes-grid">
+      <div class="note-item">
+        <h4>A — Pfote + Puls</h4>
+        <p>Der Standard-Pfoten-Twist: die drei Ballen bleiben, aber der vierte (Hauptballen oben) wird zur EKG-Kurve. Pfote und Health sind nicht addiert — sie sind eine Form. Auf 60px: die Kurve bleibt lesbar weil die Pille-Form den Kontrast erzwingt.</p>
+      </div>
+      <div class="note-item">
+        <h4>B — Hund Geometrisch</h4>
+        <p>Frontalansicht, nur Kreise und Ellipsen — null Freehand. Die haengenden Ohren geben sofort "Hund", die vereinfachten Augen geben Charakter ohne Kitschwert. Funktioniert am besten auf Teal, weil die Ohr-Farbe (75% Weiss) die Tiefe erzeugt.</p>
+      </div>
+      <div class="note-item">
+        <h4>C — V Monogramm</h4>
+        <p>Rein typografisch gelesen: ein fettes V. Aber der linke Schenkel laeuft mit einer kleinen Kurve nach aussen — ein stummes Tier-Ohr. Ob man es sieht oder nicht: es ist da. Maximale Reduktion, maximale Skalierbarkeit.</p>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>

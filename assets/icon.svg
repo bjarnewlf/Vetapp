@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+
+  <!-- Background -->
+  <rect width="1024" height="1024" fill="#1B6B5A"/>
+
+  <!--
+    VetApp Icon — B3 Final
+    Geometrischer Hund-Kopf in/vor Schild-Form
+    Nur 2 Farben: #1B6B5A (BG) + #FFFFFF (Elemente)
+    ViewBox 1024x1024
+  -->
+
+  <!-- ─── SCHILD ─────────────────────────────────────────────
+       Klassisches abgerundetes Pentagon.
+       Breite: 640px (von x=192 bis x=832)
+       Oben flach, Seiten leicht schraeg, Spitze unten zentriert.
+       rx/ry an den Ecken durch Bezierkurven geloest.
+  ─────────────────────────────────────────────────────────── -->
+  <path d="
+    M 512 96
+    C 512 96, 768 152, 816 200
+    L 832 544
+    C 832 700, 680 820, 512 904
+    C 344 820, 192 700, 192 544
+    L 208 200
+    C 256 152, 512 96, 512 96
+    Z
+  " fill="none" stroke="#FFFFFF" stroke-width="28" stroke-linejoin="round"/>
+
+  <!-- ─── OHREN ──────────────────────────────────────────────
+       Zwei abgerundete Dreiecke / Ellipsen.
+       Links: cx=356, cy=390 — etwas breiter und tiefer haengend
+       Rechts: cx=668, cy=390 — spiegel-symmetrisch
+       Gross genug um auch bei 40px noch als Ohren lesbar zu sein.
+  ─────────────────────────────────────────────────────────── -->
+  <!-- Linkes Ohr -->
+  <ellipse cx="352" cy="382" rx="78" ry="118" fill="#FFFFFF"/>
+  <!-- Rechtes Ohr -->
+  <ellipse cx="672" cy="382" rx="78" ry="118" fill="#FFFFFF"/>
+
+  <!-- ─── KOPF ──────────────────────────────────────────────
+       Grosser Kreis, zentriert, ueberdeckt untere Haelfte der Ohren.
+       Radius 194px — schoen rund, faellt nicht aus dem Schild.
+  ─────────────────────────────────────────────────────────── -->
+  <circle cx="512" cy="520" r="194" fill="#FFFFFF"/>
+
+  <!-- ─── AUGEN ─────────────────────────────────────────────
+       Zwei Kreise mit Highlight-Punkt.
+       Abstand weit genug fuer kleine Darstellungen.
+       Iris: gross, klar erkennbar.
+  ─────────────────────────────────────────────────────────── -->
+  <!-- Linkes Auge — Iris -->
+  <circle cx="432" cy="484" r="44" fill="#1B6B5A"/>
+  <!-- Linkes Auge — Highlight -->
+  <circle cx="448" cy="468" r="16" fill="#FFFFFF"/>
+
+  <!-- Rechtes Auge — Iris -->
+  <circle cx="592" cy="484" r="44" fill="#1B6B5A"/>
+  <!-- Rechtes Auge — Highlight -->
+  <circle cx="608" cy="468" r="16" fill="#FFFFFF"/>
+
+  <!-- ─── NASE ───────────────────────────────────────────────
+       Abgerundetes Dreieck / breite Ellipse.
+       Gross und klar — auf 40px noch lesbar als Nase.
+  ─────────────────────────────────────────────────────────── -->
+  <ellipse cx="512" cy="576" rx="58" ry="44" fill="#1B6B5A"/>
+  <!-- Nase-Steg: vertikale Linie von Nasenmitte nach oben -->
+  <rect x="507" y="544" width="10" height="32" rx="5" fill="#1B6B5A"/>
+  <!-- Nasenlocher: zwei kleine Ovale -->
+  <ellipse cx="490" cy="580" rx="14" ry="10" fill="#FFFFFF"/>
+  <ellipse cx="534" cy="580" rx="14" ry="10" fill="#FFFFFF"/>
+
+  <!-- ─── MUND ───────────────────────────────────────────────
+       Einfaches Laecheln. Zwei geschwungene Linien von der Nasenmitte.
+       Warm, nicht klinisch.
+  ─────────────────────────────────────────────────────────── -->
+  <path d="M 472 622 Q 512 658 552 622"
+    fill="none" stroke="#1B6B5A" stroke-width="18" stroke-linecap="round"/>
+
+</svg>

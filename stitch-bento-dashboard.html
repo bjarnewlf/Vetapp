@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=375, initial-scale=1.0">
+  <title>VetApp — Bento Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    /* ── Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── VetApp Design Tokens ── */
+    :root {
+      --color-primary:         #1B6B5A;
+      --color-primary-dark:    #145244;
+      --color-primary-mid:     #2D8A73;
+      --color-primary-grad:    #3AA08A;
+      --color-primary-light:   #E8F5F1;
+      --color-primary-border:  #B8DDD4;
+      --color-accent:          #CC6B3D;
+      --color-accent-light:    #F5D0B9;
+      --color-background:      #FAF6F1;
+      --color-surface:         #FFFFFF;
+      --color-text:            #1A1A1A;
+      --color-text-secondary:  #6B6B6B;
+      --color-text-light:      #999999;
+      --color-border:          #E8E0D8;
+      --color-border-light:    #F0EBE5;
+      --color-error:           #D94040;
+      --color-error-light:     #FDEAEA;
+      --color-success:         #2E8B57;
+      --color-success-light:   #E8F5EE;
+      --color-warning:         #D4A020;
+      --color-warning-light:   #FFF8E1;
+      --color-card-shadow:     rgba(0, 0, 0, 0.08);
+
+      --font-heading: 'DM Sans', sans-serif;
+      --font-body:    'Inter', sans-serif;
+
+      --radius-sm:  8px;
+      --radius-md:  12px;
+      --radius-lg:  16px;
+      --radius-xl:  24px;
+
+      --spacing-xs:  4px;
+      --spacing-sm:  8px;
+      --spacing-md:  12px;
+      --spacing-lg:  16px;
+      --spacing-xl:  24px;
+    }
+
+    /* ── Device Frame ── */
+    body {
+      background: #D8D8D8;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 32px 16px 64px;
+      font-family: var(--font-body);
+    }
+
+    .device-frame {
+      width: 375px;
+      background: var(--color-background);
+      border-radius: 44px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 10px #1A1A1A,
+        0 0 0 12px #3A3A3A,
+        0 40px 80px rgba(0,0,0,0.4);
+      position: relative;
+    }
+
+    /* ── Status Bar ── */
+    .status-bar {
+      height: 44px;
+      background: var(--color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+    }
+    .status-bar .time {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 15px;
+      color: #FFFFFF;
+    }
+    .status-bar .icons {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .status-bar .icons svg {
+      width: 16px;
+      height: 16px;
+      fill: rgba(255,255,255,0.9);
+    }
+
+    /* ── Gradient Header ── */
+    .app-header {
+      background: linear-gradient(160deg, var(--color-primary) 0%, var(--color-primary-grad) 100%);
+      padding: 20px var(--spacing-lg) 28px;
+      border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .header-text .greeting {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 24px;
+      color: #FFFFFF;
+      line-height: 1.2;
+    }
+    .header-text .subtitle {
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.72);
+      margin-top: 4px;
+    }
+    .profile-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.22);
+      border: 2px solid rgba(255, 255, 255, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .profile-circle svg {
+      width: 22px;
+      height: 22px;
+      fill: rgba(255,255,255,0.85);
+    }
+
+    /* ── Scrollable Content ── */
+    .scroll-content {
+      padding: var(--spacing-xl) var(--spacing-lg) 100px;
+      overflow-y: auto;
+    }
+
+    /* ── Section Header ── */
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: var(--spacing-md);
+    }
+    .section-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--color-text);
+      letter-spacing: -0.2px;
+    }
+    .section-title--sm {
+      font-size: 18px;
+    }
+    .section-action {
+      font-family: var(--font-body);
+      font-weight: 500;
+      font-size: 14px;
+      color: var(--color-primary);
+    }
+
+    /* ── Pet Card Carousel ── */
+    .carousel-wrapper {
+      margin: 0 -16px;
+      padding: 4px 16px 8px;
+      overflow-x: auto;
+      display: flex;
+      gap: 12px;
+      scrollbar-width: none;
+    }
+    .carousel-wrapper::-webkit-scrollbar { display: none; }
+
+    .pet-card {
+      flex: 0 0 145px;
+      height: 180px;
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 2px 8px var(--color-card-shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-lg);
+      gap: 8px;
+    }
+    .pet-card--hint { opacity: 0.6; }
+
+    .pet-photo {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .pet-photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .pet-photo-icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--color-primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pet-name {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--color-text);
+      text-align: center;
+    }
+    .pet-meta {
+      font-family: var(--font-body);
+      font-size: 11px;
+      color: var(--color-text-secondary);
+      text-align: center;
+    }
+
+    /* ── Bento Grid ── */
+    .bento-section {
+      margin-top: var(--spacing-xl);
+    }
+
+    .bento-row {
+      display: flex;
+      gap: var(--spacing-lg);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .bento-card {
+      background: var(--color-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 2px 8px var(--color-card-shadow);
+      padding: var(--spacing-lg);
+      height: 140px;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .bento-card--teal-light {
+      background: var(--color-primary-light);
+      box-shadow: none;
+    }
+    .bento-card--bordered {
+      background: var(--color-primary-light);
+      border: 1.5px solid var(--color-primary-border);
+      box-shadow: none;
+    }
+
+    /* Termin Card (flex 2 ~65%) */
+    .bento-card--termin {
+      flex: 2;
+    }
+    .bento-card--termin::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: var(--color-error);
+      border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+    }
+    .bento-card--termin .inner {
+      padding-left: 8px;
+    }
+
+    /* Quick-Action Card (flex 1 ~35%) */
+    .bento-card--action {
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    /* Score Card (flex 1 ~35%) */
+    .bento-card--score {
+      flex: 1;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    /* KI Card (flex 2 ~65%) */
+    .bento-card--ki {
+      flex: 2;
+      flex-direction: row;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* ── Bento Card Inner Elements ── */
+    .card-label {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 11px;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+    }
+    .card-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--color-text);
+      margin-top: 6px;
+      line-height: 1.2;
+    }
+    .card-subtitle {
+      font-family: var(--font-body);
+      font-size: 13px;
+      color: var(--color-error);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+    .countdown-badge {
+      background: var(--color-error-light);
+      color: var(--color-error);
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 12px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      align-self: flex-end;
+      display: inline-block;
+    }
+
+    .action-icon-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .action-icon-circle svg { fill: #FFFFFF; width: 24px; height: 24px; }
+    .action-label {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--color-primary);
+      text-align: center;
+      line-height: 1.3;
+    }
+
+    .score-number {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 38px;
+      color: var(--color-success);
+      line-height: 1;
+    }
+    .score-label {
+      font-family: var(--font-body);
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      text-align: center;
+    }
+    .score-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--color-success);
+      margin-top: 4px;
+    }
+
+    .ki-icon-circle {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .ki-icon-circle svg { width: 22px; height: 22px; fill: #FFFFFF; }
+    .ki-text { flex: 1; }
+    .ki-title {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--color-text);
+      line-height: 1.2;
+    }
+    .ki-subtitle {
+      font-family: var(--font-body);
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+    .pro-badge {
+      background: var(--color-accent);
+      color: #FFFFFF;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+      align-self: flex-start;
+      position: absolute;
+      top: var(--spacing-md);
+      right: 40px;
+    }
+    .ki-chevron {
+      position: absolute;
+      right: var(--spacing-md);
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .ki-chevron svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: var(--color-primary);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ── Aktivitaet Section ── */
+    .aktivitaet-section {
+      margin-top: var(--spacing-xl);
+    }
+    .aktivitaet-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+    .aktivitaet-row {
+      background: var(--color-surface);
+      border-radius: var(--radius-md);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 56px;
+    }
+
+    .date-block {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .date-block--overdue { background: var(--color-error-light); }
+    .date-block--upcoming { background: var(--color-primary-light); }
+    .date-day {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--color-text);
+      line-height: 1;
+    }
+    .date-day--overdue { color: var(--color-error); }
+    .date-day--upcoming { color: var(--color-primary); }
+    .date-month {
+      font-family: var(--font-body);
+      font-size: 9px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 1px;
+    }
+    .date-month--overdue { color: var(--color-error); }
+    .date-month--upcoming { color: var(--color-primary); }
+
+    .aktivitaet-info { flex: 1; min-width: 0; }
+    .aktivitaet-title {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 14px;
+      color: var(--color-text);
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .aktivitaet-pet {
+      font-family: var(--font-body);
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      margin-top: 2px;
+    }
+
+    .type-badge {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .type-badge--vorsorge {
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+    }
+    .type-badge--impfung {
+      background: var(--color-primary-light);
+      color: var(--color-primary);
+    }
+    .type-badge--wurm {
+      background: var(--color-warning-light);
+      color: var(--color-warning);
+    }
+
+    /* ── Tab Bar ── */
+    .tab-bar {
+      position: sticky;
+      bottom: 0;
+      background: var(--color-surface);
+      border-top: 1px solid var(--color-border-light);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 8px 0 20px;
+      box-shadow: 0 -4px 16px rgba(0,0,0,0.06);
+    }
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 12px;
+      min-width: 44px;
+      min-height: 44px;
+      justify-content: center;
+    }
+    .tab-item svg {
+      width: 22px;
+      height: 22px;
+    }
+    .tab-item span {
+      font-family: var(--font-body);
+      font-size: 10px;
+      font-weight: 500;
+    }
+    .tab-item--inactive svg { fill: var(--color-text-light); stroke: none; }
+    .tab-item--inactive span { color: var(--color-text-light); }
+    .tab-item--active svg { fill: var(--color-accent); }
+    .tab-item--active span { color: var(--color-accent); font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <div class="device-frame">
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <div class="icons">
+        <svg viewBox="0 0 24 24"><rect x="1" y="14" width="3" height="7" rx="0.5"/><rect x="6.5" y="10" width="3" height="11" rx="0.5"/><rect x="12" y="6" width="3" height="15" rx="0.5"/><rect x="17.5" y="2" width="3" height="19" rx="0.5"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+        <svg viewBox="0 0 24 24"><rect x="2" y="7" width="18" height="10" rx="2" stroke="white" stroke-width="1.5" fill="none"/><rect x="3" y="8" width="13" height="8" rx="1" fill="white"/><path d="M21 10v4" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+
+    <!-- App Header -->
+    <div class="app-header">
+      <div class="header-text">
+        <div class="greeting">Hallo, Claas!</div>
+        <div class="subtitle">Alles im Blick.</div>
+      </div>
+      <div class="profile-circle">
+        <!-- Person icon -->
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="scroll-content">
+
+      <!-- ── Section: Meine Tiere ── -->
+      <div class="section-header">
+        <span class="section-title">Meine Tiere</span>
+        <span class="section-action">+ Hinzufuegen</span>
+      </div>
+
+      <div class="carousel-wrapper">
+        <!-- Bella -->
+        <div class="pet-card">
+          <div class="pet-photo-icon">
+            <!-- Golden Retriever placeholder -->
+            <svg viewBox="0 0 48 48" fill="none" style="width:44px;height:44px;">
+              <circle cx="24" cy="24" r="22" fill="#F5D0B9"/>
+              <ellipse cx="24" cy="26" rx="13" ry="11" fill="#CC6B3D" opacity="0.5"/>
+              <circle cx="24" cy="22" r="9" fill="#CC6B3D" opacity="0.6"/>
+              <circle cx="20" cy="20" r="2" fill="#1A1A1A" opacity="0.7"/>
+              <circle cx="28" cy="20" r="2" fill="#1A1A1A" opacity="0.7"/>
+              <ellipse cx="24" cy="25" rx="3" ry="2" fill="#CC6B3D" opacity="0.8"/>
+              <!-- Ears -->
+              <ellipse cx="15" cy="14" rx="4" ry="7" fill="#CC6B3D" opacity="0.5" transform="rotate(-15 15 14)"/>
+              <ellipse cx="33" cy="14" rx="4" ry="7" fill="#CC6B3D" opacity="0.5" transform="rotate(15 33 14)"/>
+            </svg>
+          </div>
+          <span class="pet-name">Bella</span>
+          <span class="pet-meta">Hund · 3 Jahre</span>
+        </div>
+
+        <!-- Milo -->
+        <div class="pet-card">
+          <div class="pet-photo-icon" style="background: #F0F0F5;">
+            <!-- Cat placeholder -->
+            <svg viewBox="0 0 48 48" fill="none" style="width:44px;height:44px;">
+              <circle cx="24" cy="26" r="13" fill="#9090A0" opacity="0.35"/>
+              <circle cx="24" cy="24" r="11" fill="#A0A0B0" opacity="0.5"/>
+              <circle cx="19" cy="22" r="2" fill="#1A1A1A" opacity="0.7"/>
+              <circle cx="29" cy="22" r="2" fill="#1A1A1A" opacity="0.7"/>
+              <ellipse cx="24" cy="27" rx="3" ry="1.5" fill="#9090A0" opacity="0.6"/>
+              <!-- Cat ears -->
+              <polygon points="13,10 9,20 19,18" fill="#A0A0B0" opacity="0.55"/>
+              <polygon points="35,10 39,20 29,18" fill="#A0A0B0" opacity="0.55"/>
+              <!-- Whiskers -->
+              <line x1="10" y1="25" x2="21" y2="27" stroke="#1A1A1A" stroke-width="0.8" opacity="0.3"/>
+              <line x1="10" y1="28" x2="21" y2="28" stroke="#1A1A1A" stroke-width="0.8" opacity="0.3"/>
+              <line x1="38" y1="25" x2="27" y2="27" stroke="#1A1A1A" stroke-width="0.8" opacity="0.3"/>
+              <line x1="38" y1="28" x2="27" y2="28" stroke="#1A1A1A" stroke-width="0.8" opacity="0.3"/>
+            </svg>
+          </div>
+          <span class="pet-name">Milo</span>
+          <span class="pet-meta">Katze · 5 Jahre</span>
+        </div>
+
+        <!-- Hoppel (partial) -->
+        <div class="pet-card pet-card--hint">
+          <div class="pet-photo-icon" style="background: #FFF3EC;">
+            <svg viewBox="0 0 48 48" fill="none" style="width:44px;height:44px;">
+              <ellipse cx="24" cy="30" rx="11" ry="10" fill="#CC6B3D" opacity="0.3"/>
+              <!-- Long ears -->
+              <ellipse cx="19" cy="16" rx="4" ry="10" fill="#CC6B3D" opacity="0.35"/>
+              <ellipse cx="29" cy="16" rx="4" ry="10" fill="#CC6B3D" opacity="0.35"/>
+              <ellipse cx="24" cy="29" rx="8" ry="7" fill="#CC6B3D" opacity="0.5"/>
+              <circle cx="21" cy="27" r="1.8" fill="#1A1A1A" opacity="0.6"/>
+              <circle cx="27" cy="27" r="1.8" fill="#1A1A1A" opacity="0.6"/>
+              <ellipse cx="24" cy="31" rx="2.5" ry="1.5" fill="#CC6B3D" opacity="0.7"/>
+            </svg>
+          </div>
+          <span class="pet-name">Hoppel</span>
+          <span class="pet-meta">Hase · 2 Jahre</span>
+        </div>
+
+        <div style="flex: 0 0 4px;"></div>
+      </div>
+
+      <!-- ── Bento Grid ── -->
+      <div class="bento-section">
+
+        <!-- Row 1: Termin + Quick Action -->
+        <div class="bento-row">
+
+          <!-- Naechster Termin (overdue) -->
+          <div class="bento-card bento-card--termin">
+            <div class="inner">
+              <span class="card-label">Naechster Termin</span>
+              <div class="card-title">Impfung Bella</div>
+              <div class="card-subtitle">Ueberfaellig · 3 Tage</div>
+            </div>
+            <div style="display:flex; justify-content:flex-end;">
+              <span class="countdown-badge">3T</span>
+            </div>
+          </div>
+
+          <!-- Quick Action -->
+          <div class="bento-card bento-card--teal-light bento-card--action">
+            <div class="action-icon-circle">
+              <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+            </div>
+            <span class="action-label">Event hinzufuegen</span>
+          </div>
+
+        </div>
+
+        <!-- Row 2: Health Score + KI Assistent -->
+        <div class="bento-row">
+
+          <!-- Health Score -->
+          <div class="bento-card bento-card--score">
+            <span class="score-number">92</span>
+            <span class="score-label">Gesundheit</span>
+            <div class="score-dot"></div>
+          </div>
+
+          <!-- KI Assistent -->
+          <div class="bento-card bento-card--bordered bento-card--ki">
+            <div class="ki-icon-circle">
+              <!-- Sparkle icon -->
+              <svg viewBox="0 0 24 24"><path d="M12 2l2.09 6.26L20 10l-5.91 1.74L12 18l-2.09-6.26L4 10l5.91-1.74L12 2z"/><path d="M5 3l.92 2.76L8.5 7l-2.58.76L5 10.5l-.92-2.74L1.5 7l2.58-.76L5 3z" opacity="0.5"/></svg>
+            </div>
+            <div class="ki-text">
+              <div class="ki-title">KI-Assistent</div>
+              <div class="ki-subtitle">Frage zu deinem Tier stellen</div>
+            </div>
+            <span class="pro-badge">PRO</span>
+            <div class="ki-chevron">
+              <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- ── Section: Letzte Aktivitaet ── -->
+      <div class="aktivitaet-section">
+        <div class="section-header">
+          <span class="section-title section-title--sm">Letzte Aktivitaet</span>
+          <span class="section-action">Alle</span>
+        </div>
+
+        <div class="aktivitaet-list">
+
+          <!-- Row 1: Zahnreinigung (overdue) -->
+          <div class="aktivitaet-row">
+            <div class="date-block date-block--overdue">
+              <span class="date-day date-day--overdue">05</span>
+              <span class="date-month date-month--overdue">Apr</span>
+            </div>
+            <div class="aktivitaet-info">
+              <div class="aktivitaet-title">Zahnreinigung</div>
+              <div class="aktivitaet-pet">Bella</div>
+            </div>
+            <span class="type-badge type-badge--vorsorge">Vorsorge</span>
+          </div>
+
+          <!-- Row 2: Entwurmung (upcoming) -->
+          <div class="aktivitaet-row">
+            <div class="date-block date-block--upcoming">
+              <span class="date-day date-day--upcoming">12</span>
+              <span class="date-month date-month--upcoming">Apr</span>
+            </div>
+            <div class="aktivitaet-info">
+              <div class="aktivitaet-title">Entwurmung</div>
+              <div class="aktivitaet-pet">Milo</div>
+            </div>
+            <span class="type-badge type-badge--wurm">Entwurmung</span>
+          </div>
+
+          <!-- Row 3: Impfung Tollwut (upcoming) -->
+          <div class="aktivitaet-row">
+            <div class="date-block date-block--upcoming">
+              <span class="date-day date-day--upcoming">18</span>
+              <span class="date-month date-month--upcoming">Apr</span>
+            </div>
+            <div class="aktivitaet-info">
+              <div class="aktivitaet-title">Impfung Tollwut</div>
+              <div class="aktivitaet-pet">Bella</div>
+            </div>
+            <span class="type-badge type-badge--impfung">Impfung</span>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Bottom padding for tab bar -->
+      <div style="height: 16px;"></div>
+
+    </div><!-- /scroll-content -->
+
+    <!-- ── Tab Bar ── -->
+    <div class="tab-bar">
+      <!-- Home (active) -->
+      <div class="tab-item tab-item--active">
+        <svg viewBox="0 0 24 24"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/></svg>
+        <span>Home</span>
+      </div>
+      <!-- Tiere -->
+      <div class="tab-item tab-item--inactive">
+        <svg viewBox="0 0 24 24"><path d="M10 5a2 2 0 11-4 0 2 2 0 014 0zM18 5a2 2 0 11-4 0 2 2 0 014 0zM7 11a5 5 0 0110 0v7H7v-7zM4 9s-1 1-1 3M20 9s1 1 1 3"/></svg>
+        <span>Tiere</span>
+      </div>
+      <!-- KI -->
+      <div class="tab-item tab-item--inactive">
+        <svg viewBox="0 0 24 24"><path d="M12 2l2.09 6.26L20 10l-5.91 1.74L12 18l-2.09-6.26L4 10l5.91-1.74L12 2z"/></svg>
+        <span>KI</span>
+      </div>
+      <!-- Erinnerungen -->
+      <div class="tab-item tab-item--inactive">
+        <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0"/></svg>
+        <span>Erinnerung</span>
+      </div>
+      <!-- Tierarzt -->
+      <div class="tab-item tab-item--inactive">
+        <svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2zM8 12h8M12 8v8"/></svg>
+        <span>Tierarzt</span>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
