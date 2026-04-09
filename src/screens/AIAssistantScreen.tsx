@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import Markdown from 'react-native-markdown-display';
 import { useFadeIn } from '../hooks/useFadeIn';
-import { SkeletonCard } from '../components';
+import { SkeletonCard, Button } from '../components';
 import { Ionicons } from '@expo/vector-icons';
 import { useFocusEffect } from '@react-navigation/native';
 import { colors, typography, spacing, borderRadius, TAB_BAR_HEIGHT } from '../theme';
@@ -115,7 +115,6 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
         paywallShown.current = true;
         navigation.navigate('Paywall', { feature: 'ai_assistant' });
       }
-      return () => { paywallShown.current = false; };
     }, [subscriptionLoading, isPro, navigation])
   );
 
@@ -132,7 +131,18 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
   }
 
   if (!isPro) {
-    return <View style={styles.loadingScreen} />;
+    return (
+      <View style={[styles.loadingScreen, { justifyContent: 'center', alignItems: 'center', padding: spacing.xl }]}>
+        <Ionicons name="sparkles" size={48} color={colors.primary} style={{ marginBottom: spacing.md }} />
+        <Text style={[typography.h2, { color: colors.text, textAlign: 'center', marginBottom: spacing.sm }]}>
+          KI-Assistent ist ein Pro-Feature
+        </Text>
+        <Text style={[typography.body, { color: colors.textSecondary, textAlign: 'center', marginBottom: spacing.lg }]}>
+          Upgrade auf VetApp Pro um den KI-Gesundheitsassistenten zu nutzen.
+        </Text>
+        <Button title="Pro freischalten" onPress={() => navigation.navigate('Paywall', { feature: 'ai_assistant' })} />
+      </View>
+    );
   }
 
   const quickActions: string[] = [
