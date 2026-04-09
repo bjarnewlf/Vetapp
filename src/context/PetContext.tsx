@@ -212,7 +212,7 @@ export function PetProvider({ children }: { children: React.ReactNode }) {
     if (!user) return false;
     try {
       const { path } = await uploadFile(
-        user.id, data.petId, data.fileUrl, data.name, data.fileType,
+        user.id, data.petId, data.fileUrl, data.name, data.fileType, data.fileSize,
       );
       const { error } = await supabase.from('documents').insert({
         user_id: user.id,

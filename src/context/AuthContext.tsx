@@ -38,21 +38,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
     if (error) return { error: error.message };
 
-    // If session returned, set it directly
+    // Session direkt verfuegbar = E-Mail-Bestaetigung deaktiviert
     if (data.session) {
       setSession(data.session);
       return { error: null };
     }
 
-    // If no session (email confirmation was required), try signing in
-    const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (signInError) return { error: signInError.message };
-
-    if (signInData.session) {
-      setSession(signInData.session);
+    // Keine Session = E-Mail-Bestaetigung erforderlich
+    if (data.user && !data.session) {
+      return { error: 'Bitte bestätige deine E-Mail-Adresse, um dich anzumelden.' };
     }
 
     return { error: null };

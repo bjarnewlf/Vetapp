@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import {
   View,
   Text,
@@ -13,6 +13,7 @@ import {
   ActivityIndicator,
   Animated,
 } from 'react-native';
+import Markdown from 'react-native-markdown-display';
 import { useFadeIn } from '../hooks/useFadeIn';
 import { SkeletonCard } from '../components';
 import { Ionicons } from '@expo/vector-icons';
@@ -27,6 +28,67 @@ import type { CompositeTabStackNavProp } from '../types/navigation';
 interface AIAssistantScreenProps {
   navigation: CompositeTabStackNavProp<'AI'>;
 }
+
+function TypingDots() {
+  const dot1 = useRef(new Animated.Value(0)).current;
+  const dot2 = useRef(new Animated.Value(0)).current;
+  const dot3 = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    function makeBounce(val: Animated.Value, delay: number) {
+      return Animated.loop(
+        Animated.sequence([
+          Animated.delay(delay),
+          Animated.parallel([
+            Animated.sequence([
+              Animated.timing(val, { toValue: -5, duration: 200, useNativeDriver: true }),
+              Animated.timing(val, { toValue: 0, duration: 200, useNativeDriver: true }),
+              Animated.delay(800),
+            ]),
+          ]),
+        ])
+      );
+    }
+
+    const a1 = makeBounce(dot1, 0);
+    const a2 = makeBounce(dot2, 200);
+    const a3 = makeBounce(dot3, 400);
+
+    a1.start();
+    a2.start();
+    a3.start();
+
+    return () => { a1.stop(); a2.stop(); a3.stop(); };
+  }, [dot1, dot2, dot3]);
+
+  const dotOpacity1 = dot1.interpolate({ inputRange: [-5, 0], outputRange: [1.0, 0.4] });
+  const dotOpacity2 = dot2.interpolate({ inputRange: [-5, 0], outputRange: [1.0, 0.4] });
+  const dotOpacity3 = dot3.interpolate({ inputRange: [-5, 0], outputRange: [1.0, 0.4] });
+
+  return (
+    <View style={typingStyles.container}>
+      <Animated.View style={[typingStyles.dot, { transform: [{ translateY: dot1 }], opacity: dotOpacity1 }]} />
+      <Animated.View style={[typingStyles.dot, { transform: [{ translateY: dot2 }], opacity: dotOpacity2 }]} />
+      <Animated.View style={[typingStyles.dot, { transform: [{ translateY: dot3 }], opacity: dotOpacity3 }]} />
+    </View>
+  );
+}
+
+const typingStyles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 2,
+  },
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.primaryMid,
+  },
+});
 
 interface LocalMessage extends ChatMessage {
   id: string;
@@ -132,7 +194,7 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
             <Ionicons name="sparkles" size={14} color={colors.primary} />
           </View>
           <View style={styles.aiBubble}>
-            <ActivityIndicator size="small" color={colors.primary} />
+            <TypingDots />
           </View>
         </View>
       );
@@ -166,7 +228,7 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
           <Ionicons name="sparkles" size={14} color={colors.primary} />
         </View>
         <View style={styles.aiBubble}>
-          <Text style={[typography.body, { color: colors.text }]}>{item.content}</Text>
+          <Markdown style={markdownStyles}>{item.content}</Markdown>
         </View>
       </View>
     );
@@ -300,6 +362,86 @@ export function AIAssistantScreen({ navigation }: AIAssistantScreenProps) {
     </SafeAreaView>
   );
 }
+
+// Markdown styles für AI-Bubbles (react-native-markdown-display erwartet ein Styles-Objekt)
+const markdownStyles = StyleSheet.create({
+  body: {
+    color: colors.text,
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  paragraph: {
+    color: colors.text,
+    fontSize: 15,
+    lineHeight: 22,
+    marginTop: 0,
+    marginBottom: spacing.sm,
+  },
+  heading3: {
+    color: colors.text,
+    fontSize: 15,
+    fontWeight: '600',
+    lineHeight: 20,
+    marginTop: spacing.smd,
+    marginBottom: spacing.xs,
+  },
+  strong: {
+    fontWeight: '600',
+    color: colors.text,
+  },
+  em: {
+    fontStyle: 'italic',
+    color: colors.primaryDark,
+  },
+  bullet_list: {
+    marginTop: spacing.xs,
+    marginBottom: spacing.sm,
+  },
+  ordered_list: {
+    marginTop: spacing.xs,
+    marginBottom: spacing.sm,
+  },
+  list_item: {
+    flexDirection: 'row',
+    marginBottom: 4,
+  },
+  bullet_list_icon: {
+    width: 5,
+    height: 5,
+    borderRadius: 3,
+    backgroundColor: colors.primary,
+    marginTop: 8,
+    marginRight: spacing.sm,
+  },
+  bullet_list_content: {
+    flex: 1,
+    color: colors.text,
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  ordered_list_icon: {
+    color: colors.primary,
+    fontSize: 13,
+    fontWeight: '600',
+    marginRight: spacing.sm,
+    lineHeight: 22,
+  },
+  ordered_list_content: {
+    flex: 1,
+    color: colors.text,
+    fontSize: 15,
+    lineHeight: 22,
+  },
+  code_inline: {
+    backgroundColor: colors.primaryLight,
+    color: colors.primaryDark,
+    fontSize: 13,
+  },
+  link: {
+    color: colors.primary,
+    textDecorationLine: 'underline',
+  },
+});
 
 const styles = StyleSheet.create({
   flex: {
@@ -467,9 +609,9 @@ const styles = StyleSheet.create({
   // --- AI-Bubble ---
   aiBubbleWrapper: {
     flexDirection: 'row',
-    alignItems: 'flex-end',
+    alignItems: 'flex-start',
     alignSelf: 'flex-start',
-    maxWidth: '85%',
+    maxWidth: '90%',
   },
   aiAvatarBadge: {
     width: 28,
@@ -483,6 +625,7 @@ const styles = StyleSheet.create({
   },
   aiBubble: {
     flex: 1,
+    flexShrink: 1,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,

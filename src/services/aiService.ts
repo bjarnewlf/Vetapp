@@ -45,7 +45,8 @@ export async function sendChatMessage(
         headers: {
           'Content-Type': 'application/json',
           'apikey': process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!,
-          'Authorization': `Bearer ${session.access_token}`,
+          'Authorization': `Bearer ${process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!}`,
+          'x-user-token': session.access_token,
         },
         body: JSON.stringify({ messages, petContext }),
       }
@@ -91,13 +92,14 @@ export function buildPetContext(
   return pets.map((pet) => {
     const petMedicalHistory = medicalEvents
       .filter((e) => e.petId === pet.id)
-      .map((e) => ({ type: e.type, name: e.name, date: e.date }));
+      .map((e) => ({ type: e.type, name: e.name, date: e.date }))
+      .slice(0, 40);
 
     return {
-      name: pet.name,
-      type: pet.type,
-      breed: pet.breed,
-      age: getAge(pet.birthDate),
+      name: (pet.name || '').substring(0, 100),
+      type: (pet.type || '').substring(0, 100),
+      breed: (pet.breed || '').substring(0, 100),
+      age: getAge(pet.birthDate).substring(0, 100),
       medicalHistory: petMedicalHistory,
     };
   });
